@@ -22,6 +22,12 @@ local this = {
   bar = "qux";
   baz = { { { { 42 } } } };
 }
+setmetatable(this, {
+  __call = function ()
+    io.write("called\n")
+  end;
+})
+
 local that = clone(this)
 
 this.foo, this.bar, this.baz = this.bar, this.baz, this.foo
@@ -31,3 +37,6 @@ assert(that.foo[2] == 23)
 assert(that.foo[3] == 37)
 assert(that.bar == "qux")
 assert(that.baz[1][1][1][1] == 42)
+
+this()
+that()
