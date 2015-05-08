@@ -19,6 +19,7 @@ local function clone(this)
   -- not check recursion
   if type(this) == "table" then
     local that = {}
+    -- avoid __pairs metamethod
     for k, v in next, this do
       that[clone(k)] = clone(v)
     end
