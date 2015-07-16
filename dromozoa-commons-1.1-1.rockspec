@@ -1,8 +1,8 @@
 package = "dromozoa-commons"
-version = "1.0-1"
+version = "1.1-1"
 source = {
-  url = "https://github.com/dromozoa/dromozoa-commons/archive/v1.0.tar.gz";
-  file = "dromozoa-commons-1.0.tar.gz";
+  url = "https://github.com/dromozoa/dromozoa-commons/archive/v1.1.tar.gz";
+  file = "dromozoa-commons-1.1.tar.gz";
 }
 description = {
   summary = "Reusable Lua components";
@@ -14,5 +14,6 @@ build = {
   type = "builtin";
   modules = {
     ["dromozoa.commons.clone"] = "dromozoa/commons/clone.lua";
+    ["dromozoa.commons.equal"] = "dromozoa/commons/equal.lua";
   };
 }
