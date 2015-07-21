@@ -32,7 +32,7 @@ std::uint32_t djb2(const std::uint8_t* ptr, std::size_t size) {
 void make_test(const char* s) {
   std::cout
       << "assert(djb2.string(\"" << s << "\") == "
-      << djb2(reinterpret_cast<const std::uint8_t*>(s), strlen(s))
+      << djb2(reinterpret_cast<const std::uint8_t*>(s), std::strlen(s))
       << ")\n";
 }
 
