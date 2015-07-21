@@ -15,7 +15,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local murmur_hash3 = require "dromozoa.commons.murmur_hash3"
+local murmur_hash3 = require "dromozoa.commons.hash.murmur_hash3"
 
 assert(murmur_hash3.string("", 0) == 0)
 assert(murmur_hash3.string("a", 0) == 1009084850)
