@@ -28,38 +28,30 @@ local function update(hash, a, b, c, d)
 end
 
 return {
-  uint32 = function (key, hash)
-    if hash == nil then
-      hash = 5381
-    end
+  uint32 = function (key)
+    local hash = 5381
     hash = update(hash, uint32.byte(key))
     return hash
   end;
 
-  uint64 = function (key, hash)
-    if hash == nil then
-      hash = 5381
-    end
+  uint64 = function (key)
+    local hash = 5381
     local a, b = uint64.word(key)
     hash = update(hash, uint32.byte(a))
     hash = update(hash, uint32.byte(b))
     return hash
   end;
 
-  double = function (key, hash)
-    if hash == nil then
-      hash = 5381
-    end
+  double = function (key)
+    local hash = 5381
     local a, b = double.word(key)
     hash = update(hash, uint32.byte(a))
     hash = update(hash, uint32.byte(b))
     return hash
   end;
 
-  string = function (key, hash)
-    if hash == nil then
-      hash = 5381
-    end
+  string = function (key)
+    local hash = 5381
     local n = #key
     local m = n - n % 4
     for i = 4, m, 4 do
@@ -69,14 +61,12 @@ return {
       local a, b, c = string.byte(key, m + 1, n)
       if c then
         hash = hash * 35937 + a * 1089 + b * 33 + c
-        hash = hash % 0x100000000
       elseif b then
         hash = hash * 1089 + a * 33 + b
-        hash = hash % 0x100000000
       else
         hash = hash * 33 + a
-        hash = hash % 0x100000000
       end
+      hash = hash % 0x100000000
     end
     return hash
   end;
