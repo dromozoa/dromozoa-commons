@@ -22,9 +22,11 @@ local this = {
   bar = "qux";
   baz = { { { { 42 } } } };
 }
+
+local count = 0
 setmetatable(this, {
   __call = function ()
-    io.write("called\n")
+    count = count + 1
   end;
 })
 
@@ -40,3 +42,4 @@ assert(that.baz[1][1][1][1] == 42)
 
 this()
 that()
+assert(count == 2)

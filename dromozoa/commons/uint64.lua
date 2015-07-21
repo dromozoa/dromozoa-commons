@@ -15,32 +15,20 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local equal = require "dromozoa.commons.equal"
+local function word(v)
+  local a = v % 0x100000000
+  local b = (v - a) / 0x100000000
+  return a, b
+end
 
-local a = { 1, 2, 3 }
-local b = { 1, 2, 3 }
-assert(a ~= b)
-assert(equal(a, b))
-
-local a = { foo = a }
-local b = { foo = b }
-assert(a ~= b)
-assert(equal(a, b))
-
-local count = 0
-local metatable = {
-  __call = function ()
-    count = count + 1
-  end;
-}
-setmetatable(a, metatable)
-assert(not equal(a, b))
-setmetatable(b, metatable)
-assert(equal(a, b))
-
-a()
-b()
-assert(count == 2)
-
-assert(not equal({ foo = 17, bar = 23 }, { foo = 17, bar = 23, baz = 37 }))
-assert(not equal({ foo = 17, bar = 23, baz = 37 }, { foo = 17, bar = 23 }))
+if _VERSION >= "Lua 5.3" then
+  return {
+    word = function (v)
+      return string.unpack("<I4I4", string.pack("<I8", v))
+    end;
+  }
+else
+  return {
+    word = word;
+  }
+end

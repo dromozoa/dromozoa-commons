@@ -102,8 +102,13 @@ void make_test2(std::uint32_t v) {
       << std::hex
       << "assert(uint32.bnot("
       << "0x" << std::setw(8) << v << ") == "
-      << "0x" << std::setw(0) << (~v) << ")"
+      << "0x" << std::setw(8) << (~v) << ")"
       << "\n"
+      << "local a, b, c, d = uint32.byte(" << "0x" << std::setw(8) << v << ")\n"
+      << "assert(a == 0x" << std::setw(2) << (v & 0xFF) << ")\n"
+      << "assert(b == 0x" << std::setw(2) << (v >> 8 & 0xFF) << ")\n"
+      << "assert(c == 0x" << std::setw(2) << (v >> 16 & 0xFF) << ")\n"
+      << "assert(d == 0x" << std::setw(2) << (v >> 24 & 0xFF) << ")\n"
       ;
 }
 

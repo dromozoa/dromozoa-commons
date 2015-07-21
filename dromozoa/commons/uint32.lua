@@ -16,13 +16,11 @@
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
 local function add(a, b)
-  local r = a + b
-  return r % 0x100000000
+  return (a + b) % 0x100000000
 end
 
 local function sub(a, b)
-  local r = a - b
-  return r % 0x100000000
+  return (a - b) % 0x100000000
 end
 
 local function mul(a, b)
@@ -30,8 +28,7 @@ local function mul(a, b)
   local a2 = (a - a1) / 0x10000
   local r1 = a1 * b
   local r2 = a2 * b % 0x10000
-  local r = r1 + r2 * 0x10000
-  return r % 0x100000000
+  return (r1 + r2 * 0x10000) % 0x100000000
 end
 
 local function div(a, b)
@@ -40,8 +37,7 @@ local function div(a, b)
 end
 
 local function mod(a, b)
-  local r = a % b
-  return r
+  return a % b
 end
 
 local function band(a, b)
@@ -121,8 +117,7 @@ end
 local function shl(a, b)
   local b1 = 2 ^ b
   local b2 = 0x100000000 / b1
-  local r = a % b2 * b1
-  return r
+  return a % b2 * b1
 end
 
 local function shr(a, b)
@@ -136,8 +131,7 @@ local function rotl(a, b)
   local b2 = 0x100000000 / b1
   local r1 = a % b2
   local r2 = (a - r1) / b2
-  local r = r1 * b1 + r2
-  return r
+  return r1 * b1 + r2
 end
 
 local function rotr(a, b)
@@ -145,8 +139,18 @@ local function rotr(a, b)
   local b2 = 0x100000000 / b1
   local r1 = a % b1
   local r2 = (a - r1) / b1
-  local r = r1 * b2 + r2
-  return r
+  return r1 * b2 + r2
+end
+
+local function byte(v)
+  local a = v % 0x100
+  v = (v - a) / 0x100
+  local b = v % 0x100
+  v = (v - b) / 0x100
+  local c = v % 0x100
+  v = (v - c) / 0x100
+  local d = v
+  return a, b, c, d
 end
 
 if _VERSION >= "Lua 5.3" then
@@ -191,41 +195,29 @@ if _VERSION >= "Lua 5.3" then
       rotr = function (a, b)
         return (a >> b | a << 32 - b) & 0xFFFFFFFF
       end;
+      byte = function (v)
+        return string.byte(string.pack("<I4", v), 1, 4)
+      end;
     }
   ]]))()
 elseif bit32 then
-  local band = bit32.band
-  local bor = bit32.bor
-  local bxor = bit32.bxor
-  local shl = bit32.lshift
-  local shr = bit32.rshift
-  local bnot = bit32.bnot
-  local rotl = bit32.lrotate
-  local rotr = bit32.rrotate
   return {
     add = add;
     sub = sub;
     mul = mul;
     div = div;
     mod = mod;
-    band = band;
-    bor = bor;
-    bxor = bxor;
-    shl = shl;
-    shr = shr;
-    bnot = bnot;
-    rotl = rotl;
-    rotr = rotr;
+    band = bit32.band;
+    bor = bit32.bor;
+    bxor = bit32.bxor;
+    shl = bit32.lshift;
+    shr = bit32.rshift;
+    bnot = bit32.bnot;
+    rotl = bit32.lrotate;
+    rotr = bit32.rrotate;
+    byte = byte;
   }
 elseif bit then
-  local band = bit.band
-  local bor = bit.bor
-  local bxor = bit.bxor
-  local shl = bit.lshift
-  local shr = bit.rshift
-  local bnot = bit.bnot
-  local rotl = bit.rol
-  local rotr = bit.ror
   return {
     add = add;
     sub = sub;
@@ -233,29 +225,30 @@ elseif bit then
     div = div;
     mod = mod;
     band = function (a, b)
-      return band(a, b) % 0x100000000
+      return bit.band(a, b) % 0x100000000
     end;
     bor = function (a, b)
-      return bor(a, b) % 0x100000000
+      return bit.bor(a, b) % 0x100000000
     end;
     bxor = function (a, b)
-      return bxor(a, b) % 0x100000000
+      return bit.bxor(a, b) % 0x100000000
     end;
     shl = function (a, b)
-      return shl(a, b) % 0x100000000
+      return bit.lshift(a, b) % 0x100000000
     end;
     shr = function (a, b)
-      return shr(a, b) % 0x100000000
+      return bit.rshift(a, b) % 0x100000000
     end;
     bnot = function (v)
-      return bnot(v) % 0x100000000
+      return bit.bnot(v) % 0x100000000
     end;
     rotl = function (a, b)
-      return rotl(a, b) % 0x100000000
+      return bit.rol(a, b) % 0x100000000
     end;
     rotr = function (a, b)
-      return rotr(a, b) % 0x100000000
+      return bit.ror(a, b) % 0x100000000
     end;
+    byte = byte;
   }
 else
   return {
@@ -272,5 +265,6 @@ else
     bnot = bnot;
     rotl = rotl;
     rotr = rotr;
+    byte = byte;
   }
 end
