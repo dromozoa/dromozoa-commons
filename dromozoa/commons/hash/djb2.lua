@@ -28,30 +28,26 @@ local function update(hash, a, b, c, d)
 end
 
 return {
-  uint32 = function (key)
-    local hash = 5381
+  uint32 = function (key, hash)
     hash = update(hash, uint32.byte(key))
     return hash
   end;
 
-  uint64 = function (key)
-    local hash = 5381
+  uint64 = function (key, hash)
     local a, b = uint64.word(key)
     hash = update(hash, uint32.byte(a))
     hash = update(hash, uint32.byte(b))
     return hash
   end;
 
-  double = function (key)
-    local hash = 5381
+  double = function (key, hash)
     local a, b = double.word(key)
     hash = update(hash, uint32.byte(a))
     hash = update(hash, uint32.byte(b))
     return hash
   end;
 
-  string = function (key)
-    local hash = 5381
+  string = function (key, hash)
     local n = #key
     local m = n - n % 4
     for i = 4, m, 4 do

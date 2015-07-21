@@ -31,7 +31,7 @@ std::uint32_t djb2(const std::uint8_t* ptr, std::size_t size) {
 
 void make_test(const char* s) {
   std::cout
-      << "assert(djb2.string(\"" << s << "\") == "
+      << "assert(djb2.string(\"" << s << "\", 5381) == "
       << djb2(reinterpret_cast<const std::uint8_t*>(s), std::strlen(s))
       << ")\n";
 }
@@ -44,7 +44,7 @@ void make_test2(T v, const char* type) {
   } u;
   u.v = v;
   std::cout
-      << "assert(djb2." << type << "(" << v << ") == "
+      << "assert(djb2." << type << "(" << v << ", 5381) == "
       << djb2(u.p, sizeof(T))
       << ")\n";
 }
