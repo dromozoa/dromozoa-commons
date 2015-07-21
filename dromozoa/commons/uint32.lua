@@ -203,14 +203,6 @@ elseif bit32 then
     rotr = bit32.rrotate;
   }
 elseif bit then
-  local band = bit.band
-  local bor = bit.bor
-  local bxor = bit.bxor
-  local shl = bit.lshift
-  local shr = bit.rshift
-  local bnot = bit.bnot
-  local rotl = bit.rol
-  local rotr = bit.ror
   return {
     add = add;
     sub = sub;
@@ -218,28 +210,28 @@ elseif bit then
     div = div;
     mod = mod;
     band = function (a, b)
-      return band(a, b) % 0x100000000
+      return bit.band(a, b) % 0x100000000
     end;
     bor = function (a, b)
-      return bor(a, b) % 0x100000000
+      return bit.bor(a, b) % 0x100000000
     end;
     bxor = function (a, b)
-      return bxor(a, b) % 0x100000000
+      return bit.bxor(a, b) % 0x100000000
     end;
     shl = function (a, b)
-      return shl(a, b) % 0x100000000
+      return bit.lshift(a, b) % 0x100000000
     end;
     shr = function (a, b)
-      return shr(a, b) % 0x100000000
+      return bit.rshift(a, b) % 0x100000000
     end;
     bnot = function (v)
-      return bnot(v) % 0x100000000
+      return bit.bnot(v) % 0x100000000
     end;
     rotl = function (a, b)
-      return rotl(a, b) % 0x100000000
+      return bit.rol(a, b) % 0x100000000
     end;
     rotr = function (a, b)
-      return rotr(a, b) % 0x100000000
+      return bit.ror(a, b) % 0x100000000
     end;
   }
 else
