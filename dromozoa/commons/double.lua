@@ -45,8 +45,8 @@ local function word(v)
       end
     end
   end
-  local r = b % 1
-  return r * 0x100000000, a + b - r
+  local c = b % 1
+  return c * 0x100000000, a + b - c
 end
 
 if _VERSION >= "Lua 5.3" then

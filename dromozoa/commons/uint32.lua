@@ -16,13 +16,11 @@
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
 local function add(a, b)
-  local r = a + b
-  return r % 0x100000000
+  return (a + b) % 0x100000000
 end
 
 local function sub(a, b)
-  local r = a - b
-  return r % 0x100000000
+  return (a - b) % 0x100000000
 end
 
 local function mul(a, b)
@@ -30,8 +28,7 @@ local function mul(a, b)
   local a2 = (a - a1) / 0x10000
   local r1 = a1 * b
   local r2 = a2 * b % 0x10000
-  local r = r1 + r2 * 0x10000
-  return r % 0x100000000
+  return (r1 + r2 * 0x10000) % 0x100000000
 end
 
 local function div(a, b)
@@ -40,8 +37,7 @@ local function div(a, b)
 end
 
 local function mod(a, b)
-  local r = a % b
-  return r
+  return a % b
 end
 
 local function band(a, b)
@@ -121,8 +117,7 @@ end
 local function shl(a, b)
   local b1 = 2 ^ b
   local b2 = 0x100000000 / b1
-  local r = a % b2 * b1
-  return r
+  return a % b2 * b1
 end
 
 local function shr(a, b)
@@ -136,8 +131,7 @@ local function rotl(a, b)
   local b2 = 0x100000000 / b1
   local r1 = a % b2
   local r2 = (a - r1) / b2
-  local r = r1 * b1 + r2
-  return r
+  return r1 * b1 + r2
 end
 
 local function rotr(a, b)
@@ -145,8 +139,7 @@ local function rotr(a, b)
   local b2 = 0x100000000 / b1
   local r1 = a % b1
   local r2 = (a - r1) / b1
-  local r = r1 * b2 + r2
-  return r
+  return r1 * b2 + r2
 end
 
 if _VERSION >= "Lua 5.3" then
@@ -194,28 +187,20 @@ if _VERSION >= "Lua 5.3" then
     }
   ]]))()
 elseif bit32 then
-  local band = bit32.band
-  local bor = bit32.bor
-  local bxor = bit32.bxor
-  local shl = bit32.lshift
-  local shr = bit32.rshift
-  local bnot = bit32.bnot
-  local rotl = bit32.lrotate
-  local rotr = bit32.rrotate
   return {
     add = add;
     sub = sub;
     mul = mul;
     div = div;
     mod = mod;
-    band = band;
-    bor = bor;
-    bxor = bxor;
-    shl = shl;
-    shr = shr;
-    bnot = bnot;
-    rotl = rotl;
-    rotr = rotr;
+    band = bit32.band;
+    bor = bit32.bor;
+    bxor = bit32.bxor;
+    shl = bit32.lshift;
+    shr = bit32.rshift;
+    bnot = bit32.bnot;
+    rotl = bit32.lrotate;
+    rotr = bit32.rrotate;
   }
 elseif bit then
   local band = bit.band
