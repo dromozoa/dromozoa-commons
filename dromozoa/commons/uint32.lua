@@ -142,6 +142,16 @@ local function rotr(a, b)
   return r1 * b2 + r2
 end
 
+local function byte(v)
+  local a = v % 0x100
+  v = (v - a) / 0x100
+  local b = v % 0x100
+  v = (v - b) / 0x100
+  local c = v % 0x100
+  v = (v - c) / 0x100
+  return a, b, c, v
+end
+
 if _VERSION >= "Lua 5.3" then
   return assert(load([[
     return {
@@ -184,6 +194,9 @@ if _VERSION >= "Lua 5.3" then
       rotr = function (a, b)
         return (a >> b | a << 32 - b) & 0xFFFFFFFF
       end;
+      byte = function (v)
+        return string.unpack("<BBBB", string.pack("<I4", v))
+      end;
     }
   ]]))()
 elseif bit32 then
@@ -201,6 +214,7 @@ elseif bit32 then
     bnot = bit32.bnot;
     rotl = bit32.lrotate;
     rotr = bit32.rrotate;
+    byte = byte;
   }
 elseif bit then
   return {
@@ -233,6 +247,7 @@ elseif bit then
     rotr = function (a, b)
       return bit.ror(a, b) % 0x100000000
     end;
+    byte = byte;
   }
 else
   return {
@@ -249,5 +264,6 @@ else
     bnot = bnot;
     rotl = rotl;
     rotr = rotr;
+    byte = byte;
   }
 end

@@ -25,7 +25,7 @@ if _VERSION >= "Lua 5.3" then
   return assert(load([[
     return {
       word = function (v)
-        return v & 0xFFFFFFFF, v >> 32
+        return string.unpack("<I4I4", string.pack("<I8", v))
       end;
     }
   ]]))()

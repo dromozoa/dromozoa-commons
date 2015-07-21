@@ -19,86 +19,65 @@ local double = require "dromozoa.commons.double"
 local uint32 = require "dromozoa.commons.uint32"
 local uint64 = require "dromozoa.commons.uint64"
 
-local function update1(hash, k)
-  k = uint32.mul(k, 0xCC9E2D51)
-  k = uint32.rotl(k, 15)
-  k = uint32.mul(k, 0x1B873593)
-  hash = uint32.bxor(hash, k)
-  return hash
-end
-
-local function update2(hash)
-  hash = uint32.rotl(hash, 13)
-  hash = uint32.mul(hash, 5)
-  hash = uint32.add(hash, 0xE6546B64)
-  return hash
-end
-
-local function finalize(hash, n)
-  hash = uint32.bxor(hash, n)
-  hash = uint32.bxor(hash, uint32.shr(hash, 16))
-  hash = uint32.mul(hash, 0x85EBCA6B)
-  hash = uint32.bxor(hash, uint32.shr(hash, 13))
-  hash = uint32.mul(hash, 0xC2B2AE35)
-  hash = uint32.bxor(hash, uint32.shr(hash, 16))
+local function update(hash, a, b, c, d)
+  hash = hash * 1089 + a * 33 + b
+  hash = hash % 0x100000000
+  hash = hash * 1089 + c * 33 + d
+  hash = hash % 0x100000000
   return hash
 end
 
 return {
   uint32 = function (key, hash)
     if hash == nil then
-      hash = 0
+      hash = 5381
     end
-    hash = update1(hash, key)
-    hash = update2(hash)
-    return finalize(hash, 4)
+    hash = update(hash, uint32.byte(key))
+    return hash
   end;
 
   uint64 = function (key, hash)
     if hash == nil then
-      hash = 0
+      hash = 5381
     end
     local a, b = uint64.word(key)
-    hash = update1(hash, a)
-    hash = update2(hash)
-    hash = update1(hash, b)
-    hash = update2(hash)
-    return finalize(hash, 8)
+    hash = update(hash, uint32.byte(a))
+    hash = update(hash, uint32.byte(b))
+    return hash
   end;
 
   double = function (key, hash)
     if hash == nil then
-      hash = 0
+      hash = 5381
     end
     local a, b = double.word(key)
-    hash = update1(hash, a)
-    hash = update2(hash)
-    hash = update1(hash, b)
-    hash = update2(hash)
-    return finalize(hash, 8)
+    hash = update(hash, uint32.byte(a))
+    hash = update(hash, uint32.byte(b))
+    return hash
   end;
 
   string = function (key, hash)
     if hash == nil then
-      hash = 0
+      hash = 5381
     end
     local n = #key
     local m = n - n % 4
     for i = 4, m, 4 do
-      local a, b, c, d = string.byte(key, i - 3, i)
-      hash = update1(hash, a + b * 0x100 + c * 0x10000 + d * 0x1000000)
-      hash = update2(hash)
+      hash = update(hash, string.byte(key, i - 3, i))
     end
     if m < n then
       local a, b, c = string.byte(key, m + 1, n)
       if c then
-        hash = update1(hash, a + b * 0x100 + c * 0x10000)
+        hash = hash * 35937 + a * 1089 + b * 33 + c
+        hash = hash % 0x100000000
       elseif b then
-        hash = update1(hash, a + b * 0x100)
+        hash = hash * 1089 + a * 33 + b
+        hash = hash % 0x100000000
       else
-        hash = update1(hash, a)
+        hash = hash * 33 + a
+        hash = hash % 0x100000000
       end
     end
-    return finalize(hash, n)
+    return hash
   end;
 }
