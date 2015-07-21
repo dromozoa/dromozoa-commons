@@ -15,18 +15,22 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local murmur_hash3 = require "dromozoa.commons.murmur_hash3"
+local function word(v)
+  local a = v % 0x100000000
+  local b = (v - a) / 0x100000000
+  return a, b
+end
 
-assert(murmur_hash3.string("", 0) == 0)
-assert(murmur_hash3.string("a", 0) == 1009084850)
-assert(murmur_hash3.string("ab", 0) == 2613040991)
-assert(murmur_hash3.string("abc", 0) == 3017643002)
-assert(murmur_hash3.string("abcd", 0) == 1139631978)
-assert(murmur_hash3.string("abcde", 0) == 3902511862)
-assert(murmur_hash3.string("abcdef", 0) == 1635893381)
-assert(murmur_hash3.string("abcdefg", 0) == 2285673222)
-assert(murmur_hash3.string("abcdefgh", 0) == 1239272644)
-assert(murmur_hash3.string("abcdefghi", 0) == 1108608752)
-assert(murmur_hash3.uint32(0xFEEDFACE, 0) == 0x11C86E55)
-assert(murmur_hash3.uint64(0xFEEDFACE0000, 0) == 0x3348F984)
-assert(murmur_hash3.double(math.pi, 0) == 0x8948E5CE)
+if _VERSION >= "Lua 5.3" then
+  return assert(load([[
+    return {
+      word = function (v)
+        return v & 0xFFFFFFFF, v >> 32
+      end;
+    }
+  ]]))()
+else
+  return {
+    word = word;
+  }
+end

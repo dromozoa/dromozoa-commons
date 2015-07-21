@@ -15,7 +15,9 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
+local double = require "dromozoa.commons.double"
 local uint32 = require "dromozoa.commons.uint32"
+local uint64 = require "dromozoa.commons.uint64"
 
 local add = uint32.add
 local mul = uint32.mul
@@ -50,7 +52,31 @@ local function finalize(hash, n)
 end
 
 return {
-  string = function(key, hash)
+  uint32 = function (key, hash)
+    hash = update1(hash, key)
+    hash = update2(hash)
+    return finalize(hash, 4)
+  end;
+
+  uint64 = function (key, hash)
+    local a, b = uint64.word(key)
+    hash = update1(hash, a)
+    hash = update2(hash)
+    hash = update1(hash, b)
+    hash = update2(hash)
+    return finalize(hash, 8)
+  end;
+
+  double = function (key, hash)
+    local a, b = double.word(key)
+    hash = update1(hash, a)
+    hash = update2(hash)
+    hash = update1(hash, b)
+    hash = update2(hash)
+    return finalize(hash, 8)
+  end;
+
+  string = function (key, hash)
     local hash = hash
     local n = #key
     local m = n - n % 4
