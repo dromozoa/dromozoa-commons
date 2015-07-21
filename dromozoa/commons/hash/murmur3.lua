@@ -46,18 +46,12 @@ end
 
 return {
   uint32 = function (key, hash)
-    if hash == nil then
-      hash = 0
-    end
     hash = update1(hash, key)
     hash = update2(hash)
     return finalize(hash, 4)
   end;
 
   uint64 = function (key, hash)
-    if hash == nil then
-      hash = 0
-    end
     local a, b = uint64.word(key)
     hash = update1(hash, a)
     hash = update2(hash)
@@ -67,9 +61,6 @@ return {
   end;
 
   double = function (key, hash)
-    if hash == nil then
-      hash = 0
-    end
     local a, b = double.word(key)
     hash = update1(hash, a)
     hash = update2(hash)
@@ -79,9 +70,6 @@ return {
   end;
 
   string = function (key, hash)
-    if hash == nil then
-      hash = 0
-    end
     local n = #key
     local m = n - n % 4
     for i = 4, m, 4 do

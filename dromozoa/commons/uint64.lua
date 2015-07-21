@@ -22,13 +22,11 @@ local function word(v)
 end
 
 if _VERSION >= "Lua 5.3" then
-  return assert(load([[
-    return {
-      word = function (v)
-        return string.unpack("<I4I4", string.pack("<I8", v))
-      end;
-    }
-  ]]))()
+  return {
+    word = function (v)
+      return string.unpack("<I4I4", string.pack("<I8", v))
+    end;
+  }
 else
   return {
     word = word;
