@@ -16,151 +16,193 @@
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
 local function add(a, b)
-  local c = a + b
-  return c % 0x100000000
+  local r = a + b
+  return r % 0x100000000
 end
 
 local function sub(a, b)
-  local c = a - b
-  return c % 0x100000000
+  local r = a - b
+  return r % 0x100000000
 end
 
 local function mul(a, b)
   local a1 = a % 0x10000
   local a2 = (a - a1) / 0x10000
-  local c1 = a1 * b
-  local c2 = a2 * b % 0x10000
-  local c = c1 + c2 * 0x10000
-  return c % 0x100000000
+  local r1 = a1 * b
+  local r2 = a2 * b % 0x10000
+  local r = r1 + r2 * 0x10000
+  return r % 0x100000000
 end
 
 local function div(a, b)
-  local c = a / b
-  return c - c % 1
+  local r = a / b
+  return r - r % 1
 end
 
 local function mod(a, b)
-  local c = a % b
-  return c
+  local r = a % b
+  return r
 end
 
 local function band(a, b)
-  local c = 1
-  local d = 0
+  local r = 0
+  local x = 1
   for i = 1, 31 do
     local a1 = a % 2
     local b1 = b % 2
     if a1 + b1 == 2 then
-      d = c + d
+      r = r + x
     end
     a = (a - a1) / 2
     b = (b - b1) / 2
-    c = c * 2
+    x = x * 2
   end
   if a + b == 2 then
-    d = c + d
+    r = r + x
   end
-  return d
+  return r
 end
 
 local function bor(a, b)
-  local c = 1
-  local d = 0
+  local r = 0
+  local x = 1
   for i = 1, 31 do
     local a1 = a % 2
     local b1 = b % 2
     if a1 + b1 ~= 0 then
-      d = c + d
+      r = r + x
     end
     a = (a - a1) / 2
     b = (b - b1) / 2
-    c = c * 2
+    x = x * 2
   end
   if a + b ~= 0 then
-    d = c + d
+    r = r + x
   end
-  return d
+  return r
 end
 
 local function bxor(a, b)
-  local c = 1
-  local d = 0
+  local r = 0
+  local x = 1
   for i = 1, 31 do
     local a1 = a % 2
     local b1 = b % 2
     if a1 ~= b1 then
-      d = c + d
+      r = r + x
     end
     a = (a - a1) / 2
     b = (b - b1) / 2
-    c = c * 2
+    x = x * 2
   end
   if a ~= b then
-    d = c + d
+    r = r + x
   end
-  return d
+  return r
+end
+
+local function bnot(v)
+  local r = 0
+  local x = 1
+  for i = 1, 31 do
+    local v1 = v % 2
+    if v1 == 0 then
+      r = r + x
+    end
+    v = (v - v1) / 2
+    x = x * 2
+  end
+  if v == 0 then
+    r = r + x
+  end
+  return r
 end
 
 local function shl(a, b)
   local b1 = 2 ^ b
   local b2 = 0x100000000 / b1
-  local c = a % b2 * b1
-  return c
+  local r = a % b2 * b1
+  return r
 end
 
 local function shr(a, b)
   local b1 = 2 ^ b
-  local c = a / b1
-  return c - c % 1
-end
-
-local function bnot(a)
-  local b = 1
-  local c = 0
-  for i = 1, 31 do
-    local a1 = a % 2
-    if a1 == 0 then
-      c = b + c
-    end
-    a = (a - a1) / 2
-    b = b * 2
-  end
-  if a == 0 then
-    c = b + c
-  end
-  return c
+  local r = a / b1
+  return r - r % 1
 end
 
 local function rotl(a, b)
   local b1 = 2 ^ b
   local b2 = 0x100000000 / b1
-  local a1 = a % b2
-  local a2 = (a - a1) / b2
-  local c = a1 * b1 + a2
-  return c
+  local r1 = a % b2
+  local r2 = (a - r1) / b2
+  local r = r1 * b1 + r2
+  return r
 end
 
 local function rotr(a, b)
   local b1 = 2 ^ b
   local b2 = 0x100000000 / b1
-  local a1 = a % b1
-  local a2 = (a - a1) / b1
-  local c = a1 * b2 + a2
-  return c
+  local r1 = a % b1
+  local r2 = (a - r1) / b1
+  local r = r1 * b2 + r2
+  return r
 end
 
-return {
-  add = add;
-  sub = sub;
-  mul = mul;
-  div = div;
-  mod = mod;
-  band = band;
-  bor = bor;
-  bxor = bxor;
-  shl = shl;
-  shr = shr;
-  bnot = bnot;
-  rotl = rotl;
-  rotr = rotr;
-}
+if bit then
+  local band = bit.band
+  local bor = bit.bor
+  local bxor = bit.bxor
+  local shl = bit.lshift
+  local shr = bit.rshift
+  local bnot = bit.bnot
+  local rotl = bit.rol
+  local rotr = bit.ror
+  return {
+    add = add;
+    sub = sub;
+    mul = mul;
+    div = div;
+    mod = mod;
+    band = function (a, b)
+      return band(a, b) % 0x100000000
+    end;
+    bor = function (a, b)
+      return bor(a, b) % 0x100000000
+    end;
+    bxor = function (a, b)
+      return bxor(a, b) % 0x100000000
+    end;
+    shl = function (a, b)
+      return shl(a, b) % 0x100000000
+    end;
+    shr = function (a, b)
+      return shr(a, b) % 0x100000000
+    end;
+    bnot = function (v)
+      return bnot(v) % 0x100000000
+    end;
+    rotl = function (a, b)
+      return rotl(a, b) % 0x100000000
+    end;
+    rotr = function (a, b)
+      return rotr(a, b) % 0x100000000
+    end;
+  }
+else
+  return {
+    add = add;
+    sub = sub;
+    mul = mul;
+    div = div;
+    mod = mod;
+    band = band;
+    bor = bor;
+    bxor = bxor;
+    shl = shl;
+    shr = shr;
+    bnot = bnot;
+    rotl = rotl;
+    rotr = rotr;
+  }
+end
