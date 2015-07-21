@@ -19,35 +19,28 @@ local double = require "dromozoa.commons.double"
 local uint32 = require "dromozoa.commons.uint32"
 local uint64 = require "dromozoa.commons.uint64"
 
-local add = uint32.add
-local mul = uint32.mul
-local bxor = uint32.bxor
-local shl = uint32.shl
-local shr = uint32.shr
-local rotl = uint32.rotl
-
 local function update1(hash, k)
-  k = mul(k, 0xCC9E2D51)
-  k = rotl(k, 15)
-  k = mul(k, 0x1B873593)
-  hash = bxor(hash, k)
+  k = uint32.mul(k, 0xCC9E2D51)
+  k = uint32.rotl(k, 15)
+  k = uint32.mul(k, 0x1B873593)
+  hash = uint32.bxor(hash, k)
   return hash
 end
 
 local function update2(hash)
-  hash = rotl(hash, 13)
-  hash = mul(hash, 5)
-  hash = add(hash, 0xE6546B64)
+  hash = uint32.rotl(hash, 13)
+  hash = uint32.mul(hash, 5)
+  hash = uint32.add(hash, 0xE6546B64)
   return hash
 end
 
 local function finalize(hash, n)
-  hash = bxor(hash, n)
-  hash = bxor(hash, shr(hash, 16))
-  hash = mul(hash, 0x85EBCA6B)
-  hash = bxor(hash, shr(hash, 13))
-  hash = mul(hash, 0xC2B2AE35)
-  hash = bxor(hash, shr(hash, 16))
+  hash = uint32.bxor(hash, n)
+  hash = uint32.bxor(hash, uint32.shr(hash, 16))
+  hash = uint32.mul(hash, 0x85EBCA6B)
+  hash = uint32.bxor(hash, uint32.shr(hash, 13))
+  hash = uint32.mul(hash, 0xC2B2AE35)
+  hash = uint32.bxor(hash, uint32.shr(hash, 16))
   return hash
 end
 
