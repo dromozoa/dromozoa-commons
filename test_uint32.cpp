@@ -114,6 +114,7 @@ int main(int, char*[]) {
       << "\n"
       ;
   make_test1(0xFEEDFACE, 0xDEADBEEF);
+  make_test1(0xDEADBEEF, 0xFEEDFACE);
   make_test1(0xFEEDFACE, 5381);
   make_test2(0xFEEDFACE);
   return 0;

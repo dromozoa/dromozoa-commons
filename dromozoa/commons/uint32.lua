@@ -149,7 +149,75 @@ local function rotr(a, b)
   return r
 end
 
-if bit then
+if _VERSION >= "Lua 5.3" then
+  return assert(load([[
+    return {
+      add = function (a, b)
+        return a + b & 0xFFFFFFFF
+      end;
+      sub = function (a, b)
+        return a - b & 0xFFFFFFFF
+      end;
+      mul = function (a, b)
+        return a * b & 0xFFFFFFFF
+      end;
+      div = function (a, b)
+        return a // b
+      end;
+      mod = function (a, b)
+        return a % b
+      end;
+      band = function (a, b)
+        return a & b
+      end;
+      bor = function (a, b)
+        return a | b
+      end;
+      bxor = function (a, b)
+        return a ~ b
+      end;
+      shl = function (a, b)
+        return a << b & 0xFFFFFFFF
+      end;
+      shr = function (a, b)
+        return a >> b
+      end;
+      bnot = function (v)
+        return ~v & 0xFFFFFFFF
+      end;
+      rotl = function (a, b)
+        return (a << b | a >> 32 - b) & 0xFFFFFFFF
+      end;
+      rotr = function (a, b)
+        return (a >> b | a << 32 - b) & 0xFFFFFFFF
+      end;
+    }
+  ]]))()
+elseif bit32 then
+  local band = bit32.band
+  local bor = bit32.bor
+  local bxor = bit32.bxor
+  local shl = bit32.lshift
+  local shr = bit32.rshift
+  local bnot = bit32.bnot
+  local rotl = bit32.lrotate
+  local rotr = bit32.rrotate
+  return {
+    add = add;
+    sub = sub;
+    mul = mul;
+    div = div;
+    mod = mod;
+    band = band;
+    bor = bor;
+    bxor = bxor;
+    shl = shl;
+    shr = shr;
+    bnot = bnot;
+    rotl = rotl;
+    rotr = rotr;
+  }
+elseif bit then
   local band = bit.band
   local bor = bit.bor
   local bxor = bit.bxor
