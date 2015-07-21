@@ -149,7 +149,8 @@ local function byte(v)
   v = (v - b) / 0x100
   local c = v % 0x100
   v = (v - c) / 0x100
-  return a, b, c, v
+  local d = v
+  return a, b, c, d
 end
 
 if _VERSION >= "Lua 5.3" then
@@ -195,7 +196,7 @@ if _VERSION >= "Lua 5.3" then
         return (a >> b | a << 32 - b) & 0xFFFFFFFF
       end;
       byte = function (v)
-        return string.unpack("<BBBB", string.pack("<I4", v))
+        return string.byte(string.pack("<I4", v), 1, 4)
       end;
     }
   ]]))()
