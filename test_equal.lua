@@ -27,9 +27,10 @@ local b = { foo = b }
 assert(a ~= b)
 assert(equal(a, b))
 
+local count = 0
 local metatable = {
   __call = function ()
-    io.write("called\n")
+    count = count + 1
   end;
 }
 setmetatable(a, metatable)
@@ -39,6 +40,7 @@ assert(equal(a, b))
 
 a()
 b()
+assert(count == 2)
 
 assert(not equal({ foo = 17, bar = 23 }, { foo = 17, bar = 23, baz = 37 }))
 assert(not equal({ foo = 17, bar = 23, baz = 37 }, { foo = 17, bar = 23 }))
