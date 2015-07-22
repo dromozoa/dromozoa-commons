@@ -17,10 +17,6 @@
 
 local hash_table_impl = require "dromozoa.commons.hash_table_impl"
 
-local function dump(this)
-  print(json.encode(this))
-end
-
 local metatable = {
   __index = hash_table_impl;
 }
