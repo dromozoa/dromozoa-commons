@@ -15,33 +15,50 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local pair = require "dromozoa.commons.hash_table.pair"
+local equal = require "dromozoa.commons.equal"
+local hash_table = require "dromozoa.commons.hash_table"
+local pairs = require "dromozoa.commons.pairs"
 
-local p = pair()
-assert(p:empty())
-
-local h1 = p:insert("foo", 17)
-local h2 = p:insert("bar", 23)
-local h3 = p:insert("baz", 37)
-assert(not p:empty())
-
-assert(p:get(h1) == 17)
-assert(p:get(h2) == 23)
-assert(p:get(h3) == 37)
-
-assert(p:set(h1, 42) == 17)
-assert(p:get(h1) == 42)
-
-local m = 0
-local n = 0
-for k, v in pairs(p) do
-  m = m + v
-  n = n + 1
+local function test(a, b)
+  local data = {}
+  local n = 0
+  for k, v in pairs(a) do
+    n = n + 1
+  end
+  for k, v in pairs(b) do
+    n = n - 1
+    assert(equal(v, a[k]))
+  end
+  assert(n == 0)
 end
-assert(m == 42 + 23 + 37)
-assert(n == 3)
 
-assert(p:remove(h3) == 37)
-assert(p:remove(h1) == 42)
-assert(p:remove(h2) == 23)
-assert(p:empty())
+local t = hash_table()
+assert(t:empty())
+
+t.foo = 17
+t.bar = 23
+t.baz = 37
+t.qux = 42
+t[{}] = 69
+t[{1}] = 105
+t[{1,2}] = 666
+t[1] = "foo"
+t[2] = "bar"
+t[3] = "baz"
+t[4] = "qux"
+assert(not t:empty())
+
+test(t, {
+  foo = 17;
+  bar = 23;
+  baz = 37;
+  qux = 42;
+  [{}] = 69;
+  [{1}] = 105;
+  [{1,2}] = 666;
+  [1] = "foo";
+  [2] = "bar";
+  [3] = "baz";
+  [4] = "qux";
+})
+assert(#t == 4)
