@@ -18,8 +18,6 @@
 local equal = require "dromozoa.commons.equal"
 local murmur_hash3 = require "dromozoa.commons.murmur_hash3"
 
-local class = {}
-
 local function hash(key)
   local t = type(key)
   if t == "number" then
@@ -91,6 +89,8 @@ local function insert(self, key, value, overwrite)
   vs[n] = value
   return nil
 end
+
+local class = {}
 
 function class.new()
   return { {}, {}, {}, {} }
