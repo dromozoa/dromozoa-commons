@@ -22,6 +22,9 @@ local function equal(a, b)
     return true
   else
     if type(a) == "table" and type(b) == "table" then
+      if getmetatable(a) ~= getmetatable(b) then
+        return false
+      end
       for k, u in pairs(a) do
         local v = b[k]
         if v == nil or not equal(u, v) then
@@ -34,7 +37,7 @@ local function equal(a, b)
           return false
         end
       end
-      return equal(getmetatable(a), getmetatable(b))
+      return true
     else
       return false
     end
