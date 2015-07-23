@@ -16,13 +16,13 @@
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
 local json = require "dromozoa.json"
-local linked_pairs = require "dromozoa.commons.linked_pairs"
+local pair = require "dromozoa.commons.hash_table.pair"
 
 local metatable = {
-  __index = linked_pairs;
+  __index = pair;
 }
 
-local p = setmetatable(linked_pairs.new(), metatable)
+local p = setmetatable(pair.new(), metatable)
 print(json.encode(p))
 assert(p:empty())
 
