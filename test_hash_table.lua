@@ -15,33 +15,50 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
+local equal = require "dromozoa.commons.equal"
+local hash_table = require "dromozoa.commons.hash_table"
 local pairs = require "dromozoa.commons.pairs"
 
-local function equal(a, b)
-  if a == b then
-    return true
-  else
-    if type(a) == "table" and type(b) == "table" then
-      if getmetatable(a) ~= getmetatable(b) then
-        return false
-      end
-      for k, u in pairs(a) do
-        local v = b[k]
-        if v == nil or not equal(u, v) then
-          return false
-        end
-      end
-      for k, v in pairs(b) do
-        local u = a[k]
-        if u == nil then
-          return false
-        end
-      end
-      return true
-    else
-      return false
-    end
+local function test(a, b)
+  local data = {}
+  local n = 0
+  for k, v in pairs(a) do
+    n = n + 1
   end
+  for k, v in pairs(b) do
+    n = n - 1
+    assert(equal(v, a[k]))
+  end
+  assert(n == 0)
 end
 
-return equal
+local t = hash_table()
+assert(t:empty())
+
+t.foo = 17
+t.bar = 23
+t.baz = 37
+t.qux = 42
+t[{}] = 69
+t[{1}] = 105
+t[{1,2}] = 666
+t[1] = "foo"
+t[2] = "bar"
+t[3] = "baz"
+t[4] = "qux"
+assert(not t:empty())
+
+test(t, {
+  foo = 17;
+  bar = 23;
+  baz = 37;
+  qux = 42;
+  [{}] = 69;
+  [{1}] = 105;
+  [{1,2}] = 666;
+  [1] = "foo";
+  [2] = "bar";
+  [3] = "baz";
+  [4] = "qux";
+})
+assert(#t == 4)

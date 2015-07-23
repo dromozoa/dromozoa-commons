@@ -15,33 +15,33 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local pairs = require "dromozoa.commons.pairs"
+local pair = require "dromozoa.commons.hash_table.pair"
 
-local function equal(a, b)
-  if a == b then
-    return true
-  else
-    if type(a) == "table" and type(b) == "table" then
-      if getmetatable(a) ~= getmetatable(b) then
-        return false
-      end
-      for k, u in pairs(a) do
-        local v = b[k]
-        if v == nil or not equal(u, v) then
-          return false
-        end
-      end
-      for k, v in pairs(b) do
-        local u = a[k]
-        if u == nil then
-          return false
-        end
-      end
-      return true
-    else
-      return false
-    end
-  end
+local p = pair()
+assert(p:empty())
+
+local h1 = p:insert("foo", 17)
+local h2 = p:insert("bar", 23)
+local h3 = p:insert("baz", 37)
+assert(not p:empty())
+
+assert(p:get(h1) == 17)
+assert(p:get(h2) == 23)
+assert(p:get(h3) == 37)
+
+assert(p:set(h1, 42) == 17)
+assert(p:get(h1) == 42)
+
+local m = 0
+local n = 0
+for k, v in pairs(p) do
+  m = m + v
+  n = n + 1
 end
+assert(m == 42 + 23 + 37)
+assert(n == 3)
 
-return equal
+assert(p:remove(h3) == 37)
+assert(p:remove(h1) == 42)
+assert(p:remove(h2) == 23)
+assert(p:empty())

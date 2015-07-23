@@ -15,33 +15,10 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local pairs = require "dromozoa.commons.pairs"
-
-local function equal(a, b)
-  if a == b then
-    return true
-  else
-    if type(a) == "table" and type(b) == "table" then
-      if getmetatable(a) ~= getmetatable(b) then
-        return false
-      end
-      for k, u in pairs(a) do
-        local v = b[k]
-        if v == nil or not equal(u, v) then
-          return false
-        end
-      end
-      for k, v in pairs(b) do
-        local u = a[k]
-        if u == nil then
-          return false
-        end
-      end
-      return true
-    else
-      return false
-    end
+return function (object, event)
+  local metatable = getmetatable(object)
+  if metatable == nil then
+    return nil
   end
+  return rawget(metatable, event)
 end
-
-return equal

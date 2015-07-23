@@ -15,33 +15,18 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local pairs = require "dromozoa.commons.pairs"
+local murmur_hash3 = require "dromozoa.commons.murmur_hash3"
 
-local function equal(a, b)
-  if a == b then
-    return true
-  else
-    if type(a) == "table" and type(b) == "table" then
-      if getmetatable(a) ~= getmetatable(b) then
-        return false
-      end
-      for k, u in pairs(a) do
-        local v = b[k]
-        if v == nil or not equal(u, v) then
-          return false
-        end
-      end
-      for k, v in pairs(b) do
-        local u = a[k]
-        if u == nil then
-          return false
-        end
-      end
-      return true
-    else
-      return false
-    end
-  end
-end
-
-return equal
+assert(murmur_hash3.string("", 0) == 0)
+assert(murmur_hash3.string("a", 0) == 1009084850)
+assert(murmur_hash3.string("ab", 0) == 2613040991)
+assert(murmur_hash3.string("abc", 0) == 3017643002)
+assert(murmur_hash3.string("abcd", 0) == 1139631978)
+assert(murmur_hash3.string("abcde", 0) == 3902511862)
+assert(murmur_hash3.string("abcdef", 0) == 1635893381)
+assert(murmur_hash3.string("abcdefg", 0) == 2285673222)
+assert(murmur_hash3.string("abcdefgh", 0) == 1239272644)
+assert(murmur_hash3.string("abcdefghi", 0) == 1108608752)
+assert(murmur_hash3.uint32(0xFEEDFACE, 0) == 298348117)
+assert(murmur_hash3.uint64(0xFEEDFACE0000, 0) == 860420484)
+assert(murmur_hash3.double(math.pi, 0) == 2303256014)
