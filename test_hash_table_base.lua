@@ -15,13 +15,13 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local hash_table_impl = require "dromozoa.commons.hash_table_impl"
+local base = require "dromozoa.commons.hash_table.base"
 
 local metatable = {
-  __index = hash_table_impl;
+  __index = base;
 }
 
-local t = setmetatable(hash_table_impl.new(), metatable)
+local t = setmetatable(base.new(), metatable)
 
 assert(t:insert({}) == nil)
 assert(t:insert({}) == true)
