@@ -20,21 +20,19 @@ local function equal(a, b)
     return true
   else
     if type(a) == "table" and type(b) == "table" then
-      -- avoid __pairs metamethod
-      for k, u in next, a do
+      for k, u in pairs(a) do
         local v = b[k]
         if v == nil or not equal(u, v) then
           return false
         end
       end
-      -- avoid __pairs metamethod
-      for k, v in next, b do
+      for k, v in pairs(b) do
         local u = a[k]
         if u == nil then
           return false
         end
       end
-      return getmetatable(a) == getmetatable(b)
+      return equal(getmetatable(a), getmetatable(b))
     else
       return false
     end
