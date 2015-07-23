@@ -15,9 +15,11 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local pair = require "dromozoa.commons.hash_table.pair"
+local clone = require "dromozoa.commons.clone"
+local equal = require "dromozoa.commons.equal"
+local hash_table_pair = require "dromozoa.commons.hash_table.pair"
 
-local p = pair()
+local p = hash_table_pair()
 assert(p:empty())
 
 local h1 = p:insert("foo", 17)
@@ -34,12 +36,19 @@ assert(p:get(h1) == 42)
 
 local m = 0
 local n = 0
-for k, v in pairs(p) do
+for k, v in p:each() do
   m = m + v
   n = n + 1
 end
 assert(m == 42 + 23 + 37)
 assert(n == 3)
+
+local p2 = clone(p)
+assert(equal(p, p2))
+assert(not p:empty())
+assert(p:get(h1) == 42)
+assert(p:get(h2) == 23)
+assert(p:get(h3) == 37)
 
 assert(p:remove(h3) == 37)
 assert(p:remove(h1) == 42)
