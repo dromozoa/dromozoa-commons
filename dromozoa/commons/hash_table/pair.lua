@@ -15,6 +15,23 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
+local function insert(self, handle, key, value)
+  local N = self[1]
+  local P = self[2]
+  local K = self[3]
+  local V = self[4]
+  local h = self[5] + 1
+  local n = N[handle]
+  N[h] = n
+  P[h] = handle
+  K[h] = key
+  V[h] = value
+  N[handle] = h
+  P[n] = h
+  self[5] = h
+  return h
+end
+
 local class = {}
 
 function class.new()
@@ -22,28 +39,19 @@ function class.new()
 end
 
 function class:get(handle)
-  local K = self[3]
   local V = self[4]
-  local k = K[handle]
   local v = V[handle]
-  return k, v
-end
-
-function class:front()
-  return class.get(self, self[2][1])
-end
-
-function class:back()
-  return class.get(self, self[1][1])
+  return v
 end
 
 function class:empty()
-  return self[1][1] == 1
+  local N = self[1]
+  return N[1] == 1
 end
 
 function class:each()
   return coroutine.wrap(function ()
-    local N = self[2]
+    local N = self[1]
     local K = self[3]
     local V = self[4]
     local handle = N[1]
@@ -54,59 +62,43 @@ function class:each()
   end)
 end
 
-function class:insert(handle, key, value)
-  local P = self[1]
-  local N = self[2]
-  local K = self[3]
+function class:insert(key, value)
+  local P = self[2]
+  return insert(self, P[1], key, value)
+end
+
+function class:set(handle, value)
   local V = self[4]
-  local h = self[5] + 1
-  local n = N[handle]
-  P[h] = handle
-  N[h] = n
-  K[h] = key
-  V[h] = value
-  P[n] = h
-  N[handle] = h
-  self[5] = h
-  return h
-end
-
-function class:push_front(key, value)
-  return class.insert(self, 1, key, value)
-end
-
-function class:push_back(key, value)
-  return class.insert(self, self[1][1], key, value)
+  local v = V[handle]
+  V[handle] = value
+  return v
 end
 
 function class:remove(handle)
-  if handle == 1 then
-    return nil, nil
-  else
-    local P = self[1]
-    local N = self[2]
-    local K = self[3]
-    local V = self[4]
-    local p = P[handle]
-    local n = N[handle]
-    local k = K[handle]
-    local v = V[handle]
-    P[handle] = nil
-    N[handle] = nil
-    K[handle] = nil
-    V[handle] = nil
-    P[n] = p
-    N[p] = n
-    return k, v
-  end
+  local N = self[1]
+  local P = self[2]
+  local K = self[3]
+  local V = self[4]
+  local n = N[handle]
+  local p = P[handle]
+  local k = K[handle]
+  local v = V[handle]
+  N[handle] = nil
+  P[handle] = nil
+  K[handle] = nil
+  V[handle] = nil
+  N[p] = n
+  P[n] = p
+  return k, v
 end
 
-function class:pop_front()
-  return class.remove(self, self[2][1])
-end
+local metatable = {
+  __index = class;
+  __pairs = class.each;
+}
 
-function class:pop_back()
-  return class.remove(self, self[1][1])
-end
-
-return class
+return setmetatable(class, {
+  __call = function ()
+    return setmetatable(class.new(), metatable)
+  end;
+})

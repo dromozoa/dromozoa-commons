@@ -15,44 +15,41 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local json = require "dromozoa.json"
 local pair = require "dromozoa.commons.hash_table.pair"
 
-local metatable = {
-  __index = pair;
-}
-
-local p = setmetatable(pair.new(), metatable)
-print(json.encode(p))
+local p = pair()
 assert(p:empty())
 
-p:push_back("foo", 17)
+local h1 = p:insert("foo", 17)
+local h2 = p:insert("bar", 23)
+local h3 = p:insert("baz", 37)
 assert(not p:empty())
-p:push_back("bar", 23)
-p:push_back("baz", 37)
-print(json.encode(p))
 
-local k, v = p:pop_back()
-print(json.encode(p))
+assert(p:get(h1) == 17)
+assert(p:get(h2) == 23)
+assert(p:get(h3) == 37)
+
+assert(p:set(h1, 42) == 17)
+assert(p:get(h1) == 42)
+
+local m = 0
+local n = 0
+for k, v in pairs(p) do
+  m = m + v
+  n = n + 1
+end
+assert(m == 42 + 23 + 37)
+assert(n == 3)
+
+local k, v = p:remove(h3)
 assert(k == "baz")
 assert(v == 37)
 
-local k, v = p:pop_front()
-print(json.encode(p))
+local k, v = p:remove(h1)
 assert(k == "foo")
-assert(v == 17)
+assert(v == 42)
 
-local k, v = p:pop_front()
-print(json.encode(p))
+local k, v = p:remove(h2)
 assert(k == "bar")
 assert(v == 23)
-
-local k, v = p:pop_front()
-assert(k == nil)
-assert(v == nil)
-
-for k, v in p:each() do
-  print(k, v)
-end
-
-
+assert(p:empty())
