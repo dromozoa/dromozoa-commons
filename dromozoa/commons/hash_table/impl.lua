@@ -41,10 +41,64 @@ local function hash(key)
   end
 end
 
-local function insert(self, key, value, overwrite)
-  if key == nil then
-    error "table index is nil"
+local class = {}
+
+function class.new()
+  return { {}, {}, {}, {} }
+end
+
+function class:get(key)
+  local h = hash(key)
+  local K = self[1]
+  local k = K[h]
+  if k == nil then
+    return nil
   end
+  if equal(k, key) then
+    local V = self[2]
+    local v = V[h]
+    return v
+  end
+  local KS = self[3]
+  local ks = KS[h]
+  if ks == nil then
+    return nil
+  end
+  for i = 1, #ks do
+    if equal(ks[i], key) then
+      local VS = self[4]
+      local vs = VS[h]
+      local v = vs[i]
+      return v
+    end
+  end
+  return nil
+end
+
+function class:empty()
+  local K = self[1]
+  return next(K) == nil
+end
+
+function class:each()
+  return coroutine.wrap(function ()
+    local K = self[1]
+    local V = self[2]
+    for h, k in pairs(K) do
+      coroutine.yield(k, V[h])
+    end
+    local KS = self[3]
+    local VS = self[4]
+    for h, ks in pairs(KS) do
+      local vs = VS[h]
+      for i = 1, #ks do
+        coroutine.yield(ks[i], vs[i])
+      end
+    end
+  end)
+end
+
+function class:insert(key, value, overwrite)
   local h = hash(key)
   local K = self[1]
   local k = K[h]
@@ -90,84 +144,7 @@ local function insert(self, key, value, overwrite)
   return nil
 end
 
-local class = {}
-
-function class.new()
-  return { {}, {}, {}, {} }
-end
-
-function class:get(key)
-  if key == nil then
-    return nil
-  end
-  local h = hash(key)
-  local K = self[1]
-  local k = K[h]
-  if k == nil then
-    return nil
-  end
-  if equal(k, key) then
-    local V = self[2]
-    local v = V[h]
-    return v
-  end
-  local KS = self[3]
-  local ks = KS[h]
-  if ks == nil then
-    return nil
-  end
-  for i = 1, #ks do
-    if equal(ks[i], key) then
-      local VS = self[4]
-      local vs = VS[h]
-      local v = vs[i]
-      return v
-    end
-  end
-  return nil
-end
-
-function class:empty()
-  return next(self[1]) == nil
-end
-
-function class:each()
-  return coroutine.wrap(function ()
-    local K = self[1]
-    local V = self[2]
-    for h, k in pairs(K) do
-      coroutine.yield(k, V[h])
-    end
-    local KS = self[3]
-    local VS = self[4]
-    for h, ks in pairs(KS) do
-      local vs = VS[h]
-      for i = 1, #ks do
-        coroutine.yield(ks[i], vs[i])
-      end
-    end
-  end)
-end
-
-function class:set(key, value)
-  if value == nil then
-    return class.remove(self, key)
-  else
-    return insert(self, key, value, true)
-  end
-end
-
-function class:insert(key, value)
-  if value == nil then
-    value = true
-  end
-  return insert(self, key, value, false)
-end
-
 function class:remove(key)
-  if key == nil then
-    error "table index is nil"
-  end
   local h = hash(key)
   local K = self[1]
   local k = K[h]
@@ -210,4 +187,12 @@ function class:remove(key)
   return nil
 end
 
-return class
+local metatable = {
+  __index = class;
+}
+
+return setmetatable(class, {
+  __call = function ()
+    return setmetatable(class.new(), metatable)
+  end;
+})

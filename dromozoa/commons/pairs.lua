@@ -15,30 +15,16 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local pairs = require "dromozoa.commons.pairs"
+local getmetafield = require "dromozoa.commons.getmetafield"
 
-local function equal(a, b)
-  if a == b then
-    return true
-  else
-    if type(a) == "table" and type(b) == "table" then
-      for k, u in pairs(a) do
-        local v = b[k]
-        if v == nil or not equal(u, v) then
-          return false
-        end
-      end
-      for k, v in pairs(b) do
-        local u = a[k]
-        if u == nil then
-          return false
-        end
-      end
-      return equal(getmetatable(a), getmetatable(b))
-    else
-      return false
+if _VERSION >= "Lua 5.2" then
+  return pairs
+else
+  return function (t)
+    local metafield = getmetafield(t, "__pairs")
+    if metafield == nil then
+      return next, t, nil
     end
+    return metafield(t)
   end
 end
-
-return equal

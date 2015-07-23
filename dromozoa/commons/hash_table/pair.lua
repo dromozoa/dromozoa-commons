@@ -15,23 +15,6 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local function insert(self, handle, key, value)
-  local N = self[1]
-  local P = self[2]
-  local K = self[3]
-  local V = self[4]
-  local h = self[5] + 1
-  local n = N[handle]
-  N[h] = n
-  P[h] = handle
-  K[h] = key
-  V[h] = value
-  N[handle] = h
-  P[n] = h
-  self[5] = h
-  return h
-end
-
 local class = {}
 
 function class.new()
@@ -45,13 +28,13 @@ function class:get(handle)
 end
 
 function class:empty()
-  local N = self[1]
-  return N[1] == 1
+  local P = self[1]
+  return P[1] == 1
 end
 
 function class:each()
   return coroutine.wrap(function ()
-    local N = self[1]
+    local N = self[2]
     local K = self[3]
     local V = self[4]
     local handle = N[1]
@@ -62,11 +45,6 @@ function class:each()
   end)
 end
 
-function class:insert(key, value)
-  local P = self[2]
-  return insert(self, P[1], key, value)
-end
-
 function class:set(handle, value)
   local V = self[4]
   local v = V[handle]
@@ -74,22 +52,39 @@ function class:set(handle, value)
   return v
 end
 
-function class:remove(handle)
-  local N = self[1]
-  local P = self[2]
+function class:insert(key, value)
+  local P = self[1]
+  local N = self[2]
   local K = self[3]
   local V = self[4]
-  local n = N[handle]
+  local h = self[5] + 1
+  local p = P[1]
+  local n = N[p]
+  P[h] = p
+  N[h] = n
+  K[h] = key
+  V[h] = value
+  P[n] = h
+  N[p] = h
+  self[5] = h
+  return h
+end
+
+function class:remove(handle)
+  local P = self[1]
+  local N = self[2]
+  local K = self[3]
+  local V = self[4]
   local p = P[handle]
-  local k = K[handle]
+  local n = N[handle]
   local v = V[handle]
-  N[handle] = nil
   P[handle] = nil
+  N[handle] = nil
   K[handle] = nil
   V[handle] = nil
-  N[p] = n
   P[n] = p
-  return k, v
+  N[p] = n
+  return v
 end
 
 local metatable = {
