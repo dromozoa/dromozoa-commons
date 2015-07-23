@@ -15,15 +15,16 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local impl = require "dromozoa.commons.hash_table.impl"
+local hash_table_impl = require "dromozoa.commons.hash_table.impl"
 
-local t = impl()
+local t = hash_table_impl()
 
+assert(t:empty())
 assert(t:insert({}, true) == nil)
 assert(t:insert({}, true) == true)
+assert(not t:empty())
 assert(t:remove({}) == true)
 assert(t:remove({}) == nil)
-
 assert(t:empty())
 
 assert(t:insert({}, 17) == nil)
