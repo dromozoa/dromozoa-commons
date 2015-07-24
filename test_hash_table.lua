@@ -15,25 +15,28 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
+local clone = require "dromozoa.commons.clone"
 local equal = require "dromozoa.commons.equal"
 local hash_table = require "dromozoa.commons.hash_table"
 local pairs = require "dromozoa.commons.pairs"
 
 local function test(a, b)
   local data = {}
+  local m = 0
   local n = 0
   for k, v in pairs(a) do
-    n = n + 1
+    m = m + 1
   end
   for k, v in pairs(b) do
-    n = n - 1
-    assert(equal(v, a[k]))
+    n = n + 1
+    assert(v == a[k])
   end
-  assert(n == 0)
+  assert(m == n)
 end
 
 local t = hash_table()
 assert(t:empty())
+assert(t[nil] == nil)
 
 t.foo = 17
 t.bar = 23
@@ -62,3 +65,76 @@ test(t, {
   [4] = "qux";
 })
 assert(#t == 4)
+
+t.bar = nil
+t[{1}] = nil
+
+test(t, {
+  foo = 17;
+  baz = 37;
+  qux = 42;
+  [{}] = 69;
+  [{1,2}] = 666;
+  [1] = "foo";
+  [2] = "bar";
+  [3] = "baz";
+  [4] = "qux";
+})
+assert(#t == 4)
+
+t.qux = false
+t[{1,2}] = false
+t[4] = false
+
+test(t, {
+  foo = 17;
+  baz = 37;
+  qux = false;
+  [{}] = 69;
+  [{1,2}] = false;
+  [1] = "foo";
+  [2] = "bar";
+  [3] = "baz";
+  [4] = false;
+})
+assert(#t == 4)
+
+assert(t.foo == 17)
+assert(t[{}] == 69)
+assert(t[1] == "foo")
+
+local t2 = clone(t)
+assert(equal(t, t2))
+assert(not t2:empty())
+test(t2, {
+  foo = 17;
+  baz = 37;
+  qux = false;
+  [{}] = 69;
+  [{1,2}] = false;
+  [1] = "foo";
+  [2] = "bar";
+  [3] = "baz";
+  [4] = false;
+})
+assert(#t2 == 4)
+
+assert(table.remove(t) == false)
+
+test(t, {
+  foo = 17;
+  baz = 37;
+  qux = false;
+  [{}] = 69;
+  [{1,2}] = false;
+  [1] = "foo";
+  [2] = "bar";
+  [3] = "baz";
+})
+assert(#t == 3)
+
+local t = hash_table()
+t.foo = 17
+t.bar = 23
+assert(equal(t, { foo = 17, bar = 23 }))
+assert(equal({ foo = 17, bar = 23 }, t))

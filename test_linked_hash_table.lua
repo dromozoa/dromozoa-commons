@@ -15,6 +15,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
+local clone = require "dromozoa.commons.clone"
 local equal = require "dromozoa.commons.equal"
 local linked_hash_table = require "dromozoa.commons.linked_hash_table"
 local pairs = require "dromozoa.commons.pairs"
@@ -29,6 +30,7 @@ end
 
 local t = linked_hash_table()
 assert(t:empty())
+assert(t[nil] == nil)
 
 t.foo = 17
 t.bar = 23
@@ -88,7 +90,27 @@ test(t, {
   { 4, false };
 })
 
-assert(t[nil] == nil)
 assert(t.foo == 17)
 assert(t[{}] == 69)
 assert(t[1] == "foo")
+
+local t2 = clone(t)
+assert(equal(t, t2))
+assert(not t2:empty())
+test(t, {
+  { "foo", 17 };
+  { "baz", 37 };
+  { "qux", false };
+  { {}, 69 };
+  { {1,2}, false };
+  { 1, "foo" };
+  { 2, "bar" };
+  { 3, "baz" };
+  { 4, false };
+})
+
+local t = linked_hash_table()
+t.foo = 17
+t.bar = 23
+assert(equal(t, { foo = 17, bar = 23 }))
+assert(equal({ foo = 17, bar = 23 }, t))

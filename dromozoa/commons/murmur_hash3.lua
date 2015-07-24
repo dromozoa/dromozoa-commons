@@ -19,11 +19,11 @@ local double = require "dromozoa.commons.double"
 local uint32 = require "dromozoa.commons.uint32"
 local uint64 = require "dromozoa.commons.uint64"
 
-local function update1(hash, k)
-  k = uint32.mul(k, 0xCC9E2D51)
-  k = uint32.rotl(k, 15)
-  k = uint32.mul(k, 0x1B873593)
-  hash = uint32.bxor(hash, k)
+local function update1(hash, key)
+  key = uint32.mul(key, 0xCC9E2D51)
+  key = uint32.rotl(key, 15)
+  key = uint32.mul(key, 0x1B873593)
+  hash = uint32.bxor(hash, key)
   return hash
 end
 

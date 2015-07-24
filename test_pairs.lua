@@ -15,22 +15,15 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local equal = require "dromozoa.commons.equal"
+local pairs = require "dromozoa.commons.pairs"
 
-local a = { 1, 2, 3 }
-local b = { 1, 2, 3 }
-assert(a ~= b)
-assert(equal(a, b))
+local metatable = {}
+local count = 0
 
-local a = { foo = a }
-local b = { foo = b }
-assert(a ~= b)
-assert(equal(a, b))
+function metatable:__pairs()
+  count = count + 1
+  return next, self, nil
+end
 
-setmetatable(a, {})
-assert(equal(a, b))
-setmetatable(b, {})
-assert(equal(a, b))
-
-assert(not equal({ foo = 17, bar = 23 }, { foo = 17, bar = 23, baz = 37 }))
-assert(not equal({ foo = 17, bar = 23, baz = 37 }, { foo = 17, bar = 23 }))
+pairs(setmetatable({}, metatable))
+assert(count == 1)

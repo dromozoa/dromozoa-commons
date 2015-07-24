@@ -16,21 +16,10 @@
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
 local equal = require "dromozoa.commons.equal"
+local uint64 = require "dromozoa.commons.uint64"
 
-local a = { 1, 2, 3 }
-local b = { 1, 2, 3 }
-assert(a ~= b)
-assert(equal(a, b))
+local function test(a, b)
+  assert(equal({ uint64.word(a) }, b))
+end
 
-local a = { foo = a }
-local b = { foo = b }
-assert(a ~= b)
-assert(equal(a, b))
-
-setmetatable(a, {})
-assert(equal(a, b))
-setmetatable(b, {})
-assert(equal(a, b))
-
-assert(not equal({ foo = 17, bar = 23 }, { foo = 17, bar = 23, baz = 37 }))
-assert(not equal({ foo = 17, bar = 23, baz = 37 }, { foo = 17, bar = 23 }))
+test(0xFEEDFACE0000, { 0xFACE0000, 0x0000FEED })

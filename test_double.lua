@@ -16,31 +16,26 @@
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
 local double = require "dromozoa.commons.double"
-local uint64 = require "dromozoa.commons.uint64"
+local equal = require "dromozoa.commons.equal"
 
-local a, b = uint64.word(0xFEEDFACE0000)
-assert(a == 0xFACE0000)
-assert(b == 0x0000FEED)
+local function test(a, b)
+  local x, y = double.word(a)
+  assert(equal({ double.word(a) }, b))
+end
 
 local DBL_MAX = 1.7976931348623157e+308
 local DBL_DENORM_MIN = 4.9406564584124654e-324
 local DBL_MIN = 2.2250738585072014e-308
 local DBL_EPSILON = 2.2204460492503131e-16
 
-local function test_double(v, expect)
-  local a, b = double.word(v)
-  assert(a == expect[1])
-  assert(b == expect[2])
-end
-
-test_double(42,             { 0x00000000, 0x40450000 })
-test_double(DBL_MAX,        { 0xffffffff, 0x7fefffff })
-test_double(DBL_DENORM_MIN, { 0x00000001, 0x00000000 })
-test_double(DBL_MIN,        { 0x00000000, 0x00100000 })
-test_double(DBL_EPSILON,    { 0x00000000, 0x3cb00000 })
-test_double(math.pi,        { 0x54442d18, 0x400921fb })
-test_double(0,              { 0x00000000, 0x00000000 })
-test_double(-1 / math.huge, { 0x00000000, 0x80000000 })
-test_double(math.huge,      { 0x00000000, 0x7ff00000 })
-test_double(-math.huge,     { 0x00000000, 0xfff00000 })
-test_double(0 / 0,          { 0x00000000, 0xfff80000 })
+test(42,             { 0x00000000, 0x40450000 })
+test(DBL_MAX,        { 0xffffffff, 0x7fefffff })
+test(DBL_DENORM_MIN, { 0x00000001, 0x00000000 })
+test(DBL_MIN,        { 0x00000000, 0x00100000 })
+test(DBL_EPSILON,    { 0x00000000, 0x3cb00000 })
+test(math.pi,        { 0x54442d18, 0x400921fb })
+test(0,              { 0x00000000, 0x00000000 })
+test(-1 / math.huge, { 0x00000000, 0x80000000 })
+test(math.huge,      { 0x00000000, 0x7ff00000 })
+test(-math.huge,     { 0x00000000, 0xfff00000 })
+test(0 / 0,          { 0x00000000, 0xfff80000 })
