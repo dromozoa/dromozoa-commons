@@ -36,6 +36,7 @@ end
 
 local t = hash_table()
 assert(t:empty())
+assert(t[nil] == nil)
 
 t.foo = 17
 t.bar = 23
@@ -81,19 +82,26 @@ test(t, {
 })
 assert(#t == 4)
 
-assert(table.remove(t) == "qux")
+t.qux = false
+t[{1,2}] = false
+t[4] = false
 
 test(t, {
   foo = 17;
   baz = 37;
-  qux = 42;
+  qux = false;
   [{}] = 69;
-  [{1,2}] = 666;
+  [{1,2}] = false;
   [1] = "foo";
   [2] = "bar";
   [3] = "baz";
+  [4] = false;
 })
-assert(#t == 3)
+assert(#t == 4)
+
+assert(t.foo == 17)
+assert(t[{}] == 69)
+assert(t[1] == "foo")
 
 local t2 = clone(t)
 assert(equal(t, t2))
@@ -101,11 +109,26 @@ assert(not t2:empty())
 test(t2, {
   foo = 17;
   baz = 37;
-  qux = 42;
+  qux = false;
   [{}] = 69;
-  [{1,2}] = 666;
+  [{1,2}] = false;
+  [1] = "foo";
+  [2] = "bar";
+  [3] = "baz";
+  [4] = false;
+})
+assert(#t2 == 4)
+
+assert(table.remove(t) == false)
+
+test(t, {
+  foo = 17;
+  baz = 37;
+  qux = false;
+  [{}] = 69;
+  [{1,2}] = false;
   [1] = "foo";
   [2] = "bar";
   [3] = "baz";
 })
-assert(#t2 == 3)
+assert(#t == 3)
