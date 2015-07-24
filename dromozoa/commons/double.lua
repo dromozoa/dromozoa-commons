@@ -52,7 +52,8 @@ end
 if _VERSION >= "Lua 5.3" then
   return {
     word = function (v)
-      return string.unpack("<I4I4", string.pack("<d", v))
+      local a, b = string.unpack("<I4I4", string.pack("<d", v))
+      return a, b
     end;
   }
 else

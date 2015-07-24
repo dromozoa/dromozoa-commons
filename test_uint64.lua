@@ -15,21 +15,11 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local function word(v)
-  local a = v % 0x100000000
-  local b = (v - a) / 0x100000000
-  return a, b
+local equal = require "dromozoa.commons.equal"
+local uint64 = require "dromozoa.commons.uint64"
+
+local function test(a, b)
+  assert(equal({ uint64.word(a) }, b))
 end
 
-if _VERSION >= "Lua 5.3" then
-  return {
-    word = function (v)
-      local a, b = string.unpack("<I4I4", string.pack("<I8", v))
-      return a, b
-    end;
-  }
-else
-  return {
-    word = word;
-  }
-end
+test(0xFEEDFACE0000, { 0xFACE0000, 0x0000FEED })
