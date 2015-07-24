@@ -15,8 +15,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local hash_table_impl = require "dromozoa.commons.hash_table.impl"
-local hash_table_pair = require "dromozoa.commons.hash_table.pair"
+local hash_table_impl = require "dromozoa.commons.hash_table_impl"
+local hash_table_pair = require "dromozoa.commons.hash_table_pair"
 
 local private_base = function () end
 local private_impl = function () end

@@ -17,7 +17,7 @@
 
 local clone = require "dromozoa.commons.clone"
 local equal = require "dromozoa.commons.equal"
-local hash_table_pair = require "dromozoa.commons.hash_table.pair"
+local hash_table_pair = require "dromozoa.commons.hash_table_pair"
 
 local p = hash_table_pair()
 assert(p:empty())
