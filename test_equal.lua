@@ -27,20 +27,10 @@ local b = { foo = b }
 assert(a ~= b)
 assert(equal(a, b))
 
-local count = 0
-local metatable = {
-  __call = function ()
-    count = count + 1
-  end;
-}
-setmetatable(a, metatable)
-assert(not equal(a, b))
-setmetatable(b, metatable)
+setmetatable(a, {})
 assert(equal(a, b))
-
-a()
-b()
-assert(count == 2)
+setmetatable(b, {})
+assert(equal(a, b))
 
 assert(not equal({ foo = 17, bar = 23 }, { foo = 17, bar = 23, baz = 37 }))
 assert(not equal({ foo = 17, bar = 23, baz = 37 }, { foo = 17, bar = 23 }))
