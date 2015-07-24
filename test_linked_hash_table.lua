@@ -95,7 +95,7 @@ assert(t[{}] == 69)
 assert(t[1] == "foo")
 
 local t2 = clone(t)
-assert(equal, t, t2)
+assert(equal(t, t2))
 assert(not t2:empty())
 test(t, {
   { "foo", 17 };
@@ -108,3 +108,9 @@ test(t, {
   { 3, "baz" };
   { 4, false };
 })
+
+local t = linked_hash_table()
+t.foo = 17
+t.bar = 23
+assert(equal(t, { foo = 17, bar = 23 }))
+assert(equal({ foo = 17, bar = 23 }, t))

@@ -132,3 +132,9 @@ test(t, {
   [3] = "baz";
 })
 assert(#t == 3)
+
+local t = hash_table()
+t.foo = 17
+t.bar = 23
+assert(equal(t, { foo = 17, bar = 23 }))
+assert(equal({ foo = 17, bar = 23 }, t))
