@@ -15,22 +15,16 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local equal = require "dromozoa.commons.equal"
+local getmetafield = require "dromozoa.commons.getmetafield"
 
-local a = { 1, 2, 3 }
-local b = { 1, 2, 3 }
-assert(a ~= b)
-assert(equal(a, b))
-
-local a = { foo = a }
-local b = { foo = b }
-assert(a ~= b)
-assert(equal(a, b))
-
-setmetatable(a, {})
-assert(equal(a, b))
-setmetatable(b, {})
-assert(equal(a, b))
-
-assert(not equal({ foo = 17, bar = 23 }, { foo = 17, bar = 23, baz = 37 }))
-assert(not equal({ foo = 17, bar = 23, baz = 37 }, { foo = 17, bar = 23 }))
+if _VERSION >= "Lua 5.2" then
+  return pairs
+else
+  return function (t)
+    local metafield = getmetafield(t, "__pairs")
+    if metafield == nil then
+      return next, t, nil
+    end
+    return metafield(t)
+  end
+end

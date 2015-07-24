@@ -15,22 +15,18 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local equal = require "dromozoa.commons.equal"
+local murmur_hash3 = require "dromozoa.commons.murmur_hash3"
 
-local a = { 1, 2, 3 }
-local b = { 1, 2, 3 }
-assert(a ~= b)
-assert(equal(a, b))
-
-local a = { foo = a }
-local b = { foo = b }
-assert(a ~= b)
-assert(equal(a, b))
-
-setmetatable(a, {})
-assert(equal(a, b))
-setmetatable(b, {})
-assert(equal(a, b))
-
-assert(not equal({ foo = 17, bar = 23 }, { foo = 17, bar = 23, baz = 37 }))
-assert(not equal({ foo = 17, bar = 23, baz = 37 }, { foo = 17, bar = 23 }))
+assert(murmur_hash3.string("", 0) == 0)
+assert(murmur_hash3.string("a", 0) == 1009084850)
+assert(murmur_hash3.string("ab", 0) == 2613040991)
+assert(murmur_hash3.string("abc", 0) == 3017643002)
+assert(murmur_hash3.string("abcd", 0) == 1139631978)
+assert(murmur_hash3.string("abcde", 0) == 3902511862)
+assert(murmur_hash3.string("abcdef", 0) == 1635893381)
+assert(murmur_hash3.string("abcdefg", 0) == 2285673222)
+assert(murmur_hash3.string("abcdefgh", 0) == 1239272644)
+assert(murmur_hash3.string("abcdefghi", 0) == 1108608752)
+assert(murmur_hash3.uint32(0xFEEDFACE, 0) == 298348117)
+assert(murmur_hash3.uint64(0xFEEDFACE0000, 0) == 860420484)
+assert(murmur_hash3.double(math.pi, 0) == 2303256014)

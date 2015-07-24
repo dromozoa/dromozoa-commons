@@ -21,15 +21,10 @@ local function clone(this)
     local that = {}
     -- avoid __pairs metamethod
     for k, v in next, this do
-      that[clone(k)] = clone(v)
+      rawset(that, clone(k), clone(v))
     end
-    local metatable = getmetatable(this)
-    if metatable then
-      -- not clone metatable
-      return setmetatable(that, metatable)
-    else
-      return that
-    end
+    -- not clone metatable
+    return setmetatable(that, getmetatable(this))
   else
     return this
   end
