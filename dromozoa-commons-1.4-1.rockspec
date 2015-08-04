@@ -1,8 +1,8 @@
 package = "dromozoa-commons"
-version = "1.2-1"
+version = "1.4-1"
 source = {
-  url = "https://github.com/dromozoa/dromozoa-commons/archive/v1.2.tar.gz";
-  file = "dromozoa-commons-1.2.tar.gz";
+  url = "https://github.com/dromozoa/dromozoa-commons/archive/v1.4.tar.gz";
+  file = "dromozoa-commons-1.4.tar.gz";
 }
 description = {
   summary = "Reusable Lua components";
@@ -23,6 +23,7 @@ build = {
     ["dromozoa.commons.linked_hash_table"] = "dromozoa/commons/linked_hash_table.lua";
     ["dromozoa.commons.murmur_hash3"] = "dromozoa/commons/murmur_hash3.lua";
     ["dromozoa.commons.pairs"] = "dromozoa/commons/pairs.lua";
+    ["dromozoa.commons.sequence"] = "dromozoa/commons/sequence.lua";
     ["dromozoa.commons.uint32"] = "dromozoa/commons/uint32.lua";
     ["dromozoa.commons.uint64"] = "dromozoa/commons/uint64.lua";
     ["dromozoa.commons.unpack"] = "dromozoa/commons/unpack.lua";
