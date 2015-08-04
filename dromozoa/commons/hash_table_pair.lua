@@ -18,7 +18,7 @@
 local class = {}
 
 function class.new()
-  return { { 1 }, { 1 }, {}, {}, 1 }
+  return { { [0] = 0 }, { [0] = 0 }, {}, {}, 0 }
 end
 
 function class:get(handle)
@@ -29,7 +29,7 @@ end
 
 function class:empty()
   local P = self[1]
-  return P[1] == 1
+  return P[0] == 0
 end
 
 function class:each()
@@ -37,8 +37,8 @@ function class:each()
     local N = self[2]
     local K = self[3]
     local V = self[4]
-    local handle = N[1]
-    while handle ~= 1 do
+    local handle = N[0]
+    while handle ~= 0 do
       coroutine.yield(K[handle], V[handle])
       handle = N[handle]
     end
@@ -58,7 +58,7 @@ function class:insert(key, value)
   local K = self[3]
   local V = self[4]
   local h = self[5] + 1
-  local p = P[1]
+  local p = P[0]
   local n = N[p]
   P[h] = p
   N[h] = n
