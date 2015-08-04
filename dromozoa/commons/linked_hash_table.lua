@@ -32,6 +32,20 @@ function class.new()
   }
 end
 
+function class:identity(key)
+  if key == nil then
+    return nil
+  end
+  local t = type(key)
+  if t == "number" or t == "string" or t == "boolean" then
+    local base = self[private_base]
+    return base[key]
+  else
+    local impl = self[private_impl]
+    return impl:get(key)
+  end
+end
+
 function class:get(key)
   if key == nil then
     return nil
