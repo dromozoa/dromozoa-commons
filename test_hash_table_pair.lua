@@ -30,6 +30,10 @@ assert(h2 == 2)
 assert(h3 == 3)
 assert(not p:empty())
 
+local k, v = p:find(h1)
+assert(k == "foo")
+assert(v == 17)
+
 assert(p:get(h1) == 17)
 assert(p:get(h2) == 23)
 assert(p:get(h3) == 37)
