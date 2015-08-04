@@ -58,6 +58,10 @@ assert(t:identity(3) == 10)
 assert(t:identity(4) == 11)
 assert(t:identity(5) == nil)
 
+local k, v = t:find(4)
+assert(k == "qux")
+assert(v == 42)
+
 test(t, {
   { "foo", 17 };
   { "bar", 23 };

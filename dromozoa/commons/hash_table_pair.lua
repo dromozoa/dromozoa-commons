@@ -21,6 +21,14 @@ function class.new()
   return { { [0] = 0 }, { [0] = 0 }, {}, {}, 0 }
 end
 
+function class:find(handle)
+  local K = self[3]
+  local V = self[4]
+  local k = K[handle]
+  local v = V[handle]
+  return k, v
+end
+
 function class:get(handle)
   local V = self[4]
   local v = V[handle]
