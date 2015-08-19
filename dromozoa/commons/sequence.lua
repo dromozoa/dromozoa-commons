@@ -27,12 +27,8 @@ end
 
 local class = {}
 
-function class.new(that, i, j)
-  if that == nil then
-    return {}
-  else
-    return class.copy({}, that, i, j)
-  end
+function class.new()
+  return {}
 end
 
 function class:top(i)
@@ -82,7 +78,10 @@ local metatable = {
 }
 
 return setmetatable(class, {
-  __call = function (class, that, i, j)
-    return setmetatable(class.new(that, i, j), metatable)
+  __call = function (_, self)
+    if self == nil then
+      self = class.new()
+    end
+    return setmetatable(self, metatable)
   end;
 })
