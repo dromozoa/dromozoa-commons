@@ -46,26 +46,22 @@ assert(equal(s, { 17, 23, 37 }))
 local s = sequence()
 s:copy({ 17, 23, 37, 42 }, 2)
 assert(equal(s, { 23, 37, 42 }))
-assert(equal(s, sequence({ 17, 23, 37, 42 }, 2)))
 
 local s = sequence()
 s:copy({ 17, 23, 37, 42 }, 2, 3)
 assert(equal(s, { 23, 37 }))
-assert(equal(s, sequence({ 17, 23, 37, 42 }, 2, 3)))
 
 local s = sequence()
 s:copy({ 17, 23, 37, 42 }, -3)
 assert(equal(s, { 23, 37, 42 }))
-assert(equal(s, sequence({ 17, 23, 37, 42 }, -3)))
 
 local s = sequence()
 s:copy({ 17, 23, 37, 42 }, -3, -2)
 assert(equal(s, { 23, 37 }))
-assert(equal(s, sequence({ 17, 23, 37, 42 }, -3, -2)))
 
 local m = 0
 local n = 0
-for v in sequence({ 17, 23, 37, 42 }):each() do
+for v in sequence():push(17, 23, 37, 42):each() do
   m = m + v
   n = n + 1
 end
