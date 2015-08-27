@@ -131,3 +131,13 @@ t.foo = 17
 t.bar = 23
 assert(equal(t, { foo = 17, bar = 23 }))
 assert(equal({ foo = 17, bar = 23 }, t))
+
+local n = 0
+for k, v, i in t:each() do
+  n = n + 1
+  assert(i == n)
+end
+
+for k, v, i in pairs(t) do
+  assert(i == nil)
+end

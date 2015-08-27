@@ -43,9 +43,10 @@ assert(p:get(h1) == 42)
 
 local m = 0
 local n = 0
-for k, v in p:each() do
+for k, v, i in p:each() do
   m = m + v
   n = n + 1
+  assert(i == n)
 end
 assert(m == 42 + 23 + 37)
 assert(n == 3)
