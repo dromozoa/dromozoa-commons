@@ -45,6 +45,23 @@ t[3] = "baz"
 t[4] = "qux"
 assert(not t:empty())
 
+assert(t:identity("foo") == 1)
+assert(t:identity("bar") == 2)
+assert(t:identity("baz") == 3)
+assert(t:identity("qux") == 4)
+assert(t:identity({}) == 5)
+assert(t:identity({1}) == 6)
+assert(t:identity({1,2}) == 7)
+assert(t:identity(1) == 8)
+assert(t:identity(2) == 9)
+assert(t:identity(3) == 10)
+assert(t:identity(4) == 11)
+assert(t:identity(5) == nil)
+
+local k, v = t:find(4)
+assert(k == "qux")
+assert(v == 42)
+
 test(t, {
   { "foo", 17 };
   { "bar", 23 };
