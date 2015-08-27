@@ -17,13 +17,12 @@
 # You should have received a copy of the GNU General Public License
 # along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-
 case x$1 in
   x) lua=lua;;
   *) lua=$1;;
 esac
 
-for i in test*.lua
+for i in test_*.lua
 do
   "$lua" "$i"
 done
