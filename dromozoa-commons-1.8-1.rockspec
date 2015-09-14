@@ -27,6 +27,7 @@ build = {
     ["dromozoa.commons.pairs"] = "dromozoa/commons/pairs.lua";
     ["dromozoa.commons.sequence"] = "dromozoa/commons/sequence.lua";
     ["dromozoa.commons.sequence_writer"] = "dromozoa/commons/sequence_writer.lua";
+    ["dromozoa.commons.split"] = "dromozoa/commons/split.lua";
     ["dromozoa.commons.uint32"] = "dromozoa/commons/uint32.lua";
     ["dromozoa.commons.uint64"] = "dromozoa/commons/uint64.lua";
     ["dromozoa.commons.unpack"] = "dromozoa/commons/unpack.lua";
