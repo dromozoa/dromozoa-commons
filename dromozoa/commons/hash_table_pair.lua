@@ -47,7 +47,7 @@ function class:each()
     local V = self[4]
     local handle = N[0]
     while handle ~= 0 do
-      coroutine.yield(K[handle], V[handle])
+      coroutine.yield(K[handle], V[handle], handle)
       handle = N[handle]
     end
   end)

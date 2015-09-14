@@ -142,7 +142,6 @@ end
 
 local metatable = {
   __newindex = class.set;
-  __pairs = class.each;
 }
 
 function metatable:__index(key)
@@ -152,6 +151,14 @@ function metatable:__index(key)
   else
     return v
   end
+end
+
+function metatable:__pairs()
+  return coroutine.wrap(function ()
+    for k, v in class.each(self) do
+      coroutine.yield(k, v)
+    end
+  end)
 end
 
 return setmetatable(class, {

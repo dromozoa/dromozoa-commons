@@ -15,6 +15,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
+local ipairs = require "dromozoa.commons.ipairs"
+
 local function push(self, n, value, ...)
   if value == nil then
     return self
