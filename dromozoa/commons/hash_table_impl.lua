@@ -17,6 +17,7 @@
 
 local equal = require "dromozoa.commons.equal"
 local murmur_hash3 = require "dromozoa.commons.murmur_hash3"
+local pairs = require "dromozoa.commons.pairs"
 
 local function hash(key)
   local t = type(key)
