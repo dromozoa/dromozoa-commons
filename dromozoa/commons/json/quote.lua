@@ -33,10 +33,6 @@ for i = 0x00, 0x19 do
   end
 end
 
-local function quote(value)
+return function (value)
   return [["]] .. value:gsub("[\"\\/%c]", quote_char) .. [["]]
 end
-
-return {
-  quote = quote;
-}
