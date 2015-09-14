@@ -16,15 +16,13 @@
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
 local linked_hash_table = require "dromozoa.commons.linked_hash_table"
-local quote = require "dromozoa.commons.json.quote"
 local sequence = require "dromozoa.commons.sequence"
-local write = require "dromozoa.commons.json.write"
-local encode = require "dromozoa.commons.json.encode"
+local json = require "dromozoa.commons.json"
 
-assert(quote("foo\"\\/\b\f\n\r\tbar\0baz") == [["foo\"\\\/\b\f\n\r\tbar\u0000baz"]])
+assert(json.quote("foo\"\\/\b\f\n\r\tbar\0baz") == [["foo\"\\\/\b\f\n\r\tbar\u0000baz"]])
 
 local t = linked_hash_table()
 t.foo = sequence():push(17, 23, 37, 42)
 t.bar = false
 t.baz = "qux"
-assert(encode(t) == [[{"foo":[17,23,37,42],"bar":false,"baz":"qux"}]])
+assert(json.encode(t) == [[{"foo":[17,23,37,42],"bar":false,"baz":"qux"}]])

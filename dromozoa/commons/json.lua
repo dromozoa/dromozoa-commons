@@ -17,7 +17,29 @@
 
 local ipairs = require "dromozoa.commons.ipairs"
 local pairs = require "dromozoa.commons.pairs"
-local quote = require "dromozoa.commons.json.quote"
+local sequence_writer = require "dromozoa.commons.sequence_writer"
+
+local quote_char = {
+  [string.char(0x22)] = [[\"]];
+  [string.char(0x5C)] = [[\\]];
+  [string.char(0x2F)] = [[\/]];
+  [string.char(0x08)] = [[\b]];
+  [string.char(0x0C)] = [[\f]];
+  [string.char(0x0A)] = [[\n]];
+  [string.char(0x0D)] = [[\r]];
+  [string.char(0x09)] = [[\t]];
+}
+
+for i = 0x00, 0x19 do
+  local char = string.char(i)
+  if quote_char[char] == nil then
+    quote_char[char] = string.format([[\u%04X]], i)
+  end
+end
+
+local function quote(value)
+  return [["]] .. value:gsub("[\"\\/%c]", quote_char) .. [["]]
+end
 
 local function write(out, value)
   local t = type(value)
@@ -65,4 +87,10 @@ local function write(out, value)
   return out
 end
 
-return write
+return {
+  quote = quote;
+  write = write;
+  encode = function (value)
+    return write(sequence_writer(), value):concat()
+  end;
+}
