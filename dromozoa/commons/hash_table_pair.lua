@@ -84,10 +84,9 @@ function class:insert(key, value)
     self[6] = h
   else
     local p = P[F]
-    local n = F
     P[h] = p
-    N[h] = n
-    P[n] = h
+    N[h] = F
+    P[F] = h
     N[p] = h
   end
   K[h] = key
@@ -101,11 +100,9 @@ function class:remove(handle)
   local N = self[2]
   local K = self[3]
   local V = self[4]
-
   local p = P[handle]
   local n = N[handle]
   local v = V[handle]
-
   if handle == p then
     self[6] = nil
   else
