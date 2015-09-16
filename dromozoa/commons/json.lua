@@ -38,7 +38,7 @@ for i = 0x00, 0x19 do
 end
 
 local function quote(value)
-  return [["]] .. value:gsub("[\"\\/%c]", quote_char) .. [["]]
+  return "\"" .. value:gsub("[\"\\/%c]", quote_char) .. "\""
 end
 
 local function write(out, value)
@@ -87,10 +87,12 @@ local function write(out, value)
   return out
 end
 
+local function encode(value)
+  return write(sequence_writer(), value):concat()
+end
+
 return {
   quote = quote;
   write = write;
-  encode = function (value)
-    return write(sequence_writer(), value):concat()
-  end;
+  encode = encode;
 }

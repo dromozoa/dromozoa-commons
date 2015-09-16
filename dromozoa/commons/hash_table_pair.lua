@@ -18,7 +18,13 @@
 local class = {}
 
 function class.new()
-  return { { [0] = 0 }, { [0] = 0 }, {}, {}, 0 }
+  -- 1: P (prev)
+  -- 2: N (next)
+  -- 3: K (key)
+  -- 4: V (value)
+  -- 5: H (handle)
+  -- 6: F (front)
+  return { {}, {}, {}, {}, 0 }
 end
 
 function class:find(handle)
@@ -36,21 +42,26 @@ function class:get(handle)
 end
 
 function class:empty()
-  local P = self[1]
-  return P[0] == 0
+  local F = self[6]
+  return F == nil
 end
 
 function class:each()
-  return coroutine.wrap(function ()
+  local F = self[6]
+  if F == nil then
+    return function () end
+  else
     local N = self[2]
     local K = self[3]
     local V = self[4]
-    local handle = N[0]
-    while handle ~= 0 do
-      coroutine.yield(K[handle], V[handle], handle)
-      handle = N[handle]
-    end
-  end)
+    return coroutine.wrap(function ()
+      local handle = F
+      repeat
+        coroutine.yield(K[handle], V[handle], handle)
+        handle = N[handle]
+      until handle == F
+    end)
+  end
 end
 
 function class:set(handle, value)
@@ -66,14 +77,20 @@ function class:insert(key, value)
   local K = self[3]
   local V = self[4]
   local h = self[5] + 1
-  local p = P[0]
-  local n = N[p]
-  P[h] = p
-  N[h] = n
+  local F = self[6]
+  if F == nil then
+    P[h] = h
+    N[h] = h
+    self[6] = h
+  else
+    local p = P[F]
+    P[h] = p
+    N[h] = F
+    P[F] = h
+    N[p] = h
+  end
   K[h] = key
   V[h] = value
-  P[n] = h
-  N[p] = h
   self[5] = h
   return h
 end
@@ -86,12 +103,16 @@ function class:remove(handle)
   local p = P[handle]
   local n = N[handle]
   local v = V[handle]
+  if handle == p then
+    self[6] = nil
+  else
+    P[n] = p
+    N[p] = n
+  end
   P[handle] = nil
   N[handle] = nil
   K[handle] = nil
   V[handle] = nil
-  P[n] = p
-  N[p] = n
   return v
 end
 
