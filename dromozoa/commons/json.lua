@@ -19,8 +19,6 @@ local ipairs = require "dromozoa.commons.ipairs"
 local pairs = require "dromozoa.commons.pairs"
 local sequence_writer = require "dromozoa.commons.sequence_writer"
 
-local class = {}
-
 local quote_char = {
   [string.char(0x22)] = [[\"]];
   [string.char(0x5C)] = [[\\]];
@@ -39,16 +37,16 @@ for i = 0x00, 0x19 do
   end
 end
 
-function class.quote(value)
+local function quote(value)
   return "\"" .. value:gsub("[\"\\/%c]", quote_char) .. "\""
 end
 
-function class.write(out, value)
+local function write(out, value)
   local t = type(value)
   if t == "number" then
     out:write(string.format("%.17g", value))
   elseif t == "string" then
-    out:write(class.quote(value))
+    out:write(quote(value))
   elseif t == "boolean" then
     if value then
       out:write("true")
@@ -65,8 +63,8 @@ function class.write(out, value)
           else
             out:write(",")
           end
-          out:write(class.quote(k), ":")
-          class.write(out, v)
+          out:write(quote(k), ":")
+          write(out, v)
         end
       end
       out:write("}")
@@ -79,7 +77,7 @@ function class.write(out, value)
         else
           out:write(",")
         end
-        class.write(out, v)
+        write(out, v)
       end
       out:write("]")
     end
@@ -89,8 +87,12 @@ function class.write(out, value)
   return out
 end
 
-function class.encode(value)
-  return class.write(sequence_writer(), value):concat()
+local function encode(value)
+  return write(sequence_writer(), value):concat()
 end
 
-return class
+return {
+  quote = quote;
+  write = write;
+  encode = encode;
+}
