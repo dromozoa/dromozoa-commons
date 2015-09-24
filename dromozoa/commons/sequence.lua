@@ -33,7 +33,7 @@ function class.new()
   return {}
 end
 
-function class:top(i)
+function class:top()
   return self[#self]
 end
 
