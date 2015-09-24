@@ -15,10 +15,14 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local ipairs = require "dromozoa.commons.ipairs"
+local class = {}
+
+local private_min = function () end
+local private_max = function () end
 
 local function push(self, n, value, ...)
   if value == nil then
+    self[private_max] = n
     return self
   else
     n = n + 1
@@ -27,24 +31,30 @@ local function push(self, n, value, ...)
   end
 end
 
-local class = {}
-
 function class.new()
-  return {}
+  return {
+    [private_min] = 1;
+    [private_max] = 0;
+  }
 end
 
-function class:top()
-  return self[#self]
+function class:empty()
+  return self[private_min] > self[private_max]
+end
+
+function class:front()
+  return self[self[private_min]]
 end
 
 function class:push(...)
-  return push(self, #self, ...)
+  return push(self, self[private_max], ...)
 end
 
 function class:pop()
-  local n = #self
+  local n = self[private_min]
   local v = self[n]
   self[n] = nil
+  self[private_min] = n + 1
   return v
 end
 
@@ -59,18 +69,19 @@ function class:copy(that, i, j)
   elseif j < 0 then
     j = #that + 1 + j
   end
-  local n = #self
+  local n = self[private_max]
   for i = i, j do
     n = n + 1
     self[n] = that[i]
   end
+  self[private_max] = n
   return self
 end
 
 function class:each()
   return coroutine.wrap(function ()
-    for _, v in ipairs(self) do
-      coroutine.yield(v)
+    for i = self[private_min], self[private_max] do
+      coroutine.yield(self[i])
     end
   end)
 end
@@ -80,10 +91,7 @@ local metatable = {
 }
 
 return setmetatable(class, {
-  __call = function (_, self)
-    if self == nil then
-      self = class.new()
-    end
-    return setmetatable(self, metatable)
+  __call = function ()
+    return setmetatable(class.new(), metatable)
   end;
 })
