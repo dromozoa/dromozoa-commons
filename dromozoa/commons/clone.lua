@@ -20,7 +20,7 @@ local function clone(this)
   if type(this) == "table" then
     local that = {}
     -- avoid __pairs metamethod
-    for k, v in next, this do
+    for k, v in next, this, nil do
       rawset(that, clone(k), clone(v))
     end
     -- not clone metatable
