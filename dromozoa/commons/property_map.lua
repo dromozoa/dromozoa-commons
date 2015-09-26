@@ -17,11 +17,21 @@
 
 local pairs = require "dromozoa.commons.pairs"
 
+local function construct(constructor)
+  if constructor == nil then
+    return {}
+  else
+    return constructor()
+  end
+end
+
 local class = {}
 
-function class.new()
+function class.new(dataset_constructor, data_constructor)
+  print(dataset_constructor, data_constructor)
   return {
-    dataset = {};
+    dataset = construct(dataset_constructor);
+    data_constructor = data_constructor;
   }
 end
 
@@ -41,7 +51,11 @@ end
 function class:each(key)
   local data = self.dataset[key]
   if data then
-    return next, data, nil
+    return coroutine.wrap(function ()
+      for handle, value in pairs(data) do
+        coroutine.yield(handle)
+      end
+    end)
   else
     return function () end
   end
@@ -50,18 +64,16 @@ end
 function class:set_property(handle, key, value)
   local dataset = self.dataset
   local data = dataset[key]
-  if data then
-    local v = data[handle]
-    data[handle] = value
-    if next(data) == nil then
-      dataset[key] = nil
-    end
-    return v
-  else
-    if value ~= nil then
-      dataset[key] = { [handle] = value }
-    end
+  if data == nil then
+    data = construct(self.data_constructor)
+    dataset[key] = data
   end
+  local v = data[handle]
+  data[handle] = value
+  if next(data) == nil then
+    dataset[key] = nil
+  end
+  return v
 end
 
 function class:get_property(handle, key)
@@ -87,7 +99,7 @@ local metatable = {
 }
 
 return setmetatable(class, {
-  __call = function ()
-    return setmetatable(class.new(), metatable)
+  __call = function (_, dataset_constructor, data_constructor)
+    return setmetatable(class.new(dataset_constructor, data_constructor), metatable)
   end;
 })
