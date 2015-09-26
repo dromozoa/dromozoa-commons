@@ -90,6 +90,10 @@ local metatable = {
   __index = class;
 }
 
+function metatable:__pairs()
+  return class.each(self)
+end
+
 return setmetatable(class, {
   __call = function ()
     return setmetatable(class.new(), metatable)
