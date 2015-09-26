@@ -17,44 +17,45 @@
 
 local class = {}
 
-local private_min = function () end
-local private_max = function () end
+local private_min = "min"
+local private_max = "max"
 
-local function push(self, n, value, ...)
+local function push(data, n, value, ...)
   if value == nil then
-    self[private_max] = n
-    return self
+    return n
   else
     n = n + 1
-    self[n] = value
-    return push(self, n, ...)
+    data[n] = value
+    return push(data, n, ...)
   end
 end
 
 function class.new()
   return {
-    [private_min] = 1;
-    [private_max] = 0;
+    min = 1;
+    max = 0;
+    data = {};
   }
 end
 
 function class:empty()
-  return self[private_min] > self[private_max]
+  return self.min > self.max
 end
 
 function class:front()
-  return self[self[private_min]]
+  return self.data[self.min]
 end
 
 function class:push(...)
-  return push(self, self[private_max], ...)
+  self.max = push(self.data, self.max, ...)
+  return self
 end
 
 function class:pop()
-  local n = self[private_min]
-  local v = self[n]
-  self[n] = nil
-  self[private_min] = n + 1
+  local n = self.min
+  local v = self.data[n]
+  self.data[n] = nil
+  self.min = n + 1
   return v
 end
 
@@ -69,19 +70,20 @@ function class:copy(that, i, j)
   elseif j < 0 then
     j = #that + 1 + j
   end
-  local n = self[private_max]
+  local n = self.max
   for i = i, j do
     n = n + 1
-    self[n] = that[i]
+    self.data[n] = that[i]
   end
-  self[private_max] = n
+  self.max = n
   return self
 end
 
 function class:each()
+  local data = self.data
   return coroutine.wrap(function ()
-    for i = self[private_min], self[private_max] do
-      coroutine.yield(self[i])
+    for i = self.min, self.max do
+      coroutine.yield(data[i])
     end
   end)
 end
@@ -91,9 +93,10 @@ local metatable = {
 }
 
 function metatable:__pairs()
+  local data = self.data
   return coroutine.wrap(function ()
-    for i = self[private_min], self[private_max] do
-      coroutine.yield(i, self[i])
+    for i = self.min, self.max do
+      coroutine.yield(i, data[i])
     end
   end)
 end
