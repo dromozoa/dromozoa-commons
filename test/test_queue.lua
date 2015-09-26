@@ -15,6 +15,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
+local pairs = require "dromozoa.commons.pairs"
 local queue = require "dromozoa.commons.queue"
 
 local q = queue()
@@ -46,6 +47,15 @@ q:pop()
 local m = 0
 local n = 0
 for v in q:each() do
+  m = m + v
+  n = n + 1
+end
+assert(m == 23 + 37 + 42)
+assert(n == 3)
+
+local m = 0
+local n = 0
+for k, v in pairs(q) do
   m = m + v
   n = n + 1
 end

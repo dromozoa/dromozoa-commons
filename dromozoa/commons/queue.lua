@@ -91,7 +91,11 @@ local metatable = {
 }
 
 function metatable:__pairs()
-  return class.each(self)
+  return coroutine.wrap(function ()
+    for i = self[private_min], self[private_max] do
+      coroutine.yield(i, self[i])
+    end
+  end)
 end
 
 return setmetatable(class, {
