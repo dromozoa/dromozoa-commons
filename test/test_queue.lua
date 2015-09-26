@@ -15,6 +15,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
+local json = require "dromozoa.commons.json"
 local pairs = require "dromozoa.commons.pairs"
 local queue = require "dromozoa.commons.queue"
 
@@ -61,3 +62,6 @@ for k, v in pairs(q) do
 end
 assert(m == 23 + 37 + 42)
 assert(n == 3)
+
+json.write(io.stdout, q):write("\n")
+assert(json.encode(q) ~= "{}")
