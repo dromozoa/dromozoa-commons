@@ -24,7 +24,7 @@ local escape_char = {
 }
 
 local function escape(value)
-  return (value:gsub("[<>&'\"]", escape_char))
+  return (tostring(value):gsub("[<>&'\"]", escape_char))
 end
 
 return {
