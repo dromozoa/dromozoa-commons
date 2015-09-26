@@ -20,3 +20,4 @@ local xml = require "dromozoa.commons.xml"
 local a, b = xml.escape("<>&\"'")
 assert(a == "&lt;&gt;&amp;&quot;&apos;")
 assert(b == nil)
+assert(xml.escape(42) == "42")
