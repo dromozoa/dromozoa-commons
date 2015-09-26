@@ -20,21 +20,21 @@ local class = {}
 local private_min = "min"
 local private_max = "max"
 
-local function push(data, n, value, ...)
+local function push(d, n, value, ...)
   if value == nil then
     return n
   else
     n = n + 1
-    data[n] = value
-    return push(data, n, ...)
+    d[n] = value
+    return push(d, n, ...)
   end
 end
 
 function class.new()
   return {
+    data = {};
     min = 1;
     max = 0;
-    data = {};
   }
 end
 
@@ -52,9 +52,10 @@ function class:push(...)
 end
 
 function class:pop()
+  local d = self.data
   local n = self.min
-  local v = self.data[n]
-  self.data[n] = nil
+  local v = d[n]
+  d[n] = nil
   self.min = n + 1
   return v
 end
@@ -70,20 +71,21 @@ function class:copy(that, i, j)
   elseif j < 0 then
     j = #that + 1 + j
   end
+  local d = self.data
   local n = self.max
   for i = i, j do
     n = n + 1
-    self.data[n] = that[i]
+    d[n] = that[i]
   end
   self.max = n
   return self
 end
 
 function class:each()
-  local data = self.data
+  local d = self.data
   return coroutine.wrap(function ()
     for i = self.min, self.max do
-      coroutine.yield(data[i])
+      coroutine.yield(d[i])
     end
   end)
 end
@@ -93,10 +95,10 @@ local metatable = {
 }
 
 function metatable:__pairs()
-  local data = self.data
+  local d = self.data
   return coroutine.wrap(function ()
     for i = self.min, self.max do
-      coroutine.yield(i, data[i])
+      coroutine.yield(i, d[i])
     end
   end)
 end
