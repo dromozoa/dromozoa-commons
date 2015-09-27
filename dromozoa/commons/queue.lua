@@ -17,9 +17,6 @@
 
 local class = {}
 
-local private_min = "min"
-local private_max = "max"
-
 local function push(d, n, value, ...)
   if value == nil then
     return n
@@ -33,13 +30,13 @@ end
 function class.new()
   return {
     data = {};
-    min = 1;
     max = 0;
+    min = 1;
   }
 end
 
 function class:empty()
-  return self.min > self.max
+  return self.max < self.min
 end
 
 function class:front()
@@ -90,15 +87,23 @@ function class:each()
   end)
 end
 
-local metatable = {
-  __index = class;
-}
+local metatable = {}
+
+function metatable:__index(key)
+  local n = self.min - 1
+  if type(key) == "number" then
+    return self.data[key + n]
+  else
+    return class[key]
+  end
+end
 
 function metatable:__pairs()
   local d = self.data
+  local n = self.min - 1
   return coroutine.wrap(function ()
     for i = self.min, self.max do
-      coroutine.yield(i, d[i])
+      coroutine.yield(i - n, d[i])
     end
   end)
 end

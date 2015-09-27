@@ -16,6 +16,7 @@
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
 local json = require "dromozoa.commons.json"
+local ipairs = require "dromozoa.commons.ipairs"
 local pairs = require "dromozoa.commons.pairs"
 local queue = require "dromozoa.commons.queue"
 
@@ -57,11 +58,20 @@ assert(n == 3)
 local m = 0
 local n = 0
 for k, v in pairs(q) do
-  m = m + v
-  n = n + 1
+  m = m + k
+  n = n + v
 end
-assert(m == 23 + 37 + 42)
-assert(n == 3)
+assert(m == 1 + 2 + 3)
+assert(n == 23 + 37 + 42)
+
+local m = 0
+local n = 0
+for k, v in ipairs(q) do
+  m = m + k
+  n = n + v
+end
+assert(m == 1 + 2 + 3)
+assert(n == 23 + 37 + 42)
 
 json.write(io.stdout, q):write("\n")
 assert(json.encode(q) ~= "{}")
