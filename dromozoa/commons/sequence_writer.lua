@@ -15,16 +15,14 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local function write(self, i, j, n, value, ...)
+local function write(data, i, j, n, value, ...)
   j = j + 1
   local t = type(value)
   if t == "string" or t == "number" then
     i = i + 1
-    self[i] = value
+    data[i] = value
     if j < n then
-      return write(self, i, j, n, ...)
-    else
-      return self
+      return write(data, i, j, n, ...)
     end
   else
     error("bad argument #" .. j .. " to 'write' (string expected, got " .. t .. ")")
@@ -38,7 +36,8 @@ function class.new()
 end
 
 function class:write(...)
-  return write(self, #self, 0, select("#", ...), ...)
+  write(self, #self, 0, select("#", ...), ...)
+  return self
 end
 
 function class:concat()
