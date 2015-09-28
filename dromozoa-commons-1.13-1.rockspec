@@ -14,6 +14,7 @@ build = {
   type = "builtin";
   modules = {
     ["dromozoa.commons.clone"] = "dromozoa/commons/clone.lua";
+    ["dromozoa.commons.copy"] = "dromozoa/commons/copy.lua";
     ["dromozoa.commons.double"] = "dromozoa/commons/double.lua";
     ["dromozoa.commons.equal"] = "dromozoa/commons/equal.lua";
     ["dromozoa.commons.getmetafield"] = "dromozoa/commons/getmetafield.lua";

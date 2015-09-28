@@ -15,6 +15,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
+local copy = require "dromozoa.commons.copy"
 local ipairs = require "dromozoa.commons.ipairs"
 local push = require "dromozoa.commons.push"
 
@@ -41,21 +42,7 @@ function class:pop()
 end
 
 function class:copy(that, i, j)
-  if i == nil then
-    i = 1
-  elseif i < 0 then
-    i = #that + 1 + i
-  end
-  if j == nil then
-    j = #that
-  elseif j < 0 then
-    j = #that + 1 + j
-  end
-  local n = #self
-  for i = i, j do
-    n = n + 1
-    self[n] = that[i]
-  end
+  copy(self, #self, that, i, j)
   return self
 end
 
