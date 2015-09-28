@@ -15,17 +15,9 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local class = {}
+local push = require "dromozoa.commons.push"
 
-local function push(data, n, value, ...)
-  if value == nil then
-    return n
-  else
-    n = n + 1
-    data[n] = value
-    return push(data, n, ...)
-  end
-end
+local class = {}
 
 function class.new()
   return {

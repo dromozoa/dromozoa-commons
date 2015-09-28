@@ -25,6 +25,7 @@ build = {
     ["dromozoa.commons.linked_hash_table"] = "dromozoa/commons/linked_hash_table.lua";
     ["dromozoa.commons.murmur_hash3"] = "dromozoa/commons/murmur_hash3.lua";
     ["dromozoa.commons.pairs"] = "dromozoa/commons/pairs.lua";
+    ["dromozoa.commons.push"] = "dromozoa/commons/push.lua";
     ["dromozoa.commons.queue"] = "dromozoa/commons/queue.lua";
     ["dromozoa.commons.sequence"] = "dromozoa/commons/sequence.lua";
     ["dromozoa.commons.sequence_writer"] = "dromozoa/commons/sequence_writer.lua";
