@@ -27,12 +27,13 @@ function class.new()
 end
 
 function class:clear(key)
-  self.dataset[key] = nil
+  local dataset = self.dataset
+  dataset[key] = nil
 end
 
 function class:remove(handle)
   local dataset = self.dataset
-  for key, data in pairs(self.dataset) do
+  for key, data in pairs(dataset) do
     data[handle] = nil
     if empty(data) then
       dataset[key] = nil
@@ -41,7 +42,8 @@ function class:remove(handle)
 end
 
 function class:each(key)
-  local data = self.dataset[key]
+  local dataset = self.dataset
+  local data = dataset[key]
   if data then
     return coroutine.wrap(function ()
       for handle, value in pairs(data) do
@@ -53,31 +55,60 @@ function class:each(key)
   end
 end
 
-function class:set_property(handle, key, value)
+function class:insert_property(handle, key, value)
+  if handle == nil or key == nil then
+    error "table index is nil"
+  end
   local dataset = self.dataset
   local data = dataset[key]
-  if data == nil then
-    data = {}
-    dataset[key] = data
+  if data then
+    local v = data[handle]
+    data[handle] = value
+    return v
+  else
+    dataset[key] = { [handle] = value }
+    return nil
   end
-  local v = data[handle]
-  data[handle] = value
-  if empty(data) then
-    dataset[key] = nil
+end
+
+function class:remove_property(handle, key)
+  if handle == nil or key == nil then
+    error "table index is nil"
   end
-  return v
+  local dataset = self.dataset
+  local data = dataset[key]
+  if data then
+    local v = data[handle]
+    data[handle] = nil
+    if empty(data) then
+      dataset[key] = nil
+    end
+    return v
+  else
+    return nil
+  end
+end
+
+function class:set_property(handle, key, value)
+  if value == nil then
+    return class.remove_property(self, handle, key)
+  else
+    return class.insert_property(self, handle, key, value)
+  end
 end
 
 function class:get_property(handle, key)
-  local data = self.dataset[key]
+  local dataset = self.dataset
+  local data = dataset[key]
   if data then
     return data[handle]
   end
 end
 
 function class:each_property(handle)
+  local dataset = self.dataset
   return coroutine.wrap(function ()
-    for key, data in pairs(self.dataset) do
+    for key, data in pairs(dataset) do
       local value = data[handle]
       if value ~= nil then
         coroutine.yield(key, value)
