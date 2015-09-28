@@ -26,12 +26,18 @@ function class.new()
   }
 end
 
-function class:clear_key(key)
+function class:clear(key)
   local dataset = self.dataset
-  dataset[key] = nil
+  if key == nil then
+    for key in pairs(dataset) do
+      dataset[key] = nil
+    end
+  else
+    dataset[key] = nil
+  end
 end
 
-function class:each_key()
+function class:each()
   local dataset = self.dataset
   return next, dataset, nil
 end
