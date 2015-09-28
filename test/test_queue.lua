@@ -77,5 +77,4 @@ end
 assert(m == 23 + 37 + 42)
 assert(n == 1 + 2 + 3)
 
-json.write(io.stdout, q):write("\n")
 assert(json.encode(q) ~= "{}")
