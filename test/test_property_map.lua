@@ -53,14 +53,14 @@ assert(p:set_property(42, "color", "gold") == "silver")
 
 local m = 0
 local n = 0
-for handle in p:each("color") do
+for handle in p:each_item("color") do
   m = m + handle
   n = n + 1
 end
 assert(m == 17 + 23 + 37 + 42)
 assert(n == 4)
 
-p:remove(42)
+p:remove_item(42)
 assert(p:get_property(42, "color") == nil)
 assert(p:get_property(42, "answer") == nil)
 
@@ -68,7 +68,7 @@ assert(p.dataset.answer == nil)
 
 local m = 0
 local n = 0
-for handle in p:each("color") do
+for handle in p:each_item("color") do
   m = m + handle
   n = n + 1
 end
@@ -76,7 +76,7 @@ assert(m == 17 + 23 + 37)
 assert(n == 3)
 
 assert(p:set_property(42, "answer", true) == nil)
-p:clear("color")
+p:clear_key("color")
 
 assert(p:get_property(17, "color") == nil)
 assert(p:get_property(17, "answer") == nil)
@@ -85,7 +85,7 @@ assert(p:get_property(42, "answer") == true)
 
 local m = 0
 local n = 0
-for handle in p:each("color") do
+for handle in p:each_item("color") do
   m = m + handle
   n = n + 1
 end

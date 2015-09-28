@@ -26,12 +26,17 @@ function class.new()
   }
 end
 
-function class:clear(key)
+function class:clear_key(key)
   local dataset = self.dataset
   dataset[key] = nil
 end
 
-function class:remove(handle)
+function class:each_key()
+  local dataset = self.dataset
+  return next, dataset, nil
+end
+
+function class:remove_item(handle)
   local dataset = self.dataset
   for key, data in pairs(dataset) do
     data[handle] = nil
@@ -41,15 +46,11 @@ function class:remove(handle)
   end
 end
 
-function class:each(key)
+function class:each_item(key)
   local dataset = self.dataset
   local data = dataset[key]
   if data then
-    return coroutine.wrap(function ()
-      for handle, value in pairs(data) do
-        coroutine.yield(handle)
-      end
-    end)
+    return next, data, nil
   else
     return function () end
   end
