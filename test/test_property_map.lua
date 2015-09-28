@@ -15,6 +15,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
+local json = require "dromozoa.commons.json"
 local property_map = require "dromozoa.commons.property_map"
 local linked_hash_table = require "dromozoa.commons.linked_hash_table"
 
@@ -64,11 +65,11 @@ local function test(dataset_constructor, data_constructor)
   assert(p:get_property(42, "color") == nil)
   assert(p:get_property(42, "answer") == nil)
 
+  assert(p.dataset.answer == nil)
+
   local m = 0
   local n = 0
-  print("--")
   for handle in p:each("color") do
-    print(handle)
     m = m + handle
     n = n + 1
   end

@@ -15,6 +15,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
+local empty = require "dromozoa.commons.empty"
 local pairs = require "dromozoa.commons.pairs"
 
 local function construct(constructor)
@@ -28,7 +29,6 @@ end
 local class = {}
 
 function class.new(dataset_constructor, data_constructor)
-  print(dataset_constructor, data_constructor)
   return {
     dataset = construct(dataset_constructor);
     data_constructor = data_constructor;
@@ -40,10 +40,11 @@ function class:clear(key)
 end
 
 function class:remove(handle)
+  local dataset = self.dataset
   for key, data in pairs(self.dataset) do
     data[handle] = nil
-    if next(data) == nil then
-      self[key] = nil
+    if empty(data) then
+      dataset[key] = nil
     end
   end
 end
@@ -70,7 +71,7 @@ function class:set_property(handle, key, value)
   end
   local v = data[handle]
   data[handle] = value
-  if next(data) == nil then
+  if empty(data) then
     dataset[key] = nil
   end
   return v
