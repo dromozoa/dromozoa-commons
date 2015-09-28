@@ -69,11 +69,6 @@ function class:get(key)
   end
 end
 
-function class:empty()
-  local pair = self[private_pair]
-  return pair:empty()
-end
-
 function class:each()
   local pair = self[private_pair]
   return pair:each()

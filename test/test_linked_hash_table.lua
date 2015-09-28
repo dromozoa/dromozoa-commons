@@ -29,7 +29,6 @@ local function test(a, b)
 end
 
 local t = linked_hash_table()
-assert(t:empty())
 assert(t[nil] == nil)
 
 t.foo = 17
@@ -43,7 +42,6 @@ t[1] = "foo"
 t[2] = "bar"
 t[3] = "baz"
 t[4] = "qux"
-assert(not t:empty())
 
 assert(t:identity("foo") == 1)
 assert(t:identity("bar") == 2)
@@ -113,7 +111,6 @@ assert(t[1] == "foo")
 
 local t2 = clone(t)
 assert(equal(t, t2))
-assert(not t2:empty())
 test(t, {
   { "foo", 17 };
   { "baz", 37 };

@@ -15,19 +15,15 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local empty = require "dromozoa.commons.empty"
 local ipairs = require "dromozoa.commons.ipairs"
 local json = require "dromozoa.commons.json"
 local pairs = require "dromozoa.commons.pairs"
 local queue = require "dromozoa.commons.queue"
 
 local q = queue()
-assert(empty(q))
 q:push()
-assert(empty(q))
 q:push(17)
 q:push(23, 37)
-assert(not empty(q))
 assert(q:front() == 17)
 assert(q:back() == 37)
 assert(q[1] == 17)
@@ -37,13 +33,11 @@ assert(q[4] == nil)
 assert(q:pop() == 17)
 assert(q:pop() == 23)
 assert(q:pop() == 37)
-assert(empty(q))
 
 local q = queue()
 q:copy({})
 q:copy({ 17 })
 q:copy({ 23, 37 })
-assert(not empty(q))
 assert(q:front() == 17)
 assert(q:back() == 37)
 assert(q[1] == 17)
@@ -53,7 +47,6 @@ assert(q[4] == nil)
 assert(q:pop() == 17)
 assert(q:pop() == 23)
 assert(q:pop() == 37)
-assert(empty(q))
 
 local q = queue():push(17, 23, 37, 42)
 q:pop()

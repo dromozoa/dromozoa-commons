@@ -40,11 +40,6 @@ function class:get(key)
   end
 end
 
-function class:empty()
-  local k, v = next(self)
-  return k == private_impl and v:empty() and next(self, k) == nil
-end
-
 function class:each()
   return coroutine.wrap(function ()
     for k, v in next, self do
