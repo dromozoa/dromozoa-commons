@@ -18,30 +18,27 @@
 local empty = require "dromozoa.commons.empty"
 local pairs = require "dromozoa.commons.pairs"
 
-local function construct(constructor)
-  if constructor == nil then
-    return {}
-  else
-    return constructor()
-  end
-end
-
 local class = {}
 
-function class.new(dataset_constructor, data_constructor)
+function class.new()
   return {
-    dataset = construct(dataset_constructor);
-    data_constructor = data_constructor;
+    dataset = {};
   }
 end
 
-function class:clear(key)
-  self.dataset[key] = nil
+function class:clear_key(key)
+  local dataset = self.dataset
+  dataset[key] = nil
 end
 
-function class:remove(handle)
+function class:each_key()
   local dataset = self.dataset
-  for key, data in pairs(self.dataset) do
+  return next, dataset, nil
+end
+
+function class:remove_item(handle)
+  local dataset = self.dataset
+  for key, data in pairs(dataset) do
     data[handle] = nil
     if empty(data) then
       dataset[key] = nil
@@ -49,44 +46,70 @@ function class:remove(handle)
   end
 end
 
-function class:each(key)
-  local data = self.dataset[key]
+function class:each_item(key)
+  local dataset = self.dataset
+  local data = dataset[key]
   if data then
-    return coroutine.wrap(function ()
-      for handle, value in pairs(data) do
-        coroutine.yield(handle)
-      end
-    end)
+    return next, data, nil
   else
     return function () end
   end
 end
 
-function class:set_property(handle, key, value)
+function class:insert_property(handle, key, value)
+  if handle == nil or key == nil then
+    error "table index is nil"
+  end
   local dataset = self.dataset
   local data = dataset[key]
-  if data == nil then
-    data = construct(self.data_constructor)
-    dataset[key] = data
+  if data then
+    local v = data[handle]
+    data[handle] = value
+    return v
+  else
+    dataset[key] = { [handle] = value }
+    return nil
   end
-  local v = data[handle]
-  data[handle] = value
-  if empty(data) then
-    dataset[key] = nil
+end
+
+function class:remove_property(handle, key)
+  if handle == nil or key == nil then
+    error "table index is nil"
   end
-  return v
+  local dataset = self.dataset
+  local data = dataset[key]
+  if data then
+    local v = data[handle]
+    data[handle] = nil
+    if empty(data) then
+      dataset[key] = nil
+    end
+    return v
+  else
+    return nil
+  end
+end
+
+function class:set_property(handle, key, value)
+  if value == nil then
+    return class.remove_property(self, handle, key)
+  else
+    return class.insert_property(self, handle, key, value)
+  end
 end
 
 function class:get_property(handle, key)
-  local data = self.dataset[key]
+  local dataset = self.dataset
+  local data = dataset[key]
   if data then
     return data[handle]
   end
 end
 
 function class:each_property(handle)
+  local dataset = self.dataset
   return coroutine.wrap(function ()
-    for key, data in pairs(self.dataset) do
+    for key, data in pairs(dataset) do
       local value = data[handle]
       if value ~= nil then
         coroutine.yield(key, value)
@@ -100,7 +123,7 @@ local metatable = {
 }
 
 return setmetatable(class, {
-  __call = function (_, dataset_constructor, data_constructor)
-    return setmetatable(class.new(dataset_constructor, data_constructor), metatable)
+  __call = function ()
+    return setmetatable(class.new(), metatable)
   end;
 })
