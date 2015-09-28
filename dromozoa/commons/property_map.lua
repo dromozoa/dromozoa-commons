@@ -18,20 +18,11 @@
 local empty = require "dromozoa.commons.empty"
 local pairs = require "dromozoa.commons.pairs"
 
-local function construct(constructor)
-  if constructor == nil then
-    return {}
-  else
-    return constructor()
-  end
-end
-
 local class = {}
 
-function class.new(dataset_constructor, data_constructor)
+function class.new()
   return {
-    dataset = construct(dataset_constructor);
-    data_constructor = data_constructor;
+    dataset = {};
   }
 end
 
@@ -66,7 +57,7 @@ function class:set_property(handle, key, value)
   local dataset = self.dataset
   local data = dataset[key]
   if data == nil then
-    data = construct(self.data_constructor)
+    data = {}
     dataset[key] = data
   end
   local v = data[handle]
@@ -100,7 +91,7 @@ local metatable = {
 }
 
 return setmetatable(class, {
-  __call = function (_, dataset_constructor, data_constructor)
-    return setmetatable(class.new(dataset_constructor, data_constructor), metatable)
+  __call = function ()
+    return setmetatable(class.new(), metatable)
   end;
 })

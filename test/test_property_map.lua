@@ -19,82 +19,75 @@ local json = require "dromozoa.commons.json"
 local property_map = require "dromozoa.commons.property_map"
 local linked_hash_table = require "dromozoa.commons.linked_hash_table"
 
-local function test(dataset_constructor, data_constructor)
-  local p = property_map(dataset_constructor, data_constructor)
-  p:set_property(17, "color", "red")
-  p:set_property(23, "color", "green")
-  p:set_property(37, "color", "blue")
-  p:set_property(42, "answer", true)
+local p = property_map()
+p:set_property(17, "color", "red")
+p:set_property(23, "color", "green")
+p:set_property(37, "color", "blue")
+p:set_property(42, "answer", true)
 
-  assert(p:get_property(17, "color") == "red")
-  assert(p:get_property(17, "answer") == nil)
-  assert(p:get_property(42, "color") == nil)
-  assert(p:get_property(42, "answer") == true)
-  assert(p:get_property(69, "color") == nil)
-  assert(p:get_property(69, "answer") == nil)
+assert(p:get_property(17, "color") == "red")
+assert(p:get_property(17, "answer") == nil)
+assert(p:get_property(42, "color") == nil)
+assert(p:get_property(42, "answer") == true)
+assert(p:get_property(69, "color") == nil)
+assert(p:get_property(69, "answer") == nil)
 
-  for k, v in p:each_property(17) do
-    assert(k == "color")
-    assert(v == "red")
-  end
-
-  for k, v in p:each_property(42) do
-    assert(k == "answer")
-    assert(v == true)
-  end
-
-  local count = 0
-  for k, v in p:each_property(69) do
-    count = count + 1
-  end
-  assert(count == 0)
-
-  assert(p:set_property(42, "color", "silver") == nil)
-  assert(p:set_property(42, "color", "gold") == "silver")
-
-  local m = 0
-  local n = 0
-  for handle in p:each("color") do
-    m = m + handle
-    n = n + 1
-  end
-  assert(m == 17 + 23 + 37 + 42)
-  assert(n == 4)
-
-  p:remove(42)
-  assert(p:get_property(42, "color") == nil)
-  assert(p:get_property(42, "answer") == nil)
-
-  assert(p.dataset.answer == nil)
-
-  local m = 0
-  local n = 0
-  for handle in p:each("color") do
-    m = m + handle
-    n = n + 1
-  end
-  assert(m == 17 + 23 + 37)
-  assert(n == 3)
-
-  assert(p:set_property(42, "answer", true) == nil)
-  p:clear("color")
-
-  assert(p:get_property(17, "color") == nil)
-  assert(p:get_property(17, "answer") == nil)
-  assert(p:get_property(42, "color") == nil)
-  assert(p:get_property(42, "answer") == true)
-
-  local m = 0
-  local n = 0
-  for handle in p:each("color") do
-    m = m + handle
-    n = n + 1
-  end
-  assert(m == 0)
-  assert(n == 0)
+for k, v in p:each_property(17) do
+  assert(k == "color")
+  assert(v == "red")
 end
 
-test()
-test(linked_hash_table)
-test(linked_hash_table, linked_hash_table)
-test(nil, linked_hash_table)
+for k, v in p:each_property(42) do
+  assert(k == "answer")
+  assert(v == true)
+end
+
+local count = 0
+for k, v in p:each_property(69) do
+  count = count + 1
+end
+assert(count == 0)
+
+assert(p:set_property(42, "color", "silver") == nil)
+assert(p:set_property(42, "color", "gold") == "silver")
+
+local m = 0
+local n = 0
+for handle in p:each("color") do
+  m = m + handle
+  n = n + 1
+end
+assert(m == 17 + 23 + 37 + 42)
+assert(n == 4)
+
+p:remove(42)
+assert(p:get_property(42, "color") == nil)
+assert(p:get_property(42, "answer") == nil)
+
+assert(p.dataset.answer == nil)
+
+local m = 0
+local n = 0
+for handle in p:each("color") do
+  m = m + handle
+  n = n + 1
+end
+assert(m == 17 + 23 + 37)
+assert(n == 3)
+
+assert(p:set_property(42, "answer", true) == nil)
+p:clear("color")
+
+assert(p:get_property(17, "color") == nil)
+assert(p:get_property(17, "answer") == nil)
+assert(p:get_property(42, "color") == nil)
+assert(p:get_property(42, "answer") == true)
+
+local m = 0
+local n = 0
+for handle in p:each("color") do
+  m = m + handle
+  n = n + 1
+end
+assert(m == 0)
+assert(n == 0)
