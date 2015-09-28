@@ -18,12 +18,12 @@
 if _VERSION >= "Lua 5.3" then
   return ipairs
 else
-  return function (t)
+  return function (this)
     return coroutine.wrap(function ()
       local i = 0
       while true do
         i = i + 1
-        local v = t[i]
+        local v = this[i]
         if v == nil then
           break
         end

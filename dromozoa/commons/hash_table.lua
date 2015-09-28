@@ -40,11 +40,6 @@ function class:get(key)
   end
 end
 
-function class:empty()
-  local k, v = next(self)
-  return k == private_impl and v:empty() and next(self, k) == nil
-end
-
 function class:each()
   return coroutine.wrap(function ()
     for k, v in next, self do
@@ -96,9 +91,9 @@ end
 
 function class:set(key, value)
   if value == nil then
-    class.remove(self, key, value)
+    return class.remove(self, key, value)
   else
-    class.insert(self, key, value, true)
+    return class.insert(self, key, value, true)
   end
 end
 

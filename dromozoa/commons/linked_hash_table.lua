@@ -46,12 +46,12 @@ function class:identity(key)
   end
 end
 
-function class:find(identity)
-  if identity == nil then
-    return identity, identity
+function class:find(handle)
+  if handle == nil then
+    return nil, nil
   end
   local pair = self[private_pair]
-  return pair:find(identity)
+  return pair:find(handle)
 end
 
 function class:get(key)
@@ -67,11 +67,6 @@ function class:get(key)
     local impl = self[private_impl]
     return pair:get(impl:get(key))
   end
-end
-
-function class:empty(key, value)
-  local pair = self[private_pair]
-  return pair:empty()
 end
 
 function class:each()

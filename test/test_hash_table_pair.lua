@@ -20,7 +20,6 @@ local equal = require "dromozoa.commons.equal"
 local hash_table_pair = require "dromozoa.commons.hash_table_pair"
 
 local p = hash_table_pair()
-assert(p:empty())
 
 local h1 = p:insert("foo", 17)
 local h2 = p:insert("bar", 23)
@@ -28,7 +27,6 @@ local h3 = p:insert("baz", 37)
 assert(h1 == 1)
 assert(h2 == 2)
 assert(h3 == 3)
-assert(not p:empty())
 
 local k, v = p:find(h1)
 assert(k == "foo")
@@ -53,7 +51,6 @@ assert(n == 3)
 
 local p2 = clone(p)
 assert(equal(p, p2))
-assert(not p:empty())
 assert(p:get(h1) == 42)
 assert(p:get(h2) == 23)
 assert(p:get(h3) == 37)
@@ -61,4 +58,3 @@ assert(p:get(h3) == 37)
 assert(p:remove(h3) == 37)
 assert(p:remove(h1) == 42)
 assert(p:remove(h2) == 23)
-assert(p:empty())

@@ -19,13 +19,10 @@ local hash_table_impl = require "dromozoa.commons.hash_table_impl"
 
 local t = hash_table_impl()
 
-assert(t:empty())
 assert(t:insert({}, true) == nil)
 assert(t:insert({}, true) == true)
-assert(not t:empty())
 assert(t:remove({}) == true)
 assert(t:remove({}) == nil)
-assert(t:empty())
 
 assert(t:insert({}, 17) == nil)
 assert(t:insert({1}, 23) == nil)
@@ -94,5 +91,3 @@ assert(t:get({1,2,3}) == nil)
 assert(t:get({1,2,3,4}) == nil)
 assert(t:get({1,2,3,4,5}) == nil)
 assert(t:get({1,2,3,4,5,6}) == nil)
-
-assert(t:empty())
