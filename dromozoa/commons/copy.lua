@@ -15,7 +15,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-return function (data, n, that, i, j)
+return function (this, n, that, i, j)
   if i == nil then
     i = 1
   elseif i < 0 then
@@ -28,7 +28,7 @@ return function (data, n, that, i, j)
   end
   for i = i, j do
     n = n + 1
-    data[n] = that[i]
+    this[n] = that[i]
   end
   return n
 end
