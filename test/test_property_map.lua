@@ -42,11 +42,18 @@ for k, v in p:each_property(42) do
   assert(v == true)
 end
 
-local count = 0
+local n = 0
 for k, v in p:each_property(69) do
-  count = count + 1
+  n = n + 1
 end
-assert(count == 0)
+assert(n == 0)
+
+local n = 0
+for k, v in p:each() do
+  assert(k == "color" or k == "answer")
+  n = n + 1
+end
+assert(n == 2)
 
 assert(p:set_property(42, "color", "silver") == nil)
 assert(p:set_property(42, "color", "gold") == "silver")
@@ -76,7 +83,7 @@ assert(m == 17 + 23 + 37)
 assert(n == 3)
 
 assert(p:set_property(42, "answer", true) == nil)
-p:clear_key("color")
+p:clear("color")
 
 assert(p:get_property(17, "color") == nil)
 assert(p:get_property(17, "answer") == nil)
@@ -91,3 +98,7 @@ for handle in p:each_item("color") do
 end
 assert(m == 0)
 assert(n == 0)
+
+p:clear()
+assert(p:get_property(42, "color") == nil)
+assert(p:get_property(42, "answer") == nil)
