@@ -15,34 +15,45 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local json = require "dromozoa.commons.json"
+local empty = require "dromozoa.commons.empty"
 local ipairs = require "dromozoa.commons.ipairs"
+local json = require "dromozoa.commons.json"
 local pairs = require "dromozoa.commons.pairs"
 local queue = require "dromozoa.commons.queue"
 
 local q = queue()
-assert(q:empty())
+assert(empty(q))
 q:push()
-assert(q:empty())
+assert(empty(q))
 q:push(17)
 q:push(23, 37)
-assert(not q:empty())
+assert(not empty(q))
 assert(q:front() == 17)
+assert(q:back() == 37)
+assert(q[1] == 17)
+assert(q[2] == 23)
+assert(q[3] == 37)
+assert(q[4] == nil)
 assert(q:pop() == 17)
 assert(q:pop() == 23)
 assert(q:pop() == 37)
-assert(q:empty())
+assert(empty(q))
 
 local q = queue()
 q:copy({})
 q:copy({ 17 })
 q:copy({ 23, 37 })
-assert(not q:empty())
+assert(not empty(q))
 assert(q:front() == 17)
+assert(q:back() == 37)
+assert(q[1] == 17)
+assert(q[2] == 23)
+assert(q[3] == 37)
+assert(q[4] == nil)
 assert(q:pop() == 17)
 assert(q:pop() == 23)
 assert(q:pop() == 37)
-assert(q:empty())
+assert(empty(q))
 
 local q = queue():push(17, 23, 37, 42)
 q:pop()
@@ -58,20 +69,20 @@ assert(n == 3)
 local m = 0
 local n = 0
 for k, v in pairs(q) do
-  m = m + k
-  n = n + v
+  m = m + v
+  n = n + 1
 end
-assert(m == 1 + 2 + 3)
-assert(n == 23 + 37 + 42)
+assert(m == 23 + 37 + 42)
+assert(n == 3)
 
 local m = 0
 local n = 0
 for k, v in ipairs(q) do
-  m = m + k
-  n = n + v
+  m = m + v
+  n = n + k
 end
-assert(m == 1 + 2 + 3)
-assert(n == 23 + 37 + 42)
+assert(m == 23 + 37 + 42)
+assert(n == 1 + 2 + 3)
 
 json.write(io.stdout, q):write("\n")
 assert(json.encode(q) ~= "{}")
