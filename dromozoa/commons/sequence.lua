@@ -17,13 +17,13 @@
 
 local ipairs = require "dromozoa.commons.ipairs"
 
-local function push(self, n, value, ...)
+local function push(data, n, value, ...)
   if value == nil then
-    return self
+    return n
   else
     n = n + 1
-    self[n] = value
-    return push(self, n, ...)
+    data[n] = value
+    return push(data, n, ...)
   end
 end
 
@@ -38,7 +38,8 @@ function class:top()
 end
 
 function class:push(...)
-  return push(self, #self, ...)
+  push(self, #self, ...)
+  return self
 end
 
 function class:pop()

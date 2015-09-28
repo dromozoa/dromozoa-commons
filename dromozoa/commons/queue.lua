@@ -17,13 +17,13 @@
 
 local class = {}
 
-local function push(d, n, value, ...)
+local function push(data, n, value, ...)
   if value == nil then
     return n
   else
     n = n + 1
-    d[n] = value
-    return push(d, n, ...)
+    data[n] = value
+    return push(data, n, ...)
   end
 end
 
