@@ -17,19 +17,24 @@
 
 local clone = require "dromozoa.commons.clone"
 local equal = require "dromozoa.commons.equal"
-local linked_hash_table = require "dromozoa.commons.linked_hash_table"
+local hash_table = require "dromozoa.commons.hash_table"
 local pairs = require "dromozoa.commons.pairs"
 
 local function test(a, b)
   local data = {}
+  local m = 0
+  local n = 0
   for k, v in pairs(a) do
-    data[#data + 1] = { k, v }
+    m = m + 1
   end
-  assert(equal(data, b))
+  for k, v in pairs(b) do
+    n = n + 1
+    assert(v == a[k])
+  end
+  assert(m == n)
 end
 
-local t = linked_hash_table()
-assert(t:empty())
+local t = hash_table()
 assert(t[nil] == nil)
 
 t.foo = 17
@@ -43,69 +48,54 @@ t[1] = "foo"
 t[2] = "bar"
 t[3] = "baz"
 t[4] = "qux"
-assert(not t:empty())
-
-assert(t:identity("foo") == 1)
-assert(t:identity("bar") == 2)
-assert(t:identity("baz") == 3)
-assert(t:identity("qux") == 4)
-assert(t:identity({}) == 5)
-assert(t:identity({1}) == 6)
-assert(t:identity({1,2}) == 7)
-assert(t:identity(1) == 8)
-assert(t:identity(2) == 9)
-assert(t:identity(3) == 10)
-assert(t:identity(4) == 11)
-assert(t:identity(5) == nil)
-
-local k, v = t:find(4)
-assert(k == "qux")
-assert(v == 42)
 
 test(t, {
-  { "foo", 17 };
-  { "bar", 23 };
-  { "baz", 37 };
-  { "qux", 42 };
-  { {}, 69 };
-  { {1}, 105 };
-  { {1,2}, 666 };
-  { 1, "foo" };
-  { 2, "bar" };
-  { 3, "baz" };
-  { 4, "qux" };
+  foo = 17;
+  bar = 23;
+  baz = 37;
+  qux = 42;
+  [{}] = 69;
+  [{1}] = 105;
+  [{1,2}] = 666;
+  [1] = "foo";
+  [2] = "bar";
+  [3] = "baz";
+  [4] = "qux";
 })
+assert(#t == 4)
 
 t.bar = nil
 t[{1}] = nil
 
 test(t, {
-  { "foo", 17 };
-  { "baz", 37 };
-  { "qux", 42 };
-  { {}, 69 };
-  { {1,2}, 666 };
-  { 1, "foo" };
-  { 2, "bar" };
-  { 3, "baz" };
-  { 4, "qux" };
+  foo = 17;
+  baz = 37;
+  qux = 42;
+  [{}] = 69;
+  [{1,2}] = 666;
+  [1] = "foo";
+  [2] = "bar";
+  [3] = "baz";
+  [4] = "qux";
 })
+assert(#t == 4)
 
 t.qux = false
 t[{1,2}] = false
 t[4] = false
 
 test(t, {
-  { "foo", 17 };
-  { "baz", 37 };
-  { "qux", false };
-  { {}, 69 };
-  { {1,2}, false };
-  { 1, "foo" };
-  { 2, "bar" };
-  { 3, "baz" };
-  { 4, false };
+  foo = 17;
+  baz = 37;
+  qux = false;
+  [{}] = 69;
+  [{1,2}] = false;
+  [1] = "foo";
+  [2] = "bar";
+  [3] = "baz";
+  [4] = false;
 })
+assert(#t == 4)
 
 assert(t.foo == 17)
 assert(t[{}] == 69)
@@ -113,31 +103,35 @@ assert(t[1] == "foo")
 
 local t2 = clone(t)
 assert(equal(t, t2))
-assert(not t2:empty())
-test(t, {
-  { "foo", 17 };
-  { "baz", 37 };
-  { "qux", false };
-  { {}, 69 };
-  { {1,2}, false };
-  { 1, "foo" };
-  { 2, "bar" };
-  { 3, "baz" };
-  { 4, false };
+test(t2, {
+  foo = 17;
+  baz = 37;
+  qux = false;
+  [{}] = 69;
+  [{1,2}] = false;
+  [1] = "foo";
+  [2] = "bar";
+  [3] = "baz";
+  [4] = false;
 })
+assert(#t2 == 4)
 
-local t = linked_hash_table()
+assert(table.remove(t) == false)
+
+test(t, {
+  foo = 17;
+  baz = 37;
+  qux = false;
+  [{}] = 69;
+  [{1,2}] = false;
+  [1] = "foo";
+  [2] = "bar";
+  [3] = "baz";
+})
+assert(#t == 3)
+
+local t = hash_table()
 t.foo = 17
 t.bar = 23
 assert(equal(t, { foo = 17, bar = 23 }))
 assert(equal({ foo = 17, bar = 23 }, t))
-
-local n = 0
-for k, v, i in t:each() do
-  n = n + 1
-  assert(i == n)
-end
-
-for k, v, i in pairs(t) do
-  assert(i == nil)
-end

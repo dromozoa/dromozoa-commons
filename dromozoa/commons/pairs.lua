@@ -20,11 +20,11 @@ local getmetafield = require "dromozoa.commons.getmetafield"
 if _VERSION >= "Lua 5.2" then
   return pairs
 else
-  return function (t)
-    local metafield = getmetafield(t, "__pairs")
+  return function (this)
+    local metafield = getmetafield(this, "__pairs")
     if metafield == nil then
-      return next, t, nil
+      return next, this, nil
     end
-    return metafield(t)
+    return metafield(this)
   end
 end

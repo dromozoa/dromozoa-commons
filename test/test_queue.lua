@@ -15,31 +15,38 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
+local ipairs = require "dromozoa.commons.ipairs"
+local json = require "dromozoa.commons.json"
+local pairs = require "dromozoa.commons.pairs"
 local queue = require "dromozoa.commons.queue"
 
 local q = queue()
-assert(q:empty())
 q:push()
-assert(q:empty())
 q:push(17)
 q:push(23, 37)
-assert(not q:empty())
 assert(q:front() == 17)
+assert(q:back() == 37)
+assert(q[1] == 17)
+assert(q[2] == 23)
+assert(q[3] == 37)
+assert(q[4] == nil)
 assert(q:pop() == 17)
 assert(q:pop() == 23)
 assert(q:pop() == 37)
-assert(q:empty())
 
 local q = queue()
 q:copy({})
 q:copy({ 17 })
 q:copy({ 23, 37 })
-assert(not q:empty())
 assert(q:front() == 17)
+assert(q:back() == 37)
+assert(q[1] == 17)
+assert(q[2] == 23)
+assert(q[3] == 37)
+assert(q[4] == nil)
 assert(q:pop() == 17)
 assert(q:pop() == 23)
 assert(q:pop() == 37)
-assert(q:empty())
 
 local q = queue():push(17, 23, 37, 42)
 q:pop()
@@ -51,3 +58,23 @@ for v in q:each() do
 end
 assert(m == 23 + 37 + 42)
 assert(n == 3)
+
+local m = 0
+local n = 0
+for k, v in pairs(q) do
+  m = m + v
+  n = n + 1
+end
+assert(m == 23 + 37 + 42)
+assert(n == 3)
+
+local m = 0
+local n = 0
+for k, v in ipairs(q) do
+  m = m + v
+  n = n + k
+end
+assert(m == 23 + 37 + 42)
+assert(n == 1 + 2 + 3)
+
+assert(json.encode(q) ~= "{}")

@@ -76,11 +76,6 @@ function class:get(key)
   return nil
 end
 
-function class:empty()
-  local K = self[1]
-  return next(K) == nil
-end
-
 function class:each()
   return coroutine.wrap(function ()
     local K = self[1]

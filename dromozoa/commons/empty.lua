@@ -15,19 +15,15 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local function clone(this)
-  -- not check recursion
+local pairs = require "dromozoa.commons.pairs"
+
+return function (this)
   if type(this) == "table" then
-    local that = {}
-    -- avoid __pairs metamethod
-    for k, v in next, this, nil do
-      rawset(that, clone(k), clone(v))
+    for _ in pairs(this) do
+      return false
     end
-    -- not clone metatable
-    return setmetatable(that, getmetatable(this))
+    return true
   else
-    return this
+    return #this == 0
   end
 end
-
-return clone

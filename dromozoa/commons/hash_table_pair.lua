@@ -41,11 +41,6 @@ function class:get(handle)
   return v
 end
 
-function class:empty()
-  local F = self[6]
-  return F == nil
-end
-
 function class:each()
   local F = self[6]
   if F == nil then
