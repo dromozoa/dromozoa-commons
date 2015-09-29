@@ -15,18 +15,13 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local escape_char = {
-  [string.char(0x26)] = "&amp;";
-  [string.char(0x3C)] = "&lt;";
-  [string.char(0x3E)] = "&gt;";
-  [string.char(0x22)] = "&quot;";
-  [string.char(0x27)] = "&apos;";
+local visit = require "dromozoa.commons.visit"
+
+local visitor = {
+  foo = function (_, a, b, c) return a + b + c end;
+  bar = function () return 42 end;
 }
 
-local function escape(value)
-  return (tostring(value):gsub("[&<>\"']", escape_char))
-end
-
-return {
-  escape = escape;
-}
+assert(visit(visitor, "foo", 17, 23, 37) == 17 + 23 + 37)
+assert(visit(visitor, "bar", 17, 23, 37) == 42)
+assert(visit(visitor, "baz", 17, 23, 37) == nil)

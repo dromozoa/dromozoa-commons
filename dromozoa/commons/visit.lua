@@ -15,18 +15,10 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local escape_char = {
-  [string.char(0x26)] = "&amp;";
-  [string.char(0x3C)] = "&lt;";
-  [string.char(0x3E)] = "&gt;";
-  [string.char(0x22)] = "&quot;";
-  [string.char(0x27)] = "&apos;";
-}
-
-local function escape(value)
-  return (tostring(value):gsub("[&<>\"']", escape_char))
+return function (this, event, ...)
+  local fn = this[event]
+  if fn == nil then
+    return
+  end
+  return fn(this, ...)
 end
-
-return {
-  escape = escape;
-}
