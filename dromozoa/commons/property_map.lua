@@ -39,7 +39,7 @@ end
 
 function class:each()
   local dataset = self.dataset
-  return next, dataset, nil
+  return pairs(dataset)
 end
 
 function class:remove_item(handle)
@@ -56,7 +56,7 @@ function class:each_item(key)
   local dataset = self.dataset
   local data = dataset[key]
   if data then
-    return next, data, nil
+    return pairs(data)
   else
     return function () end
   end
