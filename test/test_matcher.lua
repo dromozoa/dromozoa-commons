@@ -16,9 +16,9 @@
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
 local sequence = require "dromozoa.commons.sequence"
-local string_matcher = require "dromozoa.commons.string_matcher"
+local matcher = require "dromozoa.commons.matcher"
 
-local m = string_matcher("foo\tbar\tbaz\n")
+local m = matcher("foo\tbar\tbaz\n")
 
 assert(m:match("(.)(.)(.)"))
 assert(#m == 3)
@@ -65,7 +65,7 @@ assert(m.i == 9)
 assert(m.j == 12)
 assert(m:eof())
 
-local m = string_matcher("\tfoo\tbar\t")
+local m = matcher("\tfoo\tbar\t")
 local done = false
 local data = sequence()
 repeat
