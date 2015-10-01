@@ -17,6 +17,16 @@
 
 local push = require "dromozoa.commons.push"
 
+local function match(self, i, j, ...)
+  self.i = i
+  self.j = j
+  local n = push(self, 0, ...)
+  for i = n + 1, #self do
+    self[i] = nil
+  end
+  return j ~= nil
+end
+
 local class = {}
 
 function class.new(s)
@@ -26,25 +36,17 @@ function class.new(s)
   }
 end
 
-local function match(self, lookahead, i, j, ...)
-  self.i = i
-  self.j = j
-  local n = push(self, 0, ...)
-  for i = n + 1, #self do
-    self[i] = nil
-  end
-  if i == nil then
-    return false
-  else
-    if not lookahead then
-      self.position = j + 1
-    end
+function class:match(pattern)
+  if match(self, self.s:find("^" .. pattern, self.position)) then
+    self.position = self.j + 1
     return true
+  else
+    return false
   end
 end
 
-function class:match(pattern, lookahead)
-  return match(self, lookahead, self.s:find("^" .. pattern, self.position))
+function class:lookahead(pattern)
+  return match(self, self.s:find("^" .. pattern, self.position))
 end
 
 function class:eof()

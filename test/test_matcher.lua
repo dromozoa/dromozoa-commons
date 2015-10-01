@@ -35,7 +35,7 @@ assert(m[1] == nil)
 assert(m.i == 4)
 assert(m.j == 4)
 
-assert(m:match("(b)", true))
+assert(m:lookahead("(b)"))
 assert(#m == 1)
 assert(m[1] == "b")
 assert(m[2] == nil)
