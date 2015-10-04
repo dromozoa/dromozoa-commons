@@ -64,19 +64,12 @@ function class:each()
   end)
 end
 
-local metatable = {}
-
-function metatable:__index(key)
-  if type(key) == "number" then
-    return self.data[key - 1 + self.min]
-  else
-    return class[key]
-  end
-end
+local metatable = {
+  __index = class;
+}
 
 function metatable:__pairs()
   local data = self.data
-  local n = self.min - 1
   return coroutine.wrap(function ()
     for i = self.min, self.max do
       coroutine.yield(i, data[i])
