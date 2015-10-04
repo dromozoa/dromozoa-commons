@@ -26,10 +26,6 @@ q:push(17)
 q:push(23, 37)
 assert(q:front() == 17)
 assert(q:back() == 37)
-assert(q[1] == 17)
-assert(q[2] == 23)
-assert(q[3] == 37)
-assert(q[4] == nil)
 assert(q:pop() == 17)
 assert(q:pop() == 23)
 assert(q:pop() == 37)
@@ -40,10 +36,6 @@ q:copy({ 17 })
 q:copy({ 23, 37 })
 assert(q:front() == 17)
 assert(q:back() == 37)
-assert(q[1] == 17)
-assert(q[2] == 23)
-assert(q[3] == 37)
-assert(q[4] == nil)
 assert(q:pop() == 17)
 assert(q:pop() == 23)
 assert(q:pop() == 37)
@@ -67,14 +59,3 @@ for k, v in pairs(q) do
 end
 assert(m == 23 + 37 + 42)
 assert(n == 3)
-
-local m = 0
-local n = 0
-for k, v in ipairs(q) do
-  m = m + v
-  n = n + k
-end
-assert(m == 23 + 37 + 42)
-assert(n == 1 + 2 + 3)
-
-assert(json.encode(q) ~= "{}")
