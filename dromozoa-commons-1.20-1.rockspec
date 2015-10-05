@@ -1,8 +1,8 @@
 package = "dromozoa-commons"
-version = "1.19-1"
+version = "1.20-1"
 source = {
-  url = "https://github.com/dromozoa/dromozoa-commons/archive/v1.19.tar.gz";
-  file = "dromozoa-commons-1.19.tar.gz";
+  url = "https://github.com/dromozoa/dromozoa-commons/archive/v1.20.tar.gz";
+  file = "dromozoa-commons-1.20.tar.gz";
 }
 description = {
   summary = "Reusable Lua components";
@@ -33,6 +33,11 @@ build = {
     ["dromozoa.commons.queue"] = "dromozoa/commons/queue.lua";
     ["dromozoa.commons.sequence"] = "dromozoa/commons/sequence.lua";
     ["dromozoa.commons.sequence_writer"] = "dromozoa/commons/sequence_writer.lua";
+    ["dromozoa.commons.set_difference"] = "dromozoa/commons/set_difference.lua";
+    ["dromozoa.commons.set_includes"] = "dromozoa/commons/set_includes.lua";
+    ["dromozoa.commons.set_intersection"] = "dromozoa/commons/set_intersection.lua";
+    ["dromozoa.commons.set_symmetric_difference"] = "dromozoa/commons/set_symmetric_difference.lua";
+    ["dromozoa.commons.set_union"] = "dromozoa/commons/set_union.lua";
     ["dromozoa.commons.split"] = "dromozoa/commons/split.lua";
     ["dromozoa.commons.uint32"] = "dromozoa/commons/uint32.lua";
     ["dromozoa.commons.uint64"] = "dromozoa/commons/uint64.lua";
