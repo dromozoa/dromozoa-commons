@@ -17,59 +17,61 @@
 
 local pairs = require "dromozoa.commons.pairs"
 
-return {
-  includes = function (a, b)
-    for k, v in pairs(b) do
-      if a[k] == nil then
-        return false
-      end
-    end
-    return true
-  end;
+local class = {}
 
-  difference = function (a, b)
-    local n = 0
-    for k in pairs(a) do
-      if b[k] ~= nil then
-        n = n + 1
-        a[k] = nil
-      end
+function class.includes(a, b)
+  for k, v in pairs(b) do
+    if a[k] == nil then
+      return false
     end
-    return n
-  end;
+  end
+  return true
+end
 
-  intersection = function (a, b)
-    local n = 0
-    for k in pairs(a) do
-      if b[k] == nil then
-        n = n + 1
-        a[k] = nil
-      end
-    end
-    return n
-  end;
-
-  symmetric_difference = function (a, b)
-    local n = 0
-    for k, v in pairs(b) do
+function class.intersection(a, b)
+  local n = 0
+  for k in pairs(a) do
+    if b[k] == nil then
       n = n + 1
-      if a[k] == nil then
-        a[k] = v
-      else
-        a[k] = nil
-      end
+      a[k] = nil
     end
-    return n
-  end;
+  end
+  return n
+end
 
-  union = function (a, b)
-    local n = 0
-    for k, v in pairs(b) do
-      if a[k] == nil then
-        n = n + 1
-        a[k] = v
-      end
+function class.difference(a, b)
+  local n = 0
+  for k in pairs(a) do
+    if b[k] ~= nil then
+      n = n + 1
+      a[k] = nil
     end
-    return n
-  end;
-}
+  end
+  return n
+end
+
+function class.union(a, b)
+  local n = 0
+  for k, v in pairs(b) do
+    if a[k] == nil then
+      n = n + 1
+      a[k] = v
+    end
+  end
+  return n
+end
+
+function class.symmetric_difference(a, b)
+  local n = 0
+  for k, v in pairs(b) do
+    n = n + 1
+    if a[k] == nil then
+      a[k] = v
+    else
+      a[k] = nil
+    end
+  end
+  return n
+end
+
+return class
