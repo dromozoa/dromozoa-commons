@@ -16,8 +16,8 @@
 -- along with dromozoa-bitset.  If not, see <http://www.gnu.org/licenses/>.
 
 local pairs = require "dromozoa.commons.pairs"
+local includes = require "dromozoa.commons.includes"
 local set_difference = require "dromozoa.commons.set_difference"
-local set_includes = require "dromozoa.commons.set_includes"
 local set_intersection = require "dromozoa.commons.set_intersection"
 local set_symmetric_difference = require "dromozoa.commons.set_symmetric_difference"
 local set_union = require "dromozoa.commons.set_union"
@@ -62,26 +62,26 @@ function class:flip(min, max)
   return self
 end
 
-function class:set_includes(that)
-  return set_includes(self, that)
+function class:includes(that)
+  return includes(self, that)
 end
 
-function class:set_intersection(that)
+function class:intersection(that)
   set_intersection(self, that)
   return self
 end
 
-function class:set_union(that)
+function class:union(that)
   set_union(self, that)
   return self
 end
 
-function class:set_difference(that)
+function class:difference(that)
   set_difference(self, that)
   return self
 end
 
-function class:set_symmetric_difference(that)
+function class:symmetric_difference(that)
   set_symmetric_difference(self, that)
   return self
 end

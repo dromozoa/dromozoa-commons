@@ -17,14 +17,14 @@
 
 local clone = require "dromozoa.commons.clone"
 local equal = require "dromozoa.commons.equal"
+local includes = require "dromozoa.commons.includes"
 local set_difference = require "dromozoa.commons.set_difference"
-local set_includes = require "dromozoa.commons.set_includes"
 local set_intersection = require "dromozoa.commons.set_intersection"
 local set_symmetric_difference = require "dromozoa.commons.set_symmetric_difference"
 local set_union = require "dromozoa.commons.set_union"
 
-assert(set_includes({ foo = 17, bar = 23 }, { bar = 37 }))
-assert(not set_includes({ foo = 17, bar = 23 }, { bar = 37, baz = 42 }))
+assert(includes({ foo = 17, bar = 23 }, { bar = 37 }))
+assert(not includes({ foo = 17, bar = 23 }, { bar = 37, baz = 42 }))
 
 local a = { foo = 17; bar = 23 }
 local b = { bar = 37; baz = 42 }
