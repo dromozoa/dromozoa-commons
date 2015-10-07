@@ -15,14 +15,11 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-bitset.  If not, see <http://www.gnu.org/licenses/>.
 
+local clone = require "dromozoa.commons.clone"
 local pairs = require "dromozoa.commons.pairs"
 local set = require "dromozoa.commons.set"
 
-local class = {}
-
-function class.new()
-  return {}
-end
+local class = clone(set)
 
 function class:set(min, max)
   if max == nil then
@@ -55,30 +52,6 @@ function class:flip(min, max)
       self[i] = nil
     end
   end
-  return self
-end
-
-function class:includes(that)
-  return set.includes(self, that)
-end
-
-function class:intersection(that)
-  set.intersection(self, that)
-  return self
-end
-
-function class:union(that)
-  set.union(self, that)
-  return self
-end
-
-function class:difference(that)
-  set.difference(self, that)
-  return self
-end
-
-function class:symmetric_difference(that)
-  set.symmetric_difference(self, that)
   return self
 end
 

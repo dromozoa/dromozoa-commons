@@ -19,59 +19,91 @@ local pairs = require "dromozoa.commons.pairs"
 
 local class = {}
 
-function class.includes(a, b)
-  for k, v in pairs(b) do
-    if a[k] == nil then
+function class.new()
+  return {}
+end
+
+function class:includes(that)
+  for k, v in pairs(that) do
+    if self[k] == nil then
       return false
     end
   end
   return true
 end
 
-function class.intersection(a, b)
-  local n = 0
-  for k in pairs(a) do
-    if b[k] == nil then
-      n = n + 1
-      a[k] = nil
+function class:intersection(that)
+  local count = 0
+  for k in pairs(self) do
+    if that[k] == nil then
+      count = count + 1
+      self[k] = nil
     end
   end
-  return n
+  return count
 end
 
-function class.difference(a, b)
-  local n = 0
-  for k in pairs(a) do
-    if b[k] ~= nil then
-      n = n + 1
-      a[k] = nil
+function class:difference(that)
+  local count = 0
+  for k in pairs(self) do
+    if that[k] ~= nil then
+      count = count + 1
+      self[k] = nil
     end
   end
-  return n
+  return count
 end
 
-function class.union(a, b)
-  local n = 0
-  for k, v in pairs(b) do
-    if a[k] == nil then
-      n = n + 1
-      a[k] = v
+function class:union(that)
+  local count = 0
+  for k, v in pairs(that) do
+    if self[k] == nil then
+      count = count + 1
+      self[k] = v
     end
   end
-  return n
+  return count
 end
 
-function class.symmetric_difference(a, b)
-  local n = 0
-  for k, v in pairs(b) do
-    n = n + 1
-    if a[k] == nil then
-      a[k] = v
+function class:symmetric_difference(that)
+  local count = 0
+  for k, v in pairs(that) do
+    count = count + 1
+    if self[k] == nil then
+      self[k] = v
     else
-      a[k] = nil
+      self[k] = nil
     end
   end
-  return n
+  return count
 end
 
-return class
+function class:set_intersection(that)
+  class.intersection(self, that)
+  return self
+end
+
+function class:set_difference(that)
+  class.difference(self, that)
+  return self
+end
+
+function class:set_union(that)
+  class.union(self, that)
+  return self
+end
+
+function class:set_symmetric_difference(that)
+  class.symmetric_difference(self, that)
+  return self
+end
+
+local metatable = {
+  __index = class;
+}
+
+return setmetatable(class, {
+  __call = function ()
+    return setmetatable(class.new(), metatable)
+  end;
+})

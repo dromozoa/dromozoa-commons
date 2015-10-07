@@ -17,6 +17,11 @@
 
 local bitset = require "dromozoa.commons.bitset"
 local equal = require "dromozoa.commons.equal"
+local set = require "dromozoa.commons.set"
+
+assert(set ~= bitset)
+assert(not equal(set, bitset))
+assert(set.set == nil)
 
 local bs = bitset():set(2, 4)
 assert(equal(bs, { [2] = true, [3] = true, [4] = true }))
@@ -33,11 +38,11 @@ assert(equal(bs, { [1] = true, [3] = true, [5] = true }))
 assert(bs:includes(bitset():set(1)))
 assert(not bs:includes(bitset():set(1, 5)))
 
-local bs = bitset():set(1, 2):union(bitset():set(2, 3))
+local bs = bitset():set(1, 2):set_union(bitset():set(2, 3))
 assert(equal(bs, { [1] = true, [2] = true, [3] = true }))
-bs:intersection(bitset():set(2, 4))
+bs:set_intersection(bitset():set(2, 4))
 assert(equal(bs, { [2] = true, [3] = true }))
-bs:symmetric_difference(bitset():set(3, 4))
+bs:set_symmetric_difference(bitset():set(3, 4))
 assert(equal(bs, { [2] = true, [4] = true }))
-bs:difference(bitset():set(1, 3))
+bs:set_difference(bitset():set(1, 3))
 assert(equal(bs, { [4] = true }))

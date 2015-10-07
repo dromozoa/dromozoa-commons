@@ -50,3 +50,11 @@ set.union(a, q)
 set.intersection(b, q)
 set.difference(a, b)
 assert(equal(a, { foo = 17, baz = 42 }))
+
+local a = set()
+a.foo = 17
+a.bar = 23
+local b = set()
+b.bar = 37
+b.baz = 42
+assert(equal(a:set_union(b):set_difference(b), { foo = 17 }))
