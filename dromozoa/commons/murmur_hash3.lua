@@ -16,6 +16,7 @@
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
 local double = require "dromozoa.commons.double"
+local translate_range = require "dromozoa.commons.translate_range"
 local uint32 = require "dromozoa.commons.uint32"
 local uint64 = require "dromozoa.commons.uint64"
 
@@ -69,16 +70,17 @@ return {
     return finalize(hash, 8)
   end;
 
-  string = function (key, hash)
-    local n = #key
-    local m = n - n % 4
-    for i = 4, m, 4 do
+  string = function (key, hash, i, j)
+    local min, max = translate_range(#key, i, j)
+    for i = min + 3, max, 4 do
       local a, b, c, d = string.byte(key, i - 3, i)
       hash = update1(hash, a + b * 0x100 + c * 0x10000 + d * 0x1000000)
       hash = update2(hash)
     end
-    if m < n then
-      local a, b, c = string.byte(key, m + 1, n)
+    local i = max + 1
+    local m = i - (i - min) % 4
+    if m < i then
+      local a, b, c = string.byte(key, m, max)
       if c then
         hash = update1(hash, a + b * 0x100 + c * 0x10000)
       elseif b then
@@ -87,6 +89,6 @@ return {
         hash = update1(hash, a)
       end
     end
-    return finalize(hash, n)
+    return finalize(hash, i - min)
   end;
 }

@@ -30,3 +30,5 @@ assert(murmur_hash3.string("abcdefghi", 0) == 1108608752)
 assert(murmur_hash3.uint32(0xFEEDFACE, 0) == 298348117)
 assert(murmur_hash3.uint64(0xFEEDFACE0000, 0) == 860420484)
 assert(murmur_hash3.double(math.pi, 0) == 2303256014)
+
+assert(murmur_hash3.string(" abc ", 0, 2, 4) == 3017643002)
