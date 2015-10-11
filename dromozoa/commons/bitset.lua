@@ -21,31 +21,31 @@ local set = require "dromozoa.commons.set"
 
 local class = clone(set)
 
-function class:set(min, max)
-  if max == nil then
-    max = min
+function class:set(i, j)
+  if j == nil then
+    j = i
   end
-  for i = min, max do
+  for i = i, j do
     self[i] = true
   end
   return self
 end
 
-function class:reset(min, max)
-  if max == nil then
-    max = min
+function class:reset(i, j)
+  if j == nil then
+    j = i
   end
-  for i = min, max do
+  for i = i, j do
     self[i] = nil
   end
   return self
 end
 
-function class:flip(min, max)
-  if max == nil then
-    max = min
+function class:flip(i, j)
+  if j == nil then
+    j = i
   end
-  for i = min, max do
+  for i = i, j do
     if self[i] == nil then
       self[i] = true
     else
