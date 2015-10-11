@@ -17,13 +17,13 @@
 
 local pairs = require "dromozoa.commons.pairs"
 
-return function (this)
-  if type(this) == "table" then
-    for _ in pairs(this) do
+return function (self)
+  if type(self) == "table" then
+    for _ in pairs(self) do
       return false
     end
     return true
   else
-    return #this == 0
+    return #self == 0
   end
 end

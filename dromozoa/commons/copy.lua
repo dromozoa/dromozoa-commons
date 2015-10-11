@@ -18,8 +18,8 @@
 local translate_range = require "dromozoa.commons.translate_range"
 
 return function (self, n, that, i, j)
-  i, j = translate_range(#that, i, j)
-  for i = i, j do
+  local min, max = translate_range(#that, i, j)
+  for i = min, max do
     n = n + 1
     self[n] = that[i]
   end

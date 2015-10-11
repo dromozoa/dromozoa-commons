@@ -15,10 +15,10 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-return function (this, event, ...)
-  local fn = this[event]
+return function (self, event, ...)
+  local fn = self[event]
   if fn == nil then
     return
   end
-  return fn(this, ...)
+  return fn(self, ...)
 end
