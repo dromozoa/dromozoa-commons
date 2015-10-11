@@ -15,8 +15,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-return function (this, event)
-  local metatable = getmetatable(this)
+return function (self, event)
+  local metatable = getmetatable(self)
   if metatable == nil then
     return nil
   end

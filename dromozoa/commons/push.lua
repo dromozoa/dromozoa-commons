@@ -15,13 +15,13 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local function push(this, n, value, ...)
+local function push(self, n, value, ...)
   if value == nil then
     return n
   else
     n = n + 1
-    this[n] = value
-    return push(this, n, ...)
+    self[n] = value
+    return push(self, n, ...)
   end
 end
 
