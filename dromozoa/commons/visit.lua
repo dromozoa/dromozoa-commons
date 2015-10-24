@@ -16,9 +16,13 @@
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
 return function (self, event, ...)
-  local fn = self[event]
-  if fn == nil then
+  local that = self[event]
+  if that == nil then
     return
   end
-  return fn(self, ...)
+  local t = type(that)
+  if t == "number" or t == "string" or t == "boolean" then
+    return that
+  end
+  return that(self, ...)
 end

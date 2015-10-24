@@ -20,8 +20,16 @@ local visit = require "dromozoa.commons.visit"
 local visitor = {
   foo = function (_, a, b, c) return a + b + c end;
   bar = function () return 42 end;
+  a = "qux";
+  b = 42;
+  c = true;
+  d = false;
 }
 
 assert(visit(visitor, "foo", 17, 23, 37) == 17 + 23 + 37)
 assert(visit(visitor, "bar", 17, 23, 37) == 42)
 assert(visit(visitor, "baz", 17, 23, 37) == nil)
+assert(visit(visitor, "a", 17, 23, 37) == "qux")
+assert(visit(visitor, "b", 17, 23, 37) == 42)
+assert(visit(visitor, "c", 17, 23, 37) == true)
+assert(visit(visitor, "d", 17, 23, 37) == false)
