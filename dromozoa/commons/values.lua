@@ -15,14 +15,13 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-return function (self, event, ...)
-  local that = self[event]
-  if that == nil then
-    return
+local pairs = require "dromozoa.commons.pairs"
+local sequence = require "dromozoa.commons.sequence"
+
+return function (self)
+  local values = sequence()
+  for _, v in pairs(self) do
+    values:push(v)
   end
-  local t = type(that)
-  if t == "number" or t == "string" or t == "boolean" then
-    return that
-  end
-  return that(self, ...)
+  return values
 end
