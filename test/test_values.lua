@@ -22,10 +22,8 @@ local data = values({
   foo = 17;
   bar = 23;
   baz = 37;
-})
-table.sort(data)
+}):sort()
 assert(equal(data, { 17, 23, 37 }))
 
-local data = values({ "foo", "bar", "baz" })
-table.sort(data)
+local data = values({ "foo", "bar", "baz" }):sort()
 assert(equal(data, { "bar", "baz", "foo" }))
