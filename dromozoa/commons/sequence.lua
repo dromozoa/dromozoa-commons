@@ -46,6 +46,11 @@ function class:copy(that, i, j)
   return self
 end
 
+function class:sort(compare)
+  table.sort(self, compare)
+  return self
+end
+
 function class:each()
   return coroutine.wrap(function ()
     for _, v in ipairs(self) do
