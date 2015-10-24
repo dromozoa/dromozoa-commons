@@ -15,14 +15,17 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-return function (self, event, ...)
-  local that = self[event]
-  if that == nil then
-    return
-  end
-  local t = type(that)
-  if t == "number" or t == "string" or t == "boolean" then
-    return that
-  end
-  return that(self, ...)
-end
+local equal = require "dromozoa.commons.equal"
+local values = require "dromozoa.commons.values"
+
+local data = values({
+  foo = 17;
+  bar = 23;
+  baz = 37;
+})
+table.sort(data)
+assert(equal(data, { 17, 23, 37 }))
+
+local data = values({ "foo", "bar", "baz" })
+table.sort(data)
+assert(equal(data, { "bar", "baz", "foo" }))
