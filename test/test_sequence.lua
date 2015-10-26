@@ -67,3 +67,7 @@ for v in sequence():push(17, 23, 37, 42):each() do
 end
 assert(m == 17 + 23 + 37 + 42)
 assert(n == 4)
+
+local s = sequence():push("foo", "bar", "baz", "qux")
+assert(s:concat() == "foobarbazqux")
+assert(s:concat(",") == "foo,bar,baz,qux")
