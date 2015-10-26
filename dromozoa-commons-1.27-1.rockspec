@@ -1,8 +1,8 @@
 package = "dromozoa-commons"
-version = "1.26-1"
+version = "1.27-1"
 source = {
-  url = "https://github.com/dromozoa/dromozoa-commons/archive/v1.26.tar.gz";
-  file = "dromozoa-commons-1.26.tar.gz";
+  url = "https://github.com/dromozoa/dromozoa-commons/archive/v1.27.tar.gz";
+  file = "dromozoa-commons-1.27.tar.gz";
 }
 description = {
   summary = "Reusable Lua components";
