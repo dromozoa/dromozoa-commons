@@ -46,3 +46,7 @@ bs:set_symmetric_difference(bitset():set(3, 4))
 assert(equal(bs, { [2] = true, [4] = true }))
 bs:set_difference(bitset():set(1, 3))
 assert(equal(bs, { [4] = true }))
+
+local bs = bitset():set(20):set(48, 57):set(65, 90):set(97, 122)
+assert(equal({ bs:bounds() }, { 20, 122 }))
+assert(equal(bs:ranges(), { { 20, 20 }, { 48, 57 }, { 65, 90 }, { 97, 122 } }))

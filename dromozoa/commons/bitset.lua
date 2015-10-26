@@ -17,6 +17,7 @@
 
 local clone = require "dromozoa.commons.clone"
 local pairs = require "dromozoa.commons.pairs"
+local sequence = require "dromozoa.commons.sequence"
 local set = require "dromozoa.commons.set"
 
 local class = clone(set)
@@ -56,7 +57,7 @@ function class:flip(i, j)
 end
 
 function class:test(i)
-  return self[i]
+  return self[i] ~= nil
 end
 
 function class:each()
@@ -69,6 +70,36 @@ function class:count()
     count = count + 1
   end
   return count
+end
+
+function class:bounds()
+  local min
+  local max
+  for k in pairs(self) do
+    if min == nil or min > k then
+      min = k
+    end
+    if max == nil or max < k then
+      max = k
+    end
+  end
+  return min, max
+end
+
+function class:ranges()
+  local ranges = sequence()
+  local i, j = class.bounds(self)
+  for i = i, j do
+    if self[i] ~= nil then
+      local top = ranges:top()
+      if top == nil or top[2] ~= i - 1 then
+        ranges:push({ i, i })
+      else
+        top[2] = i
+      end
+    end
+  end
+  return ranges
 end
 
 local metatable = {
