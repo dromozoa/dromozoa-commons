@@ -29,10 +29,11 @@ end
 
 local class = {}
 
-function class.new(s)
+function class.new(s, position)
   return {
     s = s;
     j = 0;
+    position = position;
   }
 end
 
@@ -58,7 +59,7 @@ local metatable = {
 }
 
 return setmetatable(class, {
-  __call = function (_, data)
-    return setmetatable(class.new(data), metatable)
+  __call = function (_, s, position)
+    return setmetatable(class.new(s, position), metatable)
   end;
 })
