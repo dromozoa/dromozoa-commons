@@ -51,6 +51,10 @@ function class:sort(compare)
   return self
 end
 
+function class:concat(sep)
+  return table.concat(self, sep)
+end
+
 function class:each()
   return coroutine.wrap(function ()
     for _, v in ipairs(self) do

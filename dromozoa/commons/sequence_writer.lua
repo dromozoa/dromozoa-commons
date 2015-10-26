@@ -40,8 +40,8 @@ function class:write(...)
   return self
 end
 
-function class:concat()
-  return table.concat(self)
+function class:concat(sep)
+  return table.concat(self, sep)
 end
 
 local metatable = {
