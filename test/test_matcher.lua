@@ -74,3 +74,10 @@ repeat
   done = not m:match("\t")
 until done
 assert(data, { "", "foo", "bar", "" })
+
+local m = matcher("___((()))___", 4)
+assert(m:match("%b()"))
+assert(m.i == 4)
+assert(m.j == 9)
+assert(m.position == 10)
+assert(not m:eof())
