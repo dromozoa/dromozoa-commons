@@ -28,11 +28,11 @@ local function get_named_char_refs()
 end
 
 local function get_numeric_char_refs(i, j)
-  local references = {}
+  local refs = {}
   for i = i, j do
-    references[string.char(i)] = string.format("&#x%x;", i)
+    refs[string.char(i)] = string.format("&#x%x;", i)
   end
-  return references
+  return refs
 end
 
 local char_refs = set.set_union(get_named_char_refs(), get_numeric_char_refs(0, 127))
