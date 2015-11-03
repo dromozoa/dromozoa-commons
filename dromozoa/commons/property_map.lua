@@ -62,6 +62,20 @@ function class:each_item(key)
   end
 end
 
+function class:count_item(key)
+  local dataset = self.dataset
+  local data = dataset[key]
+  if data then
+    local count = 0
+    for _ in pairs(data) do
+      count = count + 1
+    end
+    return count
+  else
+    return 0
+  end
+end
+
 function class:insert_property(handle, key, value)
   if handle == nil or key == nil then
     error "table index is nil"

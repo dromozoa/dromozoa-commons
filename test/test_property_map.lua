@@ -25,6 +25,10 @@ p:set_property(23, "color", "green")
 p:set_property(37, "color", "blue")
 p:set_property(42, "answer", true)
 
+assert(p:count_item("color") == 3)
+assert(p:count_item("answer") == 1)
+assert(p:count_item("no_such_key") == 0)
+
 assert(p:get_property(17, "color") == "red")
 assert(p:get_property(17, "answer") == nil)
 assert(p:get_property(42, "color") == nil)
@@ -66,6 +70,7 @@ for handle in p:each_item("color") do
 end
 assert(m == 17 + 23 + 37 + 42)
 assert(n == 4)
+assert(p:count_item("color") == 4)
 
 p:remove_item(42)
 assert(p:get_property(42, "color") == nil)
@@ -81,6 +86,7 @@ for handle in p:each_item("color") do
 end
 assert(m == 17 + 23 + 37)
 assert(n == 3)
+assert(p:count_item("color") == 3)
 
 assert(p:set_property(42, "answer", true) == nil)
 p:clear("color")
@@ -98,6 +104,7 @@ for handle in p:each_item("color") do
 end
 assert(m == 0)
 assert(n == 0)
+assert(p:count_item("color") == 0)
 
 p:clear()
 assert(p:get_property(42, "color") == nil)
