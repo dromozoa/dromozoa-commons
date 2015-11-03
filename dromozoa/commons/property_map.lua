@@ -55,10 +55,24 @@ end
 function class:each_item(key)
   local dataset = self.dataset
   local data = dataset[key]
-  if data then
-    return pairs(data)
-  else
+  if data == nil then
     return function () end
+  else
+    return pairs(data)
+  end
+end
+
+function class:count_item(key)
+  local dataset = self.dataset
+  local data = dataset[key]
+  if data == nil then
+    return 0
+  else
+    local count = 0
+    for _ in pairs(data) do
+      count = count + 1
+    end
+    return count
   end
 end
 
@@ -68,13 +82,13 @@ function class:insert_property(handle, key, value)
   end
   local dataset = self.dataset
   local data = dataset[key]
-  if data then
+  if data == nil then
+    dataset[key] = { [handle] = value }
+    return nil
+  else
     local v = data[handle]
     data[handle] = value
     return v
-  else
-    dataset[key] = { [handle] = value }
-    return nil
   end
 end
 
@@ -84,15 +98,15 @@ function class:remove_property(handle, key)
   end
   local dataset = self.dataset
   local data = dataset[key]
-  if data then
+  if data == nil then
+    return nil
+  else
     local v = data[handle]
     data[handle] = nil
     if empty(data) then
       dataset[key] = nil
     end
     return v
-  else
-    return nil
   end
 end
 
@@ -107,7 +121,7 @@ end
 function class:get_property(handle, key)
   local dataset = self.dataset
   local data = dataset[key]
-  if data then
+  if data ~= nil then
     return data[handle]
   end
 end
