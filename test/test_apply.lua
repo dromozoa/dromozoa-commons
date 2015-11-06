@@ -15,14 +15,14 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
+local apply = require "dromozoa.commons.apply"
 local bitset = require "dromozoa.commons.bitset"
-local front = require "dromozoa.commons.front"
 local ipairs = require "dromozoa.commons.ipairs"
 local pairs = require "dromozoa.commons.pairs"
 
-assert(front(pairs({})) == nil)
-assert(front(pairs({17})) == 1)
-assert(front(pairs({foo = 17})) == "foo")
-assert(front(ipairs({17, 23, 37})) == 1)
-assert(select(2, front(ipairs({17, 23, 37}))) == 17)
-assert(front(bitset():set(42):each()) == 42)
+assert(apply(pairs({})) == nil)
+assert(apply(pairs({17})) == 1)
+assert(apply(pairs({foo = 17})) == "foo")
+assert(apply(ipairs({17, 23, 37})) == 1)
+assert(select(2, apply(ipairs({17, 23, 37}))) == 17)
+assert(apply(bitset():set(42):each()) == 42)

@@ -15,6 +15,6 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-return function (iterator, ...)
-  return iterator(...)
+return function (fn, ...)
+  return fn(...)
 end
