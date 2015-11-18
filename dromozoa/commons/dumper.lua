@@ -15,44 +15,69 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
+local ipairs = require "dromozoa.commons.ipairs"
 local loadstring = require "dromozoa.commons.loadstring"
 local pairs = require "dromozoa.commons.pairs"
 local sequence_writer = require "dromozoa.commons.sequence_writer"
 
-local function dump(value)
-  local t = type(value)
+local function encode_key(key)
+  local t = type(key)
   if t == "number" then
-    return string.format("%.17g", value)
+    return string.format("[%.17g]", key)
   elseif t == "string" then
-    return string.format("%q", value)
-  elseif t == "boolean" then
-    if value then
-      return "true"
+    if key:match("^[%a_][%w_]*$") then
+      return key
     else
-      return "false"
+      return string.format("[%q]", key)
+    end
+  elseif t == "boolean" then
+    if key then
+      return "[true]"
+    else
+      return "[false]"
     end
   end
 end
 
 local function write(out, value)
-  local v = dump(value)
-  if v == nil then
-    if type(value) == "table" then
-      out:write("{")
+  local t = type(value)
+  if t == "number" then
+    out:write(string.format("%.17g", value))
+  elseif t == "string" then
+    out:write(string.format("%q", value))
+  elseif t == "boolean" then
+    if value then
+      out:write("true")
+    else
+      out:write("false")
+    end
+  elseif t == "table" then
+    out:write("{")
+    if value[1] == nil then
+      local first = true
       for k, v in pairs(value) do
-        local k = dump(k)
+        local k = encode_key(k)
         if k ~= nil then
-          out:write("[", k, "]=")
+          if first then
+            first = false
+          else
+            out:write(",")
+          end
+          out:write(k, "=")
           write(out, v)
-          out:write(";")
         end
       end
-      out:write("}")
     else
-      out:write("nil")
+      for i, v in ipairs(value) do
+        if i > 1 then
+          out:write(",")
+        end
+        write(out, v)
+      end
     end
+    out:write("}")
   else
-    out:write(v)
+    out:write("nil")
   end
   return out
 end

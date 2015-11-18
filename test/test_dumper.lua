@@ -25,8 +25,12 @@ assert(dumper.encode(42) == [[42]])
 
 local t = linked_hash_table()
 t.foo = sequence():push(17, 23, 37, 42)
-t.bar = false
+t.bar = true
 t.baz = "qux"
+t[42] = false
+t["foo bar"] = "baz qux"
+t._ = 42
 local result = dumper.encode(t)
-assert(result == [[{["foo"]={[1]=17;[2]=23;[3]=37;[4]=42;};["bar"]=false;["baz"]="qux";}]])
+-- print(result)
+assert(result == [[{foo={17,23,37,42},bar=true,baz="qux",[42]=false,["foo bar"]="baz qux",_=42}]])
 assert(equal(dumper.decode(result), t))
