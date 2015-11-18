@@ -55,7 +55,8 @@ local function write(out, value)
     end
   elseif t == "table" then
     if value[1] == nil then
-      out:write("{") local first = true
+      out:write("{")
+      local first = true
       for k, v in pairs(value) do
         if type(k) == "string" then
           if first then
