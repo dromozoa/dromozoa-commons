@@ -1,8 +1,8 @@
 package = "dromozoa-commons"
-version = "1.31-1"
+version = "1.32-1"
 source = {
-  url = "https://github.com/dromozoa/dromozoa-commons/archive/v1.31.tar.gz";
-  file = "dromozoa-commons-1.31.tar.gz";
+  url = "https://github.com/dromozoa/dromozoa-commons/archive/v1.32.tar.gz";
+  file = "dromozoa-commons-1.32.tar.gz";
 }
 description = {
   summary = "Reusable Lua components";
@@ -18,6 +18,7 @@ build = {
     ["dromozoa.commons.clone"] = "dromozoa/commons/clone.lua";
     ["dromozoa.commons.copy"] = "dromozoa/commons/copy.lua";
     ["dromozoa.commons.double"] = "dromozoa/commons/double.lua";
+    ["dromozoa.commons.dumper"] = "dromozoa/commons/dumper.lua";
     ["dromozoa.commons.empty"] = "dromozoa/commons/empty.lua";
     ["dromozoa.commons.equal"] = "dromozoa/commons/equal.lua";
     ["dromozoa.commons.getmetafield"] = "dromozoa/commons/getmetafield.lua";
@@ -26,6 +27,7 @@ build = {
     ["dromozoa.commons.hash_table_pair"] = "dromozoa/commons/hash_table_pair.lua";
     ["dromozoa.commons.ipairs"] = "dromozoa/commons/ipairs.lua";
     ["dromozoa.commons.json"] = "dromozoa/commons/json.lua";
+    ["dromozoa.commons.loadstring"] = "dromozoa/commons/loadstring.lua";
     ["dromozoa.commons.keys"] = "dromozoa/commons/keys.lua";
     ["dromozoa.commons.linked_hash_table"] = "dromozoa/commons/linked_hash_table.lua";
     ["dromozoa.commons.matcher"] = "dromozoa/commons/matcher.lua";
