@@ -15,75 +15,44 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local ipairs = require "dromozoa.commons.ipairs"
+local loadstring = require "dromozoa.commons.loadstring"
 local pairs = require "dromozoa.commons.pairs"
 local sequence_writer = require "dromozoa.commons.sequence_writer"
 
-local quote_char = {
-  [string.char(0x22)] = [[\"]];
-  [string.char(0x5C)] = [[\\]];
-  [string.char(0x2F)] = [[\/]];
-  [string.char(0x08)] = [[\b]];
-  [string.char(0x0C)] = [[\f]];
-  [string.char(0x0A)] = [[\n]];
-  [string.char(0x0D)] = [[\r]];
-  [string.char(0x09)] = [[\t]];
-}
-
-for i = 0x00, 0x19 do
-  local char = string.char(i)
-  if quote_char[char] == nil then
-    quote_char[char] = string.format([[\u%04X]], i)
+local function dump(value)
+  local t = type(value)
+  if t == "number" then
+    return string.format("%.17g", value)
+  elseif t == "string" then
+    return string.format("%q", value)
+  elseif t == "boolean" then
+    if value then
+      return "true"
+    else
+      return "false"
+    end
   end
 end
 
-local function quote(value)
-  return "\"" .. tostring(value):gsub("[\"\\/%c]", quote_char) .. "\""
-end
-
 local function write(out, value)
-  local t = type(value)
-  if t == "number" then
-    out:write(string.format("%.17g", value))
-  elseif t == "string" then
-    out:write(quote(value))
-  elseif t == "boolean" then
-    if value then
-      out:write("true")
-    else
-      out:write("false")
-    end
-  elseif t == "table" then
-    if value[1] == nil then
+  local v = dump(value)
+  if v == nil then
+    if type(value) == "table" then
       out:write("{")
-      local first = true
       for k, v in pairs(value) do
-        if type(k) == "string" then
-          if first then
-            first = false
-          else
-            out:write(",")
-          end
-          out:write(quote(k), ":")
+        local k = dump(k)
+        if k ~= nil then
+          out:write("[", k, "]=")
           write(out, v)
+          out:write(";")
         end
       end
       out:write("}")
     else
-      out:write("[")
-      local first = true
-      for _, v in ipairs(value) do
-        if first then
-          first = false
-        else
-          out:write(",")
-        end
-        write(out, v)
-      end
-      out:write("]")
+      out:write("nil")
     end
   else
-    out:write("null")
+    out:write(v)
   end
   return out
 end
@@ -92,8 +61,12 @@ local function encode(value)
   return write(sequence_writer(), value):concat()
 end
 
+local function decode(code)
+  return assert(loadstring("return " .. code))()
+end
+
 return {
-  quote = quote;
   write = write;
   encode = encode;
+  decode = decode;
 }
