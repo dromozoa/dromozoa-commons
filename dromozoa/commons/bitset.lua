@@ -15,12 +15,11 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-bitset.  If not, see <http://www.gnu.org/licenses/>.
 
-local clone = require "dromozoa.commons.clone"
 local pairs = require "dromozoa.commons.pairs"
 local sequence = require "dromozoa.commons.sequence"
 local set = require "dromozoa.commons.set"
 
-local class = clone(set)
+local class = {}
 
 function class:set(i, j)
   if j == nil then
@@ -107,6 +106,7 @@ local metatable = {
 }
 
 return setmetatable(class, {
+  __index = set;
   __call = function ()
     return setmetatable(class.new(), metatable)
   end;
