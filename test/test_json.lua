@@ -21,6 +21,7 @@ local json = require "dromozoa.commons.json"
 
 assert(json.quote("foo\"\\/\b\f\n\r\tbar\0baz") == [["foo\"\\\/\b\f\n\r\tbar\u0000baz"]])
 assert(json.quote(42) == [["42"]])
+assert(json.quote(string.char(0x1B)) == [["\u001B"]])
 
 local t = linked_hash_table()
 t.foo = sequence():push(17, 23, 37, 42)
