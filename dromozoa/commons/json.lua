@@ -30,7 +30,7 @@ local quote_char = {
   [string.char(0x09)] = [[\t]];
 }
 
-for i = 0x00, 0x19 do
+for i = 0x00, 0x1F do
   local char = string.char(i)
   if quote_char[char] == nil then
     quote_char[char] = string.format([[\u%04X]], i)
