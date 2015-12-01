@@ -89,15 +89,22 @@ local function write(out, value)
   return out
 end
 
-local function encode(value)
-  return write(sequence_writer(), value):concat()
-end
-
 local function parse(this)
   return json_parser(this):apply()
 end
 
-local function decode(code)
+local class = {
+  quote = quote;
+  write = write;
+  parse = parse;
+  null = json_parser.null;
+}
+
+function class.encode(value)
+  return write(sequence_writer(), value):concat()
+end
+
+function class.decode(code)
   local value, matcher = parse(code)
   if not matcher:eof() then
     error("cannot reach eof at position " .. matcher.position)
@@ -105,11 +112,4 @@ local function decode(code)
   return value
 end
 
-return {
-  quote = quote;
-  write = write;
-  encode = encode;
-  parse = parse;
-  decode = decode;
-  null = json_parser.null;
-}
+return class
