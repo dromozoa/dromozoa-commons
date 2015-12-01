@@ -45,7 +45,6 @@ assert(json.encode(t) == s)
 
 test(s)
 test([[0]])
-test([[-0]], [[0]])
 test([[-1.25]])
 test([[-1.25e3]], [[-1250]])
 test([[-1e3]], [[-1000]])
