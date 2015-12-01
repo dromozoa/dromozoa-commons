@@ -20,6 +20,7 @@ local sequence_writer = require "dromozoa.commons.sequence_writer"
 local out = sequence_writer()
 out:write("foo"):write("bar", 42)
 out:write("baz")
+out:write()
 assert(not pcall(out.write, out, true))
 assert(out:concat() == "foobar42baz")
 assert(out:concat(",") == "foo,bar,42,baz")
