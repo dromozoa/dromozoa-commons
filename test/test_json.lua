@@ -18,6 +18,7 @@
 local linked_hash_table = require "dromozoa.commons.linked_hash_table"
 local sequence = require "dromozoa.commons.sequence"
 local json = require "dromozoa.commons.json"
+local json_parser = require "dromozoa.commons.json_parser"
 
 assert(json.quote("foo\"\\/\b\f\n\r\tbar\0baz") == [["foo\"\\\/\b\f\n\r\tbar\u0000baz"]])
 assert(json.quote(42) == [["42"]])
@@ -28,3 +29,14 @@ t.foo = sequence():push(17, 23, 37, 42)
 t.bar = false
 t.baz = "qux"
 assert(json.encode(t) == [[{"foo":[17,23,37,42],"bar":false,"baz":"qux"}]])
+
+print(json.encode(json_parser("0"):apply()))
+print(json.encode(json_parser("-0"):apply()))
+print(json.encode(json_parser("-12"):apply()))
+print(json.encode(json_parser("-12.34"):apply()))
+print(json.encode(json_parser("-12.34e5"):apply()))
+print(json.encode(json_parser("-12e3"):apply()))
+print(json.encode(json_parser([["foo\"\\\/\b\f\n\r\tbar\u0000baz"]]):apply()))
+print(json.encode(json_parser([[{"foo":17,"bar":[true,null,false]}]]):apply()))
+print(json.encode(json_parser([["\u65E5\u672C\u8A9E"]]):apply()))
+print(json.encode(json_parser([["\uD84C\uDFB4"]]):apply()))
