@@ -21,6 +21,16 @@ local sequence_writer = require "dromozoa.commons.sequence_writer"
 local linked_hash_table = require "dromozoa.commons.linked_hash_table"
 local utf8 = require "dromozoa.commons.utf8"
 
+local parse_char = {
+  b = "\b";
+  f = "\f";
+  n = "\n";
+  r = "\r";
+  t = "\t";
+}
+
+local ws = "[ \t\r\n]*"
+
 local class = {
   null = function () end;
 }
@@ -47,28 +57,26 @@ end
 function class:parse_object()
   local this = self.this
   local stack = self.stack
-  local object = linked_hash_table()
-  local n = 0
-  local first = true
+  local that = linked_hash_table()
   while true do
-    this:match("[ \t\n\r]*")
+    this:match(ws)
     if not this:match("\"") then
-      self:raise()
+      self:raise("string expected")
     end
     self:parse_string()
     local key = stack:pop()
-    this:match("[ \t\n\r]*")
+    this:match(ws)
     if not this:match(":") then
-      self:raise()
+      self:raise("name-separator expected")
     end
     self:parse_value()
-    object[key] = stack:pop()
-    this:match("[ \t\n\r]*")
+    that[key] = stack:pop()
+    this:match(ws)
     if this:match("%}") then
-      stack:push(object)
+      stack:push(that)
       return
     elseif not this:match("%,") then
-      self:raise()
+      self:raise("value-separator expected")
     end
   end
 end
@@ -76,33 +84,20 @@ end
 function class:parse_array()
   local this = self.this
   local stack = self.stack
-  local array = sequence()
-  local n = 0
-  local first = true
+  local that = sequence()
   while true do
-    this:match("[ \t\n\r]*")
+    this:match(ws)
     self:parse_value()
-    array:push(stack:pop())
-    this:match("[ \t\n\r]*")
+    that:push(stack:pop())
+    this:match(ws)
     if this:match("%]") then
-      stack:push(array)
+      stack:push(that)
       return
     elseif not this:match("%,") then
-      self:raise()
+      self:raise("value-separator expected")
     end
   end
 end
-
-local parse_char = {
-  ["\""] = "\"";
-  ["\\"] = "\\";
-  ["/"] = "/";
-  ["b"] = "\b";
-  ["f"] = "\f";
-  ["n"] = "\n";
-  ["r"] = "\r";
-  ["t"] = "\t";
-}
 
 function class:parse_string()
   local this = self.this
@@ -114,7 +109,9 @@ function class:parse_string()
       return
     elseif this:match([[([^%\%"]+)]]) then
       out:write(this[1])
-    elseif this:match([[\([%"%\%/bfnrt])]]) then
+    elseif this:match([[\([%"%\%/])]]) then
+      out:write(this[1])
+    elseif this:match([[\([bfnrt])]]) then
       out:write(parse_char[this[1]])
     elseif this:match([[\u([Dd][89ABab]%x%x)\u([Dd][C-Fc-f]%x%x)]]) then
       local a = tonumber(this[1], 16) % 0x0400 * 0x0400
@@ -131,7 +128,7 @@ end
 function class:parse_value()
   local this = self.this
   local stack = self.stack
-  this:match("[ \t\n\r]*")
+  this:match(ws)
   if this:match("false") then
     stack:push(false)
   elseif this:match("null") then
@@ -160,8 +157,10 @@ function class:parse_value()
 end
 
 function class:apply()
+  local this = self.this
   local stack = self.stack
   self:parse_value()
+  this:match(ws)
   if #stack == 1 then
     return stack:pop(), self.this
   else

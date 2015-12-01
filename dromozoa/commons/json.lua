@@ -93,14 +93,23 @@ local function encode(value)
   return write(sequence_writer(), value):concat()
 end
 
+local function parse(this)
+  return json_parser(this):apply()
+end
+
 local function decode(code)
-  return json_parser(code):apply()
+  local value, matcher = parse(code)
+  if not matcher:eof() then
+    error("cannot reach eof at position " .. matcher.position)
+  end
+  return value
 end
 
 return {
   quote = quote;
   write = write;
   encode = encode;
+  parse = parse;
   decode = decode;
   null = json_parser.null;
 }
