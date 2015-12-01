@@ -17,6 +17,7 @@
 
 local ipairs = require "dromozoa.commons.ipairs"
 local pairs = require "dromozoa.commons.pairs"
+local json_parser = require "dromozoa.commons.json_parser"
 local sequence_writer = require "dromozoa.commons.sequence_writer"
 
 local quote_char = {
@@ -88,12 +89,27 @@ local function write(out, value)
   return out
 end
 
-local function encode(value)
+local function parse(this)
+  return json_parser(this):apply()
+end
+
+local class = {
+  quote = quote;
+  write = write;
+  parse = parse;
+  null = json_parser.null;
+}
+
+function class.encode(value)
   return write(sequence_writer(), value):concat()
 end
 
-return {
-  quote = quote;
-  write = write;
-  encode = encode;
-}
+function class.decode(code)
+  local value, matcher = parse(code)
+  if not matcher:eof() then
+    error("cannot reach eof at position " .. matcher.position)
+  end
+  return value
+end
+
+return class
