@@ -17,6 +17,7 @@
 
 local ipairs = require "dromozoa.commons.ipairs"
 local pairs = require "dromozoa.commons.pairs"
+local json_parser = require "dromozoa.commons.json_parser"
 local sequence_writer = require "dromozoa.commons.sequence_writer"
 
 local quote_char = {
@@ -92,8 +93,14 @@ local function encode(value)
   return write(sequence_writer(), value):concat()
 end
 
+local function decode(code)
+  return json_parser(code):apply()
+end
+
 return {
   quote = quote;
   write = write;
   encode = encode;
+  decode = decode;
+  null = json_parser.null;
 }

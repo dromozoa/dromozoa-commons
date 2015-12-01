@@ -15,10 +15,22 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
+local dumper = require "dromozoa.commons.dumper"
+local equal = require "dromozoa.commons.equal"
 local linked_hash_table = require "dromozoa.commons.linked_hash_table"
 local sequence = require "dromozoa.commons.sequence"
 local json = require "dromozoa.commons.json"
-local json_parser = require "dromozoa.commons.json_parser"
+
+local function test(this, that)
+  local value = json.decode(this)
+  -- print(dumper.encode(value))
+  local code = json.encode(value)
+  if that == nil then
+    assert(equal(code, this))
+  else
+    assert(equal(code, that))
+  end
+end
 
 assert(json.quote("foo\"\\/\b\f\n\r\tbar\0baz") == [["foo\"\\\/\b\f\n\r\tbar\u0000baz"]])
 assert(json.quote(42) == [["42"]])
@@ -28,15 +40,18 @@ local t = linked_hash_table()
 t.foo = sequence():push(17, 23, 37, 42)
 t.bar = false
 t.baz = "qux"
-assert(json.encode(t) == [[{"foo":[17,23,37,42],"bar":false,"baz":"qux"}]])
+local s = [[{"foo":[17,23,37,42],"bar":false,"baz":"qux"}]]
+assert(json.encode(t) == s)
 
-print(json.encode(json_parser("0"):apply()))
-print(json.encode(json_parser("-0"):apply()))
-print(json.encode(json_parser("-12"):apply()))
-print(json.encode(json_parser("-12.34"):apply()))
-print(json.encode(json_parser("-12.34e5"):apply()))
-print(json.encode(json_parser("-12e3"):apply()))
-print(json.encode(json_parser([["foo\"\\\/\b\f\n\r\tbar\u0000baz"]]):apply()))
-print(json.encode(json_parser([[{"foo":17,"bar":[true,null,false]}]]):apply()))
-print(json.encode(json_parser([["\u65E5\u672C\u8A9E"]]):apply()))
-print(json.encode(json_parser([["\uD84C\uDFB4"]]):apply()))
+test(s)
+test([[0]])
+test([[-0]], [[0]])
+test([[-1.25]])
+test([[-1.25e3]], [[-1250]])
+test([[-1e3]], [[-1000]])
+test([["foo\"\\\/\b\f\n\r\tbar\u0000baz"]])
+test([[""]])
+test([["\u65E5\u672C\u8A9E"]], [["日本語"]])
+test([["\uD84C\uDFB4"]], "\"" .. string.char(0xF0, 0xA3, 0x8E, 0xB4) .. "\"")
+
+assert(json.decode("null") == json.null)

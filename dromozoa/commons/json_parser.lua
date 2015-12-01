@@ -18,12 +18,12 @@
 local matcher = require "dromozoa.commons.matcher"
 local sequence = require "dromozoa.commons.sequence"
 local sequence_writer = require "dromozoa.commons.sequence_writer"
-local linked_hash_table = require "dromozoa.commons.sequence"
+local linked_hash_table = require "dromozoa.commons.linked_hash_table"
 local utf8 = require "dromozoa.commons.utf8"
 
-local null = function () end
-
-local class = {}
+local class = {
+  null = function () end;
+}
 
 function class.new(this)
   if type(this) == "string" then
@@ -135,7 +135,7 @@ function class:parse_value()
   if this:match("false") then
     stack:push(false)
   elseif this:match("null") then
-    stack:push(null)
+    stack:push(class.null)
   elseif this:match("true") then
     stack:push(true)
   elseif this:match("%{") then
