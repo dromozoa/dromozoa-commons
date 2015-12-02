@@ -37,6 +37,7 @@ build = {
     ["dromozoa.commons.property_map"] = "dromozoa/commons/property_map.lua";
     ["dromozoa.commons.push"] = "dromozoa/commons/push.lua";
     ["dromozoa.commons.queue"] = "dromozoa/commons/queue.lua";
+    ["dromozoa.commons.read_file"] = "dromozoa/commons/read_file.lua";
     ["dromozoa.commons.sequence"] = "dromozoa/commons/sequence.lua";
     ["dromozoa.commons.sequence_writer"] = "dromozoa/commons/sequence_writer.lua";
     ["dromozoa.commons.set"] = "dromozoa/commons/set.lua";
@@ -48,6 +49,7 @@ build = {
     ["dromozoa.commons.utf8"] = "dromozoa/commons/utf8.lua";
     ["dromozoa.commons.values"] = "dromozoa/commons/values.lua";
     ["dromozoa.commons.visit"] = "dromozoa/commons/visit.lua";
+    ["dromozoa.commons.write_file"] = "dromozoa/commons/write_file.lua";
     ["dromozoa.commons.xml"] = "dromozoa/commons/xml.lua";
   };
 }
