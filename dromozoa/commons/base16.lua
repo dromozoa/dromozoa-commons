@@ -32,6 +32,7 @@ for i = 10, 15 do
   local char = string.char(byte)
   code_to_char[i] = char
   byte_to_code[byte] = i
+  byte_to_code[char:lower():byte()] = i
 end
 
 local function write(out, v)
@@ -40,26 +41,7 @@ local function write(out, v)
   out:write(code_to_char[a], code_to_char[b])
 end
 
-local function decode(code, i, j)
-  local min, max = translate_range(#code, i, j)
-  local out = sequence_writer()
-  for i = min + 3, max, 4 do
-    local a, b, c, d = string.byte(code, i - 3, i)
-    out:write(string.char(byte_to_code[a] * 16 + byte_to_code[b], byte_to_code[c] * 16 + byte_to_code[d]))
-  end
-  local i = max + 1
-  local m = i - (i - min) % 4
-  if m < i then
-    local a, b, c = string.byte(code, m, max)
-    if b then
-      out:write(string.char(byte_to_code[a] * 16 + byte_to_code[b]))
-    end
-  end
-  return out:concat()
-end
-
 return {
-  decode = decode;
   encode = function (value, i, j)
     local min, max = translate_range(#value, i, j)
     local out = sequence_writer()
@@ -83,6 +65,24 @@ return {
         write(out, b)
       else
         write(out, a)
+      end
+    end
+    return out:concat()
+  end;
+
+  decode = function (code, i, j)
+    local min, max = translate_range(#code, i, j)
+    local out = sequence_writer()
+    for i = min + 3, max, 4 do
+      local a, b, c, d = string.byte(code, i - 3, i)
+      out:write(string.char(byte_to_code[a] * 16 + byte_to_code[b], byte_to_code[c] * 16 + byte_to_code[d]))
+    end
+    local i = max + 1
+    local m = i - (i - min) % 4
+    if m < i then
+      local a, b, c = string.byte(code, m, max)
+      if b then
+        out:write(string.char(byte_to_code[a] * 16 + byte_to_code[b]))
       end
     end
     return out:concat()

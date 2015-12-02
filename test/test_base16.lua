@@ -21,6 +21,7 @@ local function test(this, that)
   local code = base16.encode(this)
   assert(code == that)
   assert(base16.decode(code) == this)
+  assert(base16.decode(code:lower()) == this)
 end
 
 test("", "")
