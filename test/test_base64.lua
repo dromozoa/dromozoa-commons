@@ -15,19 +15,18 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local base16 = require "dromozoa.commons.base16"
+local base64 = require "dromozoa.commons.base64"
 
-local function test(this, that)
-  local code = base16.encode(this)
-  assert(code == that)
-  assert(base16.decode(code) == this)
-  assert(base16.decode(code:lower()) == this)
+local function test(text, code)
+  local result = base64.encode(text)
+  assert(result == code)
 end
 
 test("", "")
-test("f", "66")
-test("fo", "666F")
-test("foo", "666F6F")
-test("foob", "666F6F62")
-test("fooba", "666F6F6261")
-test("foobar", "666F6F626172")
+test("f", "Zg==")
+test("fo", "Zm8=")
+test("foo", "Zm9v")
+test("foob", "Zm9vYg==")
+test("fooba", "Zm9vYmE=")
+test("foobar", "Zm9vYmFy")
+test("ABCDEFG", "QUJDREVGRw==")
