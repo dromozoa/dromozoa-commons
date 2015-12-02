@@ -41,6 +41,7 @@ build = {
     ["dromozoa.commons.sequence"] = "dromozoa/commons/sequence.lua";
     ["dromozoa.commons.sequence_writer"] = "dromozoa/commons/sequence_writer.lua";
     ["dromozoa.commons.set"] = "dromozoa/commons/set.lua";
+    ["dromozoa.commons.shell"] = "dromozoa/commons/shell.lua";
     ["dromozoa.commons.split"] = "dromozoa/commons/split.lua";
     ["dromozoa.commons.translate_range"] = "dromozoa/commons/translate_range.lua";
     ["dromozoa.commons.uint32"] = "dromozoa/commons/uint32.lua";
