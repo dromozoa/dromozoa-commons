@@ -81,3 +81,7 @@ assert(m.i == 4)
 assert(m.j == 9)
 assert(m.position == 10)
 assert(not m:eof())
+
+assert(string_matcher(""):eof())
+assert(not string_matcher("foo"):eof())
+

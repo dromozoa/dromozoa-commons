@@ -30,6 +30,9 @@ end
 local class = {}
 
 function class.new(s, position)
+  if position == nil then
+    position = 1
+  end
   return {
     s = s;
     j = 0;
