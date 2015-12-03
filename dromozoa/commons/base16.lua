@@ -35,33 +35,58 @@ for i = 10, 15 do
   byte_to_code[char:lower():byte()] = i
 end
 
-local function write_code(out, v)
+local function encode_impl(out, v)
   local b = v % 16
   local a = (v - b) / 16
   out:write(code_to_char[a], code_to_char[b])
 end
 
-local function write(out, s, min, max)
+local function encode(out, s, min, max)
   for i = min + 3, max, 4 do
     local a, b, c, d = s:byte(i - 3, i)
-    write_code(out, a)
-    write_code(out, b)
-    write_code(out, c)
-    write_code(out, d)
+    encode_impl(out, a)
+    encode_impl(out, b)
+    encode_impl(out, c)
+    encode_impl(out, d)
   end
   local i = max + 1
   local m = i - (i - min) % 4
   if m < i then
     local a, b, c = s:byte(m, max)
     if c then
-      write_code(out, a)
-      write_code(out, b)
-      write_code(out, c)
+      encode_impl(out, a)
+      encode_impl(out, b)
+      encode_impl(out, c)
     elseif b then
-      write_code(out, a)
-      write_code(out, b)
+      encode_impl(out, a)
+      encode_impl(out, b)
     else
-      write_code(out, a)
+      encode_impl(out, a)
+    end
+  end
+  return out
+end
+
+local function decode(out, s, min, max)
+  for i = min + 3, max, 4 do
+    local p = i - 3
+    if s:find("^%x%x%x%x", p) == nil then
+      return nil, "decode error at position " .. p
+    end
+    local a, b, c, d = s:byte(p, i)
+    out:write(string.char(byte_to_code[a] * 16 + byte_to_code[b], byte_to_code[c] * 16 + byte_to_code[d]))
+  end
+  local i = max + 1
+  local p = i - (i - min) % 4
+  if p < i then
+    if s:find("^%x%x", p) == nil then
+      return nil, "decode error at position " .. p
+    end
+    local a, b, c = s:byte(p, max)
+    if not c and b then
+      out:write(string.char(byte_to_code[a] * 16 + byte_to_code[b]))
+    else
+      return nil, "decode error at position " .. p
     end
   end
   return out
@@ -69,24 +94,15 @@ end
 
 return {
   encode = function (s, i, j)
-    return write(sequence_writer(), s, translate_range(#s, i, j)):concat()
+    return encode(sequence_writer(), s, translate_range(#s, i, j)):concat()
   end;
 
-  decode = function (code, i, j)
-    local min, max = translate_range(#code, i, j)
-    local out = sequence_writer()
-    for i = min + 3, max, 4 do
-      local a, b, c, d = string.byte(code, i - 3, i)
-      out:write(string.char(byte_to_code[a] * 16 + byte_to_code[b], byte_to_code[c] * 16 + byte_to_code[d]))
+  decode = function (s, i, j)
+    local result, message = decode(sequence_writer(), s, translate_range(#s, i, j))
+    if result == nil then
+      return nil, message
+    else
+      return result:concat()
     end
-    local i = max + 1
-    local m = i - (i - min) % 4
-    if m < i then
-      local a, b, c = string.byte(code, m, max)
-      if b then
-        out:write(string.char(byte_to_code[a] * 16 + byte_to_code[b]))
-      end
-    end
-    return out:concat()
   end;
 }
