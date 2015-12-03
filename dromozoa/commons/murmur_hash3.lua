@@ -73,14 +73,14 @@ return {
   string = function (key, hash, i, j)
     local min, max = translate_range(#key, i, j)
     for i = min + 3, max, 4 do
-      local a, b, c, d = string.byte(key, i - 3, i)
+      local a, b, c, d = key:byte(i - 3, i)
       hash = update1(hash, a + b * 0x100 + c * 0x10000 + d * 0x1000000)
       hash = update2(hash)
     end
     local i = max + 1
-    local m = i - (i - min) % 4
-    if m < i then
-      local a, b, c = string.byte(key, m, max)
+    local p = i - (i - min) % 4
+    if p < i then
+      local a, b, c = key:byte(p, max)
       if c then
         hash = update1(hash, a + b * 0x100 + c * 0x10000)
       elseif b then

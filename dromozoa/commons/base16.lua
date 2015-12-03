@@ -18,73 +18,121 @@
 local sequence_writer = require "dromozoa.commons.sequence_writer"
 local translate_range = require "dromozoa.commons.translate_range"
 
-local code_to_char = {}
-local byte_to_code = {}
+local encoder_upper = {}
+local encoder_lower = {}
+local decoder = {}
 
+local n = ("0"):byte()
 for i = 0, 9 do
-  local byte = string.byte("0") + i
+  local byte = i + n
   local char = string.char(byte)
-  code_to_char[i] = char
-  byte_to_code[byte] = i
-end
-for i = 10, 15 do
-  local byte = string.byte("A") + i - 10
-  local char = string.char(byte)
-  code_to_char[i] = char
-  byte_to_code[byte] = i
-  byte_to_code[char:lower():byte()] = i
+  encoder_upper[i] = char
+  encoder_lower[i] = char
+  decoder[byte] = i
 end
 
-local function write(out, v)
+local n = ("A"):byte() - 10
+for i = 10, 15 do
+  local byte = i + n
+  local char = string.char(byte)
+  encoder_upper[i] = char
+  decoder[byte] = i
+end
+
+local n = ("a"):byte() - 10
+for i = 10, 15 do
+  local byte = i + n
+  local char = string.char(byte)
+  encoder_lower[i] = char
+  decoder[byte] = i
+end
+
+local function encode_impl(encoder, out, v)
   local b = v % 16
   local a = (v - b) / 16
-  out:write(code_to_char[a], code_to_char[b])
+  out:write(encoder[a], encoder[b])
 end
 
-return {
-  encode = function (value, i, j)
-    local min, max = translate_range(#value, i, j)
-    local out = sequence_writer()
-    for i = min + 3, max, 4 do
-      local a, b, c, d = string.byte(value, i - 3, i)
-      write(out, a)
-      write(out, b)
-      write(out, c)
-      write(out, d)
-    end
-    local i = max + 1
-    local m = i - (i - min) % 4
-    if m < i then
-      local a, b, c = string.byte(value, m, max)
-      if c then
-        write(out, a)
-        write(out, b)
-        write(out, c)
-      elseif b then
-        write(out, a)
-        write(out, b)
-      else
-        write(out, a)
-      end
-    end
-    return out:concat()
-  end;
+local function encode(encoder, out, s, min, max)
+  for i = min + 3, max, 4 do
+    local p = i - 3
+    local a, b, c, d = s:byte(p, i)
+    encode_impl(encoder, out, a)
+    encode_impl(encoder, out, b)
+    encode_impl(encoder, out, c)
+    encode_impl(encoder, out, d)
+  end
 
-  decode = function (code, i, j)
-    local min, max = translate_range(#code, i, j)
-    local out = sequence_writer()
-    for i = min + 3, max, 4 do
-      local a, b, c, d = string.byte(code, i - 3, i)
-      out:write(string.char(byte_to_code[a] * 16 + byte_to_code[b], byte_to_code[c] * 16 + byte_to_code[d]))
+  local i = max + 1
+  local p = i - (i - min) % 4
+  if p < i then
+    local a, b, c = s:byte(p, max)
+    if c then
+      encode_impl(encoder, out, a)
+      encode_impl(encoder, out, b)
+      encode_impl(encoder, out, c)
+    elseif b then
+      encode_impl(encoder, out, a)
+      encode_impl(encoder, out, b)
+    else
+      encode_impl(encoder, out, a)
     end
-    local i = max + 1
-    local m = i - (i - min) % 4
-    if m < i then
-      local a, b, c = string.byte(code, m, max)
-      if b then
-        out:write(string.char(byte_to_code[a] * 16 + byte_to_code[b]))
-      end
+  end
+
+  return out
+end
+
+local function decode(out, s, min, max)
+  local n = max - min + 1
+  if n == 0 then
+    return out
+  elseif n % 2 ~= 0 then
+    return nil, "length not divisible by 2"
+  end
+
+  for i = min + 3, max, 4 do
+    local p = i - 3
+    if s:find("^%x%x%x%x", p) == nil then
+      return nil, "decode error at position " .. p
     end
-    return out:concat()
-  end;
-}
+    local a, b, c, d = s:byte(p, i)
+    out:write(string.char(decoder[a] * 16 + decoder[b], decoder[c] * 16 + decoder[d]))
+  end
+
+  if n % 4 == 2 then
+    local p = max - 1
+    if s:find("^%x%x", p) == nil then
+      return nil, "decode error at position " .. p
+    end
+    local a, b = s:byte(p, max)
+    out:write(string.char(decoder[a] * 16 + decoder[b]))
+  end
+
+  return out
+end
+
+local class = {}
+
+function class.encode_upper(s, i, j)
+  local s = tostring(s)
+  return encode(encoder_upper, sequence_writer(), s, translate_range(#s, i, j)):concat()
+end
+
+function class.encode_lower(s, i, j)
+  local s = tostring(s)
+  return encode(encoder_lower, sequence_writer(), s, translate_range(#s, i, j)):concat()
+end
+
+function class.decode(s, i, j)
+  local s = tostring(s)
+  local result, message = decode(sequence_writer(), s, translate_range(#s, i, j))
+  if result == nil then
+    return nil, message
+  else
+    return result:concat()
+  end
+end
+
+class.encode = class.encode_upper
+
+return class
