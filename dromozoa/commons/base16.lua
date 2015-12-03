@@ -18,50 +18,62 @@
 local sequence_writer = require "dromozoa.commons.sequence_writer"
 local translate_range = require "dromozoa.commons.translate_range"
 
-local code_to_char = {}
-local byte_to_code = {}
+local encoder_upper = {}
+local encoder_lower = {}
+local decoder = {}
 
+local n = ("0"):byte()
 for i = 0, 9 do
-  local byte = string.byte("0") + i
+  local byte = i + n
   local char = string.char(byte)
-  code_to_char[i] = char
-  byte_to_code[byte] = i
-end
-for i = 10, 15 do
-  local byte = string.byte("A") + i - 10
-  local char = string.char(byte)
-  code_to_char[i] = char
-  byte_to_code[byte] = i
-  byte_to_code[char:lower():byte()] = i
+  encoder_upper[i] = char
+  encoder_lower[i] = char
+  decoder[byte] = i
 end
 
-local function encode_impl(out, v)
+local n = ("A"):byte() - 10
+for i = 10, 15 do
+  local byte = i + n
+  local char = string.char(byte)
+  encoder_upper[i] = char
+  decoder[byte] = i
+end
+
+local n = ("a"):byte() - 10
+for i = 10, 15 do
+  local byte = i + n
+  local char = string.char(byte)
+  encoder_lower[i] = char
+  decoder[byte] = i
+end
+
+local function encode_impl(encoder, out, v)
   local b = v % 16
   local a = (v - b) / 16
-  out:write(code_to_char[a], code_to_char[b])
+  out:write(encoder[a], encoder[b])
 end
 
-local function encode(out, s, min, max)
+local function encode(encoder, out, s, min, max)
   for i = min + 3, max, 4 do
     local a, b, c, d = s:byte(i - 3, i)
-    encode_impl(out, a)
-    encode_impl(out, b)
-    encode_impl(out, c)
-    encode_impl(out, d)
+    encode_impl(encoder, out, a)
+    encode_impl(encoder, out, b)
+    encode_impl(encoder, out, c)
+    encode_impl(encoder, out, d)
   end
   local i = max + 1
   local m = i - (i - min) % 4
   if m < i then
     local a, b, c = s:byte(m, max)
     if c then
-      encode_impl(out, a)
-      encode_impl(out, b)
-      encode_impl(out, c)
+      encode_impl(encoder, out, a)
+      encode_impl(encoder, out, b)
+      encode_impl(encoder, out, c)
     elseif b then
-      encode_impl(out, a)
-      encode_impl(out, b)
+      encode_impl(encoder, out, a)
+      encode_impl(encoder, out, b)
     else
-      encode_impl(out, a)
+      encode_impl(encoder, out, a)
     end
   end
   return out
@@ -74,7 +86,7 @@ local function decode(out, s, min, max)
       return nil, "decode error at position " .. p
     end
     local a, b, c, d = s:byte(p, i)
-    out:write(string.char(byte_to_code[a] * 16 + byte_to_code[b], byte_to_code[c] * 16 + byte_to_code[d]))
+    out:write(string.char(decoder[a] * 16 + decoder[b], decoder[c] * 16 + decoder[d]))
   end
   local i = max + 1
   local p = i - (i - min) % 4
@@ -84,7 +96,7 @@ local function decode(out, s, min, max)
     end
     local a, b, c = s:byte(p, max)
     if not c and b then
-      out:write(string.char(byte_to_code[a] * 16 + byte_to_code[b]))
+      out:write(string.char(decoder[a] * 16 + decoder[b]))
     else
       return nil, "decode error at position " .. p
     end
@@ -92,17 +104,25 @@ local function decode(out, s, min, max)
   return out
 end
 
-return {
-  encode = function (s, i, j)
-    return encode(sequence_writer(), s, translate_range(#s, i, j)):concat()
-  end;
+local class = {}
 
-  decode = function (s, i, j)
-    local result, message = decode(sequence_writer(), s, translate_range(#s, i, j))
-    if result == nil then
-      return nil, message
-    else
-      return result:concat()
-    end
-  end;
-}
+function class.encode_upper(s, i, j)
+  return encode(encoder_upper, sequence_writer(), s, translate_range(#s, i, j)):concat()
+end
+
+function class.encode_lower(s, i, j)
+  return encode(encoder_lower, sequence_writer(), s, translate_range(#s, i, j)):concat()
+end
+
+function class.decode(s, i, j)
+  local result, message = decode(sequence_writer(), s, translate_range(#s, i, j))
+  if result == nil then
+    return nil, message
+  else
+    return result:concat()
+  end
+end
+
+class.encode = class.encode_upper
+
+return class

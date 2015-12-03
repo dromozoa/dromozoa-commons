@@ -19,9 +19,19 @@ local base16 = require "dromozoa.commons.base16"
 
 local function test(this, that)
   local code = base16.encode(this)
+  -- print(code)
   assert(code == that)
   assert(base16.decode(code) == this)
-  assert(base16.decode(code:lower()) == this)
+
+  local code = base16.encode_upper(this)
+  -- print(code)
+  assert(code == that)
+  assert(base16.decode(code) == this)
+
+  local code = base16.encode_lower(this)
+  -- print(code)
+  assert(code == that:lower())
+  assert(base16.decode(code) == this)
 end
 
 test("", "")
