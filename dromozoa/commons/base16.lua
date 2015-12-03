@@ -62,6 +62,7 @@ local function encode(encoder, out, s, min, max)
     encode_impl(encoder, out, c)
     encode_impl(encoder, out, d)
   end
+
   local i = max + 1
   local p = i - (i - min) % 4
   if p < i then
@@ -77,10 +78,18 @@ local function encode(encoder, out, s, min, max)
       encode_impl(encoder, out, a)
     end
   end
+
   return out
 end
 
 local function decode(out, s, min, max)
+  local n = max - min + 1
+  if n == 0 then
+    return out
+  elseif n % 2 ~= 0 then
+    return nil, "length not divisible by 2"
+  end
+
   for i = min + 3, max, 4 do
     local p = i - 3
     if s:find("^%x%x%x%x", p) == nil then
@@ -89,19 +98,16 @@ local function decode(out, s, min, max)
     local a, b, c, d = s:byte(p, i)
     out:write(string.char(decoder[a] * 16 + decoder[b], decoder[c] * 16 + decoder[d]))
   end
-  local i = max + 1
-  local p = i - (i - min) % 4
-  if p < i then
+
+  if n % 4 == 2 then
+    local p = max - 1
     if s:find("^%x%x", p) == nil then
       return nil, "decode error at position " .. p
     end
-    local a, b, c = s:byte(p, max)
-    if not c and b then
-      out:write(string.char(decoder[a] * 16 + decoder[b]))
-    else
-      return nil, "decode error at position " .. p
-    end
+    local a, b = s:byte(p, max)
+    out:write(string.char(decoder[a] * 16 + decoder[b]))
   end
+
   return out
 end
 

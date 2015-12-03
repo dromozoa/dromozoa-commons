@@ -65,6 +65,7 @@ local function encode(encoder, out, s, min, max)
     local a = (a - b) / 64
     out:write(encoder[a], encoder[b], encoder[c], encoder[d])
   end
+
   local i = max + 1
   local p = i - (i - min) % 3
   if p < i then
@@ -83,48 +84,68 @@ local function encode(encoder, out, s, min, max)
       out:write(encoder[a], encoder[b], "==")
     end
   end
+
   return out
 end
 
 local function decode(out, s, min, max)
-  for i = min + 3, max, 4 do
+  local n = max - min + 1
+  if n == 0 then
+    return out
+  elseif n % 4 ~= 0 then
+    return nil, "length not divisible by 4"
+  end
+
+  for i = min + 3, max - 4, 4 do
     local p = i - 3
-    if s:find("^[0-9A-Za-z%+%/][0-9A-Za-z%+%/][0-9A-Za-z%+%/%=][0-9A-Za-z%+%/%=]") == nil then
+    if s:find("^[0-9A-Za-z%+%/][0-9A-Za-z%+%/][0-9A-Za-z%+%/][0-9A-Za-z%+%/]", p) == nil then
       return nil, "decode error at position " .. p
     end
     local a, b, c, d = s:byte(p, i)
-    local a = decoder[a]
-    local b = decoder[b]
-    local c = decoder[c]
-    local d = decoder[d]
-    if d == nil then
-      if c == nil then
-        local a = a * 262144 + b * 4096
-        local a = a / 65536
-        out:write(string.char(a))
-      else
-        local a = a * 262144 + b * 4096 + c * 64
-        local a = a / 256
-        local b = a % 256
-        local a = (a - b) / 256
-        out:write(string.char(a, b))
-      end
-    elseif c == nil then
-      return nil, "decode error at position " .. p
-    else
-      local a = a * 262144 + b * 4096 + c * 64 + d
-      local c = a % 256
-      local a = (a - c) / 256
-      local b = a % 256
-      local a = (a - b) / 256
-      out:write(string.char(a, b, c))
-    end
+    local a = decoder[a] * 262144 + decoder[b] * 4096 + decoder[c] * 64 + decoder[d]
+    local c = a % 256
+    local a = (a - c) / 256
+    local b = a % 256
+    local a = (a - b) / 256
+    out:write(string.char(a, b, c))
   end
-  local i = max + 1
-  local p = i - (i - min) % 4
-  if p < i then
+
+  local p = max - 3
+  if s:find("^[0-9A-Za-z%+%/][0-9A-Za-z%+%/][0-9A-Za-z%+%/%=][0-9A-Za-z%+%/%=]", p) == nil then
     return nil, "decode error at position " .. p
   end
+  local a, b, c, d = s:byte(p, max)
+  local a = decoder[a]
+  local b = decoder[b]
+  local c = decoder[c]
+  local d = decoder[d]
+  if d == nil then
+    if c == nil then
+      if b % 16 ~= 0 then
+        return nil, "decode error at position " .. p + 1
+      end
+      local a = a * 4 + b / 16
+      out:write(string.char(a))
+    else
+      if c % 4 ~= 0 then
+        return nil, "decode error at position " .. p + 2
+      end
+      local a = a * 1024 + b * 16 + c / 4
+      local b = a % 256
+      local a = (a - b) / 256
+      out:write(string.char(a, b))
+    end
+  elseif c == nil then
+    return nil, "decode error at position " .. p + 3
+  else
+    local a = a * 262144 + b * 4096 + c * 64 + d
+    local c = a % 256
+    local a = (a - c) / 256
+    local b = a % 256
+    local a = (a - b) / 256
+    out:write(string.char(a, b, c))
+  end
+
   return out
 end
 
@@ -136,7 +157,6 @@ function class.encode(s, i, j)
 end
 
 function class.decode(s, i, j)
-  local s = tostring(s)
   local s = tostring(s)
   local result, message = decode(sequence_writer(), s, translate_range(#s, i, j))
   if result == nil then
