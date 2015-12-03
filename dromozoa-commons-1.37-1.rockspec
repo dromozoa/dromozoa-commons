@@ -1,8 +1,8 @@
 package = "dromozoa-commons"
-version = "1.36-1"
+version = "1.37-1"
 source = {
-  url = "https://github.com/dromozoa/dromozoa-commons/archive/v1.36.tar.gz";
-  file = "dromozoa-commons-1.36.tar.gz";
+  url = "https://github.com/dromozoa/dromozoa-commons/archive/v1.37.tar.gz";
+  file = "dromozoa-commons-1.37.tar.gz";
 }
 description = {
   summary = "Reusable Lua components";
@@ -15,6 +15,7 @@ build = {
   modules = {
     ["dromozoa.commons.apply"] = "dromozoa/commons/apply.lua";
     ["dromozoa.commons.base16"] = "dromozoa/commons/base16.lua";
+    ["dromozoa.commons.base64"] = "dromozoa/commons/base64.lua";
     ["dromozoa.commons.bitset"] = "dromozoa/commons/bitset.lua";
     ["dromozoa.commons.clone"] = "dromozoa/commons/clone.lua";
     ["dromozoa.commons.copy"] = "dromozoa/commons/copy.lua";
@@ -44,6 +45,7 @@ build = {
     ["dromozoa.commons.shell"] = "dromozoa/commons/shell.lua";
     ["dromozoa.commons.split"] = "dromozoa/commons/split.lua";
     ["dromozoa.commons.string_matcher"] = "dromozoa/commons/string_matcher.lua";
+    ["dromozoa.commons.string_reader"] = "dromozoa/commons/string_reader.lua";
     ["dromozoa.commons.translate_range"] = "dromozoa/commons/translate_range.lua";
     ["dromozoa.commons.uint32"] = "dromozoa/commons/uint32.lua";
     ["dromozoa.commons.uint64"] = "dromozoa/commons/uint64.lua";
