@@ -15,8 +15,19 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local string_matcher = require "dromozoa.commons.string_matcher"
+local base16 = require "dromozoa.commons.base16"
 
-io.stderr:write("[dromozoa-commons] dromozoa.commons.matcher obsoleted\n")
+local function test(this, that)
+  local code = base16.encode(this)
+  assert(code == that)
+  assert(base16.decode(code) == this)
+  assert(base16.decode(code:lower()) == this)
+end
 
-return string_matcher
+test("", "")
+test("f", "66")
+test("fo", "666F")
+test("foo", "666F6F")
+test("foob", "666F6F62")
+test("fooba", "666F6F6261")
+test("foobar", "666F6F626172")
