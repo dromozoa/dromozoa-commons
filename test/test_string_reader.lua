@@ -193,6 +193,7 @@ test("foo\nbar\nbaz\n", function (f, s)
   assert(f:seek("end", 2) == s:seek("end", 2))
   -- print(f:seek())
   assert(f:seek() == s:seek())
+
+  assert(not pcall(f.seek, f, "foo'bar"))
+  assert(not pcall(s.seek, s, "foo'bar"))
 end)
-
-

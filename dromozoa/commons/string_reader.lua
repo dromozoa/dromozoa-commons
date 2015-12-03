@@ -122,20 +122,22 @@ function class:seek(whence, offset)
   if offset == nil then
     offset = 0
   end
-  local position = self.position
-  local size = #self.s
+  local position
   if whence == "set" then
-    position = offset + 1
+    position = offset
   elseif whence == "cur" then
-    position = position + offset
+    position = offset + self.position - 1
   elseif whence == "end" then
-    position = size + 1 + offset
+    position = offset + #self.s
+  else
+    error("bad argument #2 to 'seek' (invalid option '" .. whence .. "')")
   end
-  if position < 1 then
-    return nil, "Invalid argument", 22 -- EINVAL
+  if position < 0 then
+    -- EINVAL
+    return nil, "Invalid argument", 22
   end
-  self.position = position
-  return position - 1
+  self.position = position + 1
+  return position
 end
 
 local metatable = {
