@@ -63,9 +63,11 @@ test("", test_read, "*l")
 test("foo\nbar\nbaz", test_read, "*l")
 test("foo\nbar\nbaz\n", test_read, "*l")
 
-test("", test_read, "*L")
-test("foo\nbar\nbaz", test_read, "*L")
-test("foo\nbar\nbaz\n", test_read, "*L")
+if _VERSION >= "Lua 5.2" then
+  test("", test_read, "*L")
+  test("foo\nbar\nbaz", test_read, "*L")
+  test("foo\nbar\nbaz\n", test_read, "*L")
+end
 
 test("", test_read, 8)
 test("foo\nbar\nbaz", test_read, 8)
@@ -89,11 +91,15 @@ test("0x80. 0x80.p3 0x80.p+3 0x80.p-3", test_read, "*n")
 test("0x.c 0x.cp3 0x.cp+3 0x.cp-3", test_read, "*n")
 test("0x80.c 0x80.cp3 0x80.cp+3 0x80.cp-3", test_read, "*n")
 
-test("0x", test_read, "*n")
-test("0x.", test_read, "*n")
 test("+0x80 -0x80", test_read, "*n")
 test("+0x.c -0x.c", test_read, "*n")
 test("0xfeedface", test_read, "*n")
+
+if _VERSION >= "Lua 5.3" then
+  test("0x", test_read, "*n")
+  test("0x.", test_read, "*n")
+end
+assert(string_reader("0x"):read("*n") == nil)
 
 test("foo\nbar\nbaz\n", function (f, s)
   -- print(pcall(f.read, f, nil))
@@ -110,9 +116,11 @@ local function test_lines(f, s, ...)
   local a = sequence()
   local b = sequence()
   for i, j in f:lines(...) do
+    -- print("f", i, j)
     a:push(i, j)
   end
   for i, j in s:lines(...) do
+    -- print("s", i, j)
     b:push(i, j)
   end
   assert(equal(a, b))
@@ -122,21 +130,23 @@ test("", test_lines)
 test("foo\nbar\nbaz", test_lines)
 test("foo\nbar\nbaz\n", test_lines)
 
-test("", test_lines, "*l")
-test("foo\nbar\nbaz", test_lines, "*l")
-test("foo\nbar\nbaz\n", test_lines, "*l")
+if _VERSION >= "Lua 5.2" then
+  test("", test_lines, "*l")
+  test("foo\nbar\nbaz", test_lines, "*l")
+  test("foo\nbar\nbaz\n", test_lines, "*l")
 
-test("", test_lines, "*L")
-test("foo\nbar\nbaz", test_lines, "*L")
-test("foo\nbar\nbaz\n", test_lines, "*L")
+  test("", test_lines, "*L")
+  test("foo\nbar\nbaz", test_lines, "*L")
+  test("foo\nbar\nbaz\n", test_lines, "*L")
 
-test("", test_lines, "*l", "*l")
-test("foo\nbar\nbaz", test_lines, "*l", "*l")
-test("foo\nbar\nbaz\n", test_lines, "*l", "*l")
+  test("", test_lines, "*l", "*l")
+  test("foo\nbar\nbaz", test_lines, "*l", "*l")
+  test("foo\nbar\nbaz\n", test_lines, "*l", "*l")
 
-test("", test_lines, 8)
-test("foo\nbar\nbaz", test_lines, 8)
-test("foo\nbar\nbaz\n", test_lines, 8)
+  test("", test_lines, 8)
+  test("foo\nbar\nbaz", test_lines, 8)
+  test("foo\nbar\nbaz\n", test_lines, 8)
+end
 
 test("foo\nbar\nbaz\n", function (f, s)
   assert(f:read() == s:read())
