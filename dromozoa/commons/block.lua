@@ -20,31 +20,31 @@ local translate_range = require "dromozoa.commons.translate_range"
 
 local class = {}
 
-function class.new(size)
-  return {
-    data = sequence();
-    size = size;
+function class.new(n)
+  local self = {
     i = 1;
   }
+  for i = 1, n do
+    self[i] = 0
+  end
+  return self
 end
 
 function class:update(s, i, j)
-  if self:is_full() then
-    self.data = sequence()
-  end
-
   local s = tostring(s)
   local min, max = translate_range(#s, i, j)
-  local data = self.data
 
-  local m = self.size - self.i + 1
+  local m = #self - self.i + 1
   local n = max - min + 1
   if m > n then
     m = n
   end
-  data:push(s:sub(min, min + m - 1))
-  self.i = self.i + m
-  if self.i > self.size then
+  for i = min, min + m - 1 do
+    self[self.i] = s:sub(i, i)
+    self.i = self.i + 1
+  end
+
+  if self.i > #self then
     self.i = 1
   end
 
@@ -56,7 +56,10 @@ function class:is_full()
 end
 
 function class:byte(i, j)
-  return self.data:concat():byte(i, j)
+  return table.concat(self):byte(i, j)
+end
+
+function class:word(i)
 end
 
 local metatable = {
@@ -64,7 +67,7 @@ local metatable = {
 }
 
 return setmetatable(class, {
-  __call = function (_, size)
-    return setmetatable(class.new(size), metatable)
+  __call = function (_, n)
+    return setmetatable(class.new(n), metatable)
   end;
 })
