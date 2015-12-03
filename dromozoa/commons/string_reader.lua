@@ -18,11 +18,9 @@
 local string_matcher = require "dromozoa.commons.string_matcher"
 local unpack = require "dromozoa.commons.unpack"
 
-local class = {}
-
-function class:read_line(chomp)
+local function read_line(self, chomp)
   if self:eof() then
-    return
+    return nil
   elseif self:match("[^\n]*") then
     local i = self.i
     local j = self.j
@@ -35,7 +33,7 @@ function class:read_line(chomp)
   end
 end
 
-function class:read_number()
+local function read_number(self)
   local positon = self.positon
   self:match("%s*[%+%-]?")
   local i = self.i
@@ -74,13 +72,13 @@ local function read(self, i, n, format, ...)
     elseif t ~= "string" then
       error("bad argument #" .. (i + 1) .. " to 'write' (string expected, got " .. t .. ")")
     elseif format:match("^%*?n") then
-      v = self:read_number()
+      v = read_number(self)
     elseif format:match("^%*?a") then
       v = self.s:sub(self.position)
     elseif format:match("^%*?l") then
-      v = self:read_line(true)
+      v = read_line(self, true)
     elseif format:match("^%*?L") then
-      v = self:read_line(false)
+      v = read_line(self, false)
     end
     if v == nil then
       return
@@ -92,19 +90,21 @@ local function read(self, i, n, format, ...)
   end
 end
 
+local function lines(result, ...)
+  if result ~= nil then
+    coroutine.yield(result, ...)
+    return true
+  end
+end
+
+local class = {}
+
 function class:read(...)
   local n = select("#", ...)
   if n == 0 then
     return read(self, 0, 1, "*l")
   else
     return read(self, 0, n, ...)
-  end
-end
-
-local function lines(result, ...)
-  if result ~= nil then
-    coroutine.yield(result, ...)
-    return true
   end
 end
 
@@ -133,8 +133,7 @@ function class:seek(whence, offset)
     error("bad argument #2 to 'seek' (invalid option '" .. whence .. "')")
   end
   if position < 0 then
-    -- EINVAL
-    return nil, "Invalid argument", 22
+    return nil, "Invalid argument", 22 -- EINVAL
   end
   self.position = position + 1
   return position
