@@ -35,21 +35,25 @@ function class:update(s, i, j)
   local s = tostring(s)
   local min, max = translate_range(#s, i, j)
 
-  local m = #self - self.i + 1
-  local n = max - min + 1
-  if m > n then
-    m = n
-  end
-  for i = min, min + m - 1 do
-    self[self.i] = s:byte(i, i)
-    self.i = self.i + 1
+  local n = #self
+  local m = min + n - self.i
+  if m > max then
+    m = max
   end
 
-  if self.i > #self then
+  local j = self.i
+  for i = min, m do
+    self[j] = s:byte(i, i)
+    j = j + 1
+  end
+
+  if j > n then
     self.i = 1
+  else
+    self.i = j
   end
 
-  return min + m
+  return m + 1
 end
 
 function class:is_full()
@@ -57,7 +61,12 @@ function class:is_full()
 end
 
 function class:byte(i, j)
-  return unpack(self, translate_range(#self, i, j, true))
+  local min, max = translate_range(#self, i, j, true)
+  if min == max then
+    return self[min]
+  else
+    return unpack(self, min, max)
+  end
 end
 
 function class:word(i)
