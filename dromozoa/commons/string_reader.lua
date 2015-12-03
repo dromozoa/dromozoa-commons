@@ -19,9 +19,8 @@ local string_matcher = require "dromozoa.commons.string_matcher"
 local unpack = require "dromozoa.commons.unpack"
 
 local function read_line(self, chomp)
-  if self:eof() then
-    return nil
-  elseif self:match("[^\n]*") then
+  if not self:eof() then
+    self:match("[^\n]*")
     local i = self.i
     local j = self.j
     if self:match("\n") then
@@ -43,7 +42,7 @@ local function read_number(self)
   elseif self:match("%d+") then
     self:match("%.%d*")
     self:match("[eE][%-%+]?%d+")
-  elseif self:match(".%d+") then
+  elseif self:match("%.%d+") then
     self:match("[eE][%-%+]?%d+")
   else
     self.positon = position
@@ -75,6 +74,7 @@ local function read(self, i, n, format, ...)
       v = read_number(self)
     elseif format:match("^%*?a") then
       v = self.s:sub(self.position)
+      self.position = #self.s + 1
     elseif format:match("^%*?l") then
       v = read_line(self, true)
     elseif format:match("^%*?L") then
@@ -91,7 +91,9 @@ local function read(self, i, n, format, ...)
 end
 
 local function lines(result, ...)
-  if result ~= nil then
+  if result == nil then
+    return false
+  else
     coroutine.yield(result, ...)
     return true
   end
@@ -122,21 +124,21 @@ function class:seek(whence, offset)
   if offset == nil then
     offset = 0
   end
-  local position
+  local pos
   if whence == "set" then
-    position = offset
+    pos = offset
   elseif whence == "cur" then
-    position = offset + self.position - 1
+    pos = offset + self.position - 1
   elseif whence == "end" then
-    position = offset + #self.s
+    pos = offset + #self.s
   else
     error("bad argument #2 to 'seek' (invalid option '" .. whence .. "')")
   end
-  if position < 0 then
+  if pos < 0 then
     return nil, "Invalid argument", 22 -- EINVAL
   end
-  self.position = position + 1
-  return position
+  self.position = pos + 1
+  return pos
 end
 
 local metatable = {

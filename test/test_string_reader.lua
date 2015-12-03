@@ -47,6 +47,7 @@ local function test_read(f, s, ...)
     local a, b = f:read(...)
     local c, d = s:read(...)
     -- print(a, b, c, d)
+    -- print(type(a), type(b), type(c), type(d))
     assert(a == c)
     assert(b == d)
     if a == nil then
@@ -77,6 +78,10 @@ test("", test_read, 0, 1)
 test("foo\nbar\nbaz", test_read, 0, 1)
 test("foo\nbar\nbaz\n", test_read, 0, 1)
 
+test("", test_read, 4, "*a")
+test("foo\nbar\nbaz", test_read, 4, "*a")
+test("foo\nbar\nbaz\n", test_read, 4, "*a")
+
 test("1 1e3 1e+3 1e-3", test_read, "*n")
 test("1. 1.e3 1.e+3 1.e-3", test_read, "*n")
 test(".25 .25e3 .25e+3 .25e-3", test_read, "*n")
@@ -95,6 +100,8 @@ test("+0x80 -0x80", test_read, "*n")
 test("+0x.c -0x.c", test_read, "*n")
 test("0xfeedface", test_read, "*n")
 
+test("+", test_read, "*n")
+test("-", test_read, "*n")
 if _VERSION >= "Lua 5.3" then
   test("0x", test_read, "*n")
   test("0x.", test_read, "*n")
