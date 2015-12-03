@@ -17,6 +17,7 @@
 
 local sequence = require "dromozoa.commons.sequence"
 local translate_range = require "dromozoa.commons.translate_range"
+local unpack = require "dromozoa.commons.unpack"
 
 local class = {}
 
@@ -40,7 +41,7 @@ function class:update(s, i, j)
     m = n
   end
   for i = min, min + m - 1 do
-    self[self.i] = s:sub(i, i)
+    self[self.i] = s:byte(i, i)
     self.i = self.i + 1
   end
 
@@ -56,7 +57,7 @@ function class:is_full()
 end
 
 function class:byte(i, j)
-  return table.concat(self):byte(i, j)
+  return unpack(self, translate_range(#self, i, j, true))
 end
 
 function class:word(i)
