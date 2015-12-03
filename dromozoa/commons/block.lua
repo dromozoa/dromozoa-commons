@@ -36,15 +36,39 @@ function class:update(s, i, j)
   local min, max = translate_range(#s, i, j)
 
   local n = #self
-  local m = min + n - self.i
-  if m > max then
-    m = max
+  local j = self.i
+  local m = min + n - j
+  if max > m then
+    max = m
   end
 
-  local j = self.i
-  for i = min, m do
-    self[j] = s:byte(i, i)
-    j = j + 1
+  for i = min + 3, max, 4 do
+    local p = i - 3
+    local a, b, c, d = s:byte(p, i)
+    self[j] = a
+    self[j + 1] = b
+    self[j + 2] = c
+    self[j + 3] = d
+    j = j + 4
+  end
+
+  local i = max + 1
+  local p = i - (i - min) % 4
+  if p < i then
+    local a, b, c = s:byte(p, max)
+    if c then
+      self[j] = a
+      self[j + 1] = b
+      self[j + 2] = c
+      j = j + 3
+    elseif b then
+      self[j] = a
+      self[j + 1] = b
+      j = j + 2
+    else
+      self[j] = a
+      j = j + 1
+    end
   end
 
   if j > n then
@@ -53,23 +77,17 @@ function class:update(s, i, j)
     self.i = j
   end
 
-  return m + 1
+  return max + 1
 end
 
 function class:is_full()
   return self.i == 1
 end
 
-function class:byte(i, j)
-  local min, max = translate_range(#self, i, j, true)
-  if min == max then
-    return self[min]
-  else
-    return unpack(self, min, max)
-  end
-end
-
 function class:word(i)
+  local j = i * 4
+  local a, b, c, d = self[j - 3], self[j - 2], self[j - 1], self[j]
+  return a * 0x1000000+ b * 0x10000 + c * 0x100 + d
 end
 
 local metatable = {

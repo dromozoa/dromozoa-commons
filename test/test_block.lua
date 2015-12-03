@@ -18,6 +18,11 @@
 local block = require "dromozoa.commons.block"
 local equal = require "dromozoa.commons.equal"
 
+local function as_word(s)
+  local a, b, c, d = s:byte(1, 4)
+  return ((a * 256 + b) * 256 + c) * 256 + d
+end
+
 local b = block(8)
 local s = "foobarbazqux"
 local i = b:update(s, 1, 4)
@@ -26,16 +31,27 @@ assert(not b:is_full())
 local i = b:update(s, i)
 assert(i == 9)
 assert(b:is_full())
-assert(equal({ b:byte(1, 4) }, { ("foob"):byte(1, 4) }))
-assert(b:byte(5) == ("a"):byte())
-assert(b:byte(6) == ("r"):byte())
-assert(b:byte(7) == ("b"):byte())
-assert(b:byte(8) == ("a"):byte())
+assert(b:word(1) == as_word("foob"))
+assert(b:word(2) == as_word("arba"))
 local i = b:update(s, i)
 assert(i == 13)
 assert(not b:is_full())
-assert(equal({ b:byte(1, 4) }, { ("zqux"):byte(1, 4) }))
+assert(b:word(1) == as_word("zqux"))
 local i = b:update("0123")
 assert(i == 5)
 assert(b:is_full())
-assert(equal({ b:byte(1, 8) }, { ("zqux0123"):byte(1, 8) }))
+assert(b:word(1) == as_word("zqux"))
+assert(b:word(2) == as_word("0123"))
+
+local i = b:update("1")
+assert(i == 2)
+local i = b:update("23")
+assert(i == 3)
+local i = b:update("456")
+assert(i == 4)
+local i = b:update("7890")
+assert(i == 3)
+assert(b:word(1) == as_word("1234"))
+assert(b:word(2) == as_word("5678"))
+
+
