@@ -15,8 +15,18 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local string_matcher = require "dromozoa.commons.string_matcher"
+local base64 = require "dromozoa.commons.base64"
 
-io.stderr:write("[dromozoa-commons] dromozoa.commons.matcher obsoleted\n")
+local function test(text, code)
+  local result = base64.encode(text)
+  assert(result == code)
+end
 
-return string_matcher
+test("", "")
+test("f", "Zg==")
+test("fo", "Zm8=")
+test("foo", "Zm9v")
+test("foob", "Zm9vYg==")
+test("fooba", "Zm9vYmE=")
+test("foobar", "Zm9vYmFy")
+test("ABCDEFG", "QUJDREVGRw==")

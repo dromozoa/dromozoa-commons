@@ -15,7 +15,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local matcher = require "dromozoa.commons.matcher"
+local string_matcher = require "dromozoa.commons.string_matcher"
 local sequence = require "dromozoa.commons.sequence"
 local sequence_writer = require "dromozoa.commons.sequence_writer"
 local linked_hash_table = require "dromozoa.commons.linked_hash_table"
@@ -37,7 +37,7 @@ local class = {
 
 function class.new(this)
   if type(this) == "string" then
-    this = matcher(this)
+    this = string_matcher(this)
   end
   return {
     this = this;
