@@ -137,3 +137,62 @@ test("foo\nbar\nbaz\n", test_lines, "*l", "*l")
 test("", test_lines, 8)
 test("foo\nbar\nbaz", test_lines, 8)
 test("foo\nbar\nbaz\n", test_lines, 8)
+
+test("foo\nbar\nbaz\n", function (f, s)
+  assert(f:read() == s:read())
+  -- print(f:seek())
+  assert(f:seek() == s:seek())
+
+  assert(f:seek("cur", -1) == s:seek("cur", -1))
+  -- print(f:seek())
+
+  assert(f:read() == s:read())
+  -- print(f:seek())
+  assert(f:seek() == s:seek())
+
+  assert(f:seek("cur", 2) == s:seek("cur", 2))
+  -- print(f:seek())
+  assert(f:seek() == s:seek())
+
+  assert(f:read() == s:read())
+  -- print(f:seek())
+  assert(f:seek() == s:seek())
+
+  assert(f:seek("cur", 5) == s:seek("cur", 5))
+  -- print(f:seek())
+  assert(f:seek() == s:seek())
+
+  assert(f:seek("cur", -100) == s:seek("cur", -100))
+  -- print(f:seek())
+  assert(f:seek() == s:seek())
+
+  assert(f:seek("set") == s:seek("set"))
+  -- print(f:seek())
+  assert(f:seek() == s:seek())
+
+  assert(f:seek("set", 2) == s:seek("set", 2))
+  -- print(f:seek())
+  assert(f:seek() == s:seek())
+
+  assert(f:seek("set", -1) == s:seek("set", -1))
+  -- print(f:seek())
+  assert(f:seek() == s:seek())
+
+  assert(f:seek("end") == s:seek("end"))
+  -- print(f:seek())
+  assert(f:seek() == s:seek())
+
+  assert(f:read() == s:read())
+  -- print(f:seek())
+  assert(f:seek() == s:seek())
+
+  assert(f:seek("end", -2) == s:seek("end", -2))
+  -- print(f:seek())
+  assert(f:seek() == s:seek())
+
+  assert(f:seek("end", 2) == s:seek("end", 2))
+  -- print(f:seek())
+  assert(f:seek() == s:seek())
+end)
+
+

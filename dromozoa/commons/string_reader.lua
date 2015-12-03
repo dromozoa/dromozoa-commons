@@ -101,7 +101,7 @@ function class:read(...)
   end
 end
 
-local function result(result, ...)
+local function lines(result, ...)
   if result ~= nil then
     coroutine.yield(result, ...)
     return true
@@ -111,8 +111,31 @@ end
 function class:lines(...)
   local formats = {...}
   return coroutine.wrap(function ()
-    repeat until not result(self:read(unpack(formats)))
+    repeat until not lines(self:read(unpack(formats)))
   end)
+end
+
+function class:seek(whence, offset)
+  if whence == nil then
+    whence = "cur"
+  end
+  if offset == nil then
+    offset = 0
+  end
+  local position = self.position
+  local size = #self.s
+  if whence == "set" then
+    position = offset + 1
+  elseif whence == "cur" then
+    position = position + offset
+  elseif whence == "end" then
+    position = size + 1 + offset
+  end
+  if position < 1 then
+    return nil, "Invalid argument", 22 -- EINVAL
+  end
+  self.position = position
+  return position - 1
 end
 
 local metatable = {
