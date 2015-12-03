@@ -22,20 +22,17 @@ local unpack = require "dromozoa.commons.unpack"
 local class = {}
 
 function class.new(n)
-  local self = {
+  return {
     i = 0;
+    n = n;
   }
-  for i = 1, n * 4 do
-    self[i] = 0
-  end
-  return self
 end
 
 function class:update(s, i, j)
   local s = tostring(s)
   local min, max = translate_range(#s, i, j)
 
-  local n = #self
+  local n = self.n * 4
   local j = self.i
   local m = min + n - (j + 1)
   if max > m then
