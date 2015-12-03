@@ -55,16 +55,17 @@ end
 
 local function encode(encoder, out, s, min, max)
   for i = min + 3, max, 4 do
-    local a, b, c, d = s:byte(i - 3, i)
+    local p = i - 3
+    local a, b, c, d = s:byte(p, i)
     encode_impl(encoder, out, a)
     encode_impl(encoder, out, b)
     encode_impl(encoder, out, c)
     encode_impl(encoder, out, d)
   end
   local i = max + 1
-  local m = i - (i - min) % 4
-  if m < i then
-    local a, b, c = s:byte(m, max)
+  local p = i - (i - min) % 4
+  if p < i then
+    local a, b, c = s:byte(p, max)
     if c then
       encode_impl(encoder, out, a)
       encode_impl(encoder, out, b)
@@ -107,14 +108,17 @@ end
 local class = {}
 
 function class.encode_upper(s, i, j)
+  local s = tostring(s)
   return encode(encoder_upper, sequence_writer(), s, translate_range(#s, i, j)):concat()
 end
 
 function class.encode_lower(s, i, j)
+  local s = tostring(s)
   return encode(encoder_lower, sequence_writer(), s, translate_range(#s, i, j)):concat()
 end
 
 function class.decode(s, i, j)
+  local s = tostring(s)
   local result, message = decode(sequence_writer(), s, translate_range(#s, i, j))
   if result == nil then
     return nil, message

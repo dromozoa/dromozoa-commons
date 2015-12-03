@@ -18,7 +18,7 @@
 local sequence_writer = require "dromozoa.commons.sequence_writer"
 local translate_range = require "dromozoa.commons.translate_range"
 
-local code_to_char = {
+local encoder = {
   [62] = "+";
   [63] = "/";
 }
@@ -27,31 +27,27 @@ local n = ("A"):byte()
 for i = 0, 25 do
   local byte = i + n
   local char = string.char(byte)
-  code_to_char[i] = char
+  encoder[i] = char
 end
 
 local n = ("a"):byte() - 26
 for i = 26, 51 do
   local byte = i + n
   local char = string.char(byte)
-  code_to_char[i] = char
+  encoder[i] = char
 end
 
 local n = ("0"):byte() - 52
 for i = 52, 61 do
   local byte = i + n
   local char = string.char(byte)
-  code_to_char[i] = char
+  encoder[i] = char
 end
 
-local class = {}
-
-local function encode(s, i, j)
-  local s = tostring(s)
-  local min, max = translate_range(#s, i, j)
-  local out = sequence_writer()
+local function encode(encoder, out, s, min, max)
   for i = min + 2, max, 3 do
-    local a, b, c = s:byte(i - 2, i)
+    local p = i - 2
+    local a, b, c = s:byte(p, i)
     local a = a * 65536 + b * 256 + c
     local d = a % 64
     local a = (a - d) / 64
@@ -59,29 +55,34 @@ local function encode(s, i, j)
     local a = (a - c) / 64
     local b = a % 64
     local a = (a - b) / 64
-    out:write(code_to_char[a], code_to_char[b], code_to_char[c], code_to_char[d])
+    out:write(encoder[a], encoder[b], encoder[c], encoder[d])
   end
   local i = max + 1
-  local m = i - (i - min) % 3
-  if m < i then
-    local a, b = s:byte(m, max)
+  local p = i - (i - min) % 3
+  if p < i then
+    local a, b = s:byte(p, max)
     if b then
       local a = a * 1024 + b * 4
       local c = a % 64
       local a = (a - c) / 64
       local b = a % 64
       local a = (a - b) / 64
-      out:write(code_to_char[a], code_to_char[b], code_to_char[c], "=")
+      out:write(encoder[a], encoder[b], encoder[c], "=")
     else
       local a = a * 16
       local b = a % 64
       local a = (a - b) / 64
-      out:write(code_to_char[a], code_to_char[b], "==")
+      out:write(encoder[a], encoder[b], "==")
     end
   end
-  return out:concat()
+  return out
 end
 
-return {
-  encode = encode;
-}
+local class = {}
+
+function class.encode(s, i, j)
+  local s = tostring(s)
+  return encode(encoder, sequence_writer(), s, translate_range(#s, i, j)):concat()
+end
+
+return class
