@@ -31,6 +31,7 @@ build = {
     ["dromozoa.commons.json"] = "dromozoa/commons/json.lua";
     ["dromozoa.commons.json_parser"] = "dromozoa/commons/json_parser.lua";
     ["dromozoa.commons.loadstring"] = "dromozoa/commons/loadstring.lua";
+    ["dromozoa.commons.matcher"] = "dromozoa/commons/matcher.lua";
     ["dromozoa.commons.keys"] = "dromozoa/commons/keys.lua";
     ["dromozoa.commons.linked_hash_table"] = "dromozoa/commons/linked_hash_table.lua";
     ["dromozoa.commons.murmur_hash3"] = "dromozoa/commons/murmur_hash3.lua";
