@@ -20,7 +20,7 @@ local function word(v)
   local b = 0
   if -math.huge < v and v < math.huge then
     if v == 0 then
-      if string.format("%g", v) == "-0" then
+      if ("%g"):format(v) == "-0" then
         a = 0x80000000
       end
     else
@@ -52,7 +52,7 @@ end
 if _VERSION >= "Lua 5.3" then
   return {
     word = function (v)
-      local a, b = string.unpack("<I4I4", string.pack("<d", v))
+      local a, b = ("<I4I4"):unpack(("<d"):pack(v))
       return a, b
     end;
   }

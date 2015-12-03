@@ -23,12 +23,12 @@ local sequence_writer = require "dromozoa.commons.sequence_writer"
 local function encode_key(key)
   local t = type(key)
   if t == "number" then
-    return string.format("[%.17g]", key)
+    return ("[%.17g]"):format(key)
   elseif t == "string" then
     if key:match("^[%a_][%w_]*$") then
       return key
     else
-      return string.format("[%q]", key)
+      return ("[%q]"):format(key)
     end
   elseif t == "boolean" then
     if key then
@@ -42,9 +42,9 @@ end
 local function write(out, value)
   local t = type(value)
   if t == "number" then
-    out:write(string.format("%.17g", value))
+    out:write(("%.17g"):format(value))
   elseif t == "string" then
-    out:write(string.format("%q", value))
+    out:write(("%q"):format(value))
   elseif t == "boolean" then
     if value then
       out:write("true")

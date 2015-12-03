@@ -34,7 +34,7 @@ local quote_char = {
 for i = 0x00, 0x1F do
   local char = string.char(i)
   if quote_char[char] == nil then
-    quote_char[char] = string.format([[\u%04X]], i)
+    quote_char[char] = ([[\u%04X]]):format(i)
   end
 end
 
@@ -45,7 +45,7 @@ end
 local function write(out, value)
   local t = type(value)
   if t == "number" then
-    out:write(string.format("%.17g", value))
+    out:write(("%.17g"):format(value))
   elseif t == "string" then
     out:write(quote(value))
   elseif t == "boolean" then
