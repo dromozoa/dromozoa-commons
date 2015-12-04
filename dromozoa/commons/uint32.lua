@@ -235,7 +235,7 @@ elseif bit32 then
     rotr = bit32.rrotate;
   }
 elseif bit then
-  return {
+  class = {
     add = add;
     sub = sub;
     mul = mul;
@@ -283,5 +283,18 @@ else
     rotr = rotr;
   }
 end
+
+local function multi(name)
+  local op_binary = class[name]
+  local function op_multi(a, b, c, ...)
+    if c == nil then
+      return op_binary(a, b)
+    else
+      return op_multi(op_binary(a, b), c, ...)
+    end
+  end
+  class[name] = op_multi
+end
+multi("mul")
 
 return class
