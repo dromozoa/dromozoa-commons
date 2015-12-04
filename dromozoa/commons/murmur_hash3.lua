@@ -27,9 +27,9 @@ local shr = uint32.shr
 local rotl = uint32.rotl
 
 local function update1(hash, key)
-  key = mul(key, 0xCC9E2D51)
+  key = mul(key, 0xcc9e2d51)
   key = rotl(key, 15)
-  key = mul(key, 0x1B873593)
+  key = mul(key, 0x1b873593)
   hash = bxor(hash, key)
   return hash
 end
@@ -37,16 +37,16 @@ end
 local function update2(hash)
   hash = rotl(hash, 13)
   hash = mul(hash, 5)
-  hash = add(hash, 0xE6546B64)
+  hash = add(hash, 0xe6546b64)
   return hash
 end
 
 local function finalize(hash, n)
   hash = bxor(hash, n)
   hash = bxor(hash, shr(hash, 16))
-  hash = mul(hash, 0x85EBCA6B)
+  hash = mul(hash, 0x85ebca6b)
   hash = bxor(hash, shr(hash, 13))
-  hash = mul(hash, 0xC2B2AE35)
+  hash = mul(hash, 0xc2b2ae35)
   hash = bxor(hash, shr(hash, 16))
   return hash
 end

@@ -167,7 +167,7 @@ end
 if _VERSION >= "Lua 5.3" then
   return assert(load([[
     local function add(a, b, x, ...)
-      local c = a + b & 0xFFFFFFFF
+      local c = a + b & 0xffffffff
       if x == nil then
         return c
       else
@@ -176,7 +176,7 @@ if _VERSION >= "Lua 5.3" then
     end
 
     local function mul(a, b, x, ...)
-      local c = a * b & 0xFFFFFFFF
+      local c = a * b & 0xffffffff
       if x == nil then
         return c
       else
@@ -214,7 +214,7 @@ if _VERSION >= "Lua 5.3" then
     return {
       add = add;
       sub = function (a, b)
-        return a - b & 0xFFFFFFFF
+        return a - b & 0xffffffff
       end;
       mul = mul;
       div = function (a, b)
@@ -227,19 +227,19 @@ if _VERSION >= "Lua 5.3" then
       bor = bor;
       bxor = bxor;
       shl = function (a, b)
-        return a << b & 0xFFFFFFFF
+        return a << b & 0xffffffff
       end;
       shr = function (a, b)
         return a >> b
       end;
       bnot = function (v)
-        return ~v & 0xFFFFFFFF
+        return ~v & 0xffffffff
       end;
       rotl = function (a, b)
-        return (a << b | a >> 32 - b) & 0xFFFFFFFF
+        return (a << b | a >> 32 - b) & 0xffffffff
       end;
       rotr = function (a, b)
-        return (a >> b | a << 32 - b) & 0xFFFFFFFF
+        return (a >> b | a << 32 - b) & 0xffffffff
       end;
     }
   ]]))()
