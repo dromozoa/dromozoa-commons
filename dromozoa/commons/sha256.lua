@@ -20,26 +20,12 @@ local uint32 = require "dromozoa.commons.uint32"
 local uint64 = require "dromozoa.commons.uint64"
 local word_block = require "dromozoa.commons.word_block"
 
+local add = uint32.add
 local band = uint32.band
+local bxor = uint32.bxor
 local shr = uint32.shr
 local bnot = uint32.bnot
 local rotr = uint32.rotr
-
-local function add(a, b, c, ...)
-  if c == nil then
-    return uint32.add(a, b)
-  else
-    return add(uint32.add(a, b), c, ...)
-  end
-end
-
-local function bxor(a, b, c, ...)
-  if c == nil then
-    return uint32.bxor(a, b)
-  else
-    return bxor(uint32.bxor(a, b), c, ...)
-  end
-end
 
 local class = {}
 

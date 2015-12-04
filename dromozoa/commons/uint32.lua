@@ -86,7 +86,7 @@ local function bor(a, b)
   return c
 end
 
-local function bxor(a, b)
+local function bxor_impl(a, b)
   local c = 0
   local d = 1
   for i = 1, 31 do
@@ -103,6 +103,14 @@ local function bxor(a, b)
     c = c + d
   end
   return c
+end
+
+local function bxor(a, b, c, ...)
+  if c == nil then
+    return bxor_impl(a, b)
+  else
+    return bxor(bxor_impl(a, b), c, ...)
+  end
 end
 
 local function bnot(v)
@@ -161,6 +169,13 @@ if _VERSION >= "Lua 5.3" then
         return add_impl(a + b, c, ...)
       end
     end
+    local function bxor_impl(a, b, c, ...)
+      if c == nil then
+        return a ~ b
+      else
+        return bxor_impl(a ~ b, c, ...)
+      end
+    end
     return {
       add = function (...)
         return add_impl(...) & 0xFFFFFFFF
@@ -183,8 +198,8 @@ if _VERSION >= "Lua 5.3" then
       bor = function (a, b)
         return a | b
       end;
-      bxor = function (a, b)
-        return a ~ b
+      bxor = function (...)
+        return bxor_impl(...)
       end;
       shl = function (a, b)
         return a << b & 0xFFFFFFFF
@@ -232,8 +247,8 @@ elseif bit then
     bor = function (a, b)
       return bit.bor(a, b) % 0x100000000
     end;
-    bxor = function (a, b)
-      return bit.bxor(a, b) % 0x100000000
+    bxor = function (...)
+      return bit.bxor(...) % 0x100000000
     end;
     shl = function (a, b)
       return bit.lshift(a, b) % 0x100000000
