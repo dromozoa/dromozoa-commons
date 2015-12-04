@@ -23,11 +23,11 @@ local class = {}
 
 function class.new(n)
   local self = {
-    size = 0;
     n = n;
     i = 0;
     j = 0;
     byte = { 0, 0, 0, 0 };
+    size = 0;
   }
   for i = 1, n do
     self[1] = 0
@@ -72,7 +72,7 @@ end
 function class:update_word(s, min, max)
   local n = self.n
   local i = self.i
-  if i < n and min + 2 < max then
+  if i < n and min + 3 <= max then
     local m = min + (n - i) * 4 - 1
     if max > m then
       max = m
@@ -99,26 +99,23 @@ function class:update(s, i, j)
   if self.i == self.n then
     self.i = 0
   end
+
+  local start = min
   if self.j > 0 then
     min = self:update_byte(s, min, max)
-    if self.j > 0 then
-      return min
+  end
+  if self.j == 0 then
+    min = self:update_word(s, min, max)
+    if self.i < self.n and min <= max then
+      min = self:update_byte(s, min, max)
     end
   end
-  min = self:update_word(s, min, max)
-  if self.i == self.n or min > max then
-    return min
-  end
-  min = self:update_byte(s, min, max)
+  self.size = self.size + min - start
   return min
 end
 
 function class:is_full()
   return self.i == self.n
-end
-
-function class:word(i)
-  return self[i]
 end
 
 local metatable = {
