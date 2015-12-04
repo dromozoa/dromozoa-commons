@@ -27,8 +27,6 @@ local shr = uint32.shr
 local bnot = uint32.bnot
 local rotr = uint32.rotr
 
-local class = {}
-
 local K = {
   0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5,
   0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
@@ -72,34 +70,13 @@ local function sigma1(x)
   return bxor(rotr(x, 17), rotr(x, 19), shr(x, 10))
 end
 
-function class.new()
-  return class.reset({
-    M = word_block(16);
-    W = {};
-    H = {};
-  })
-end
-
-function class:reset()
-  local H = self.H
-  H[1] = 0x6a09e667
-  H[2] = 0xbb67ae85
-  H[3] = 0x3c6ef372
-  H[4] = 0xa54ff53a
-  H[5] = 0x510e527f
-  H[6] = 0x9b05688c
-  H[7] = 0x1f83d9ab
-  H[8] = 0x5be0cd19
-  return self
-end
-
-function class:update_impl()
+local function update(self)
   local M = self.M
   local W = self.W
   local H = self.H
 
-  for i = 1, 16 do
-    W[i] = M[i]
+  for t = 1, 16 do
+    W[t] = M[t]
   end
   for t = 17, 64 do
     W[t] = add(sigma1(W[t - 2]), W[t - 7], sigma0(W[t - 15]), W[t - 16])
@@ -113,8 +90,8 @@ function class:update_impl()
   local H6 = H[6]
   local H7 = H[7]
   local H8 = H[8]
-  local a, b, c, d, e, f, g, h = H1, H2, H3, H4, H5, H6, H7, H8
 
+  local a, b, c, d, e, f, g, h = H1, H2, H3, H4, H5, H6, H7, H8
   for t = 1, 64 do
     local T1 = add(h, sum1(e), Ch(e, f, g), K[t], W[t])
     local T2 = add(sum0(a), Maj(a, b, c))
@@ -138,6 +115,29 @@ function class:update_impl()
   H[8] = add(h, H8)
 end
 
+local class = {}
+
+function class.new()
+  return class.reset({
+    M = word_block(16);
+    W = {};
+    H = {};
+  })
+end
+
+function class:reset()
+  local H = self.H
+  H[1] = 0x6a09e667
+  H[2] = 0xbb67ae85
+  H[3] = 0x3c6ef372
+  H[4] = 0xa54ff53a
+  H[5] = 0x510e527f
+  H[6] = 0x9b05688c
+  H[7] = 0x1f83d9ab
+  H[8] = 0x5be0cd19
+  return self
+end
+
 function class:update(s, i, j)
   local s = tostring(s)
   local min, max = translate_range(#s, i, j)
@@ -145,9 +145,10 @@ function class:update(s, i, j)
   while min <= max do
     min = M:update(s, min, max)
     if M:full() then
-      self:update_impl()
+      update(self)
     end
   end
+  return self
 end
 
 function class:finalize()
@@ -155,18 +156,16 @@ function class:finalize()
   local size = M.size * 8
   M:update("\128", 1, 1)
   if M:flush() > 14 then
-    self:update_impl()
+    update(self)
     M:zero()
   end
   M[16], M[15] = uint64.word(size)
-  self:update_impl()
+  update(self)
+  return self.H
 end
 
 function class.hex(message)
-  local self = class()
-  self:update(message)
-  self:finalize()
-  local H = self.H
+  local H = class():update(message):finalize()
   return ("%08x%08x%08x%08x%08x%08x%08x%08x"):format(H[1], H[2], H[3], H[4], H[5], H[6], H[7], H[8])
 end
 
