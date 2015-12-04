@@ -34,3 +34,8 @@ print("--")
 print(string.format("%08x %08x %08x %08x %08x %08x %08x %08x", unpack(d.M, 1, 8)))
 print(string.format("%08x %08x %08x %08x %08x %08x %08x %08x", unpack(d.M, 9, 16)))
 print(string.format("%08x %08x %08x %08x %08x %08x %08x %08x", unpack(d.H)))
+
+print("--")
+print(sha256.hex(""))
+print(sha256.hex("abc"))
+

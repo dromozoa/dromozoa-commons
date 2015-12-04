@@ -155,6 +155,14 @@ function class:finalize()
   self:update_impl()
 end
 
+function class.hex(message)
+  local self = class()
+  self:update(message)
+  self:finalize()
+  local H = self.H
+  return ("%08x%08x%08x%08x%08x%08x%08x%08x"):format(H[1], H[2], H[3], H[4], H[5], H[6], H[7], H[8])
+end
+
 local metatable = {
   __index = class;
 }
