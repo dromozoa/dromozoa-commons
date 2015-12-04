@@ -1,8 +1,8 @@
 package = "dromozoa-commons"
-version = "1.37-1"
+version = "1.38-1"
 source = {
-  url = "https://github.com/dromozoa/dromozoa-commons/archive/v1.37.tar.gz";
-  file = "dromozoa-commons-1.37.tar.gz";
+  url = "https://github.com/dromozoa/dromozoa-commons/archive/v1.38.tar.gz";
+  file = "dromozoa-commons-1.38.tar.gz";
 }
 description = {
   summary = "Reusable Lua components";
@@ -42,6 +42,7 @@ build = {
     ["dromozoa.commons.sequence"] = "dromozoa/commons/sequence.lua";
     ["dromozoa.commons.sequence_writer"] = "dromozoa/commons/sequence_writer.lua";
     ["dromozoa.commons.set"] = "dromozoa/commons/set.lua";
+    ["dromozoa.commons.sha256"] = "dromozoa/commons/sha256.lua";
     ["dromozoa.commons.shell"] = "dromozoa/commons/shell.lua";
     ["dromozoa.commons.split"] = "dromozoa/commons/split.lua";
     ["dromozoa.commons.string_matcher"] = "dromozoa/commons/string_matcher.lua";
@@ -53,6 +54,7 @@ build = {
     ["dromozoa.commons.utf8"] = "dromozoa/commons/utf8.lua";
     ["dromozoa.commons.values"] = "dromozoa/commons/values.lua";
     ["dromozoa.commons.visit"] = "dromozoa/commons/visit.lua";
+    ["dromozoa.commons.word_block"] = "dromozoa/commons/word_block.lua";
     ["dromozoa.commons.write_file"] = "dromozoa/commons/write_file.lua";
     ["dromozoa.commons.xml"] = "dromozoa/commons/xml.lua";
   };
