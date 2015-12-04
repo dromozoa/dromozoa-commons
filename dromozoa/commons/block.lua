@@ -36,11 +36,11 @@ function class:update_byte(s, min, max)
   local byte = self.byte
 
   local m = min + 3 - j
-  if max > m then
-    max = m
+  if m > max then
+    m = max
   end
 
-  local a, b, c = s:byte(min, max)
+  local a, b, c = s:byte(min, m)
   if c then
     j = j + 3
     byte[j - 2] = a
@@ -62,37 +62,43 @@ function class:update_byte(s, min, max)
     self[i] = a * 0x1000000 + b * 0x10000 + c * 0x100 + d
     self.i = i
     self.j = 0
-    return max + 1, false
+    return m + 1, false
   else
     self.j = j
-    return max + 1, true
+    return m + 1, true
   end
 end
 
 function class:update_word(s, min, max)
-  local _max = max
   local n = self.n
   local i = self.i
-  local m = min + (n - i) * 4 - 1
-  if max > m then
-    max = m
+  if i < n and min + 2 < max then
+    local m = min + (n - i) * 4 - 1
+    if m > max then
+      m = max
+    end
+
+    local p
+    for j = min + 3, m, 4 do
+      p = j - 3
+      local a, b, c, d = s:byte(p, j)
+      i = i + 1
+      self[i] = a * 0x1000000 + b * 0x10000 + c * 0x100 + d
+    end
+    self.i = i
+    local j = p + 4
+    return j, i == n
+  else
+    return min, i == n
   end
-  local x = min
-  for j = min + 3, max, 4 do
-    local p = j - 3
-    local a, b, c, d = s:byte(p, j)
-    i = i + 1
-    self[i] = a * 0x1000000 + b * 0x10000 + c * 0x100 + d
-    x = p + 4
-  end
-  self.i = i
-  return x, self:is_full() or x > max
 end
 
 function class:update(s, i, j)
   local s = tostring(s)
   local min, max = translate_range(#s, i, j)
   local done
+
+  assert(min <= max)
 
   if self:is_full() then
     self.i = 0
@@ -106,7 +112,7 @@ function class:update(s, i, j)
   end
 
   min, done = self:update_word(s, min, max)
-  if done then
+  if done or min > max then
     return min
   end
 
