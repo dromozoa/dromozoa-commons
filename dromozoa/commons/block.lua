@@ -22,25 +22,27 @@ local unpack = require "dromozoa.commons.unpack"
 local class = {}
 
 function class.new(n)
-  return {
+  local self = {
+    size = 0;
     n = n;
     i = 0;
     j = 0;
     byte = { 0, 0, 0, 0 };
-    -- ref, min, max
   }
+  for i = 1, n do
+    self[1] = 0
+  end
+  return self
 end
 
 function class:update_byte(s, min, max)
   local j = self.j
   local byte = self.byte
-
   local m = min + 3 - j
-  if m > max then
-    m = max
+  if max > m then
+    max = m
   end
-
-  local a, b, c = s:byte(min, m)
+  local a, b, c = s:byte(min, max)
   if c then
     j = j + 3
     byte[j - 2] = a
@@ -54,7 +56,6 @@ function class:update_byte(s, min, max)
     j = j + 1
     byte[j] = a
   end
-
   if j == 4 then
     local byte = self.byte
     local a, b, c, d = byte[1], byte[2], byte[3], byte[4]
@@ -62,11 +63,10 @@ function class:update_byte(s, min, max)
     self[i] = a * 0x1000000 + b * 0x10000 + c * 0x100 + d
     self.i = i
     self.j = 0
-    return m + 1, false
   else
     self.j = j
-    return m + 1, true
   end
+  return max + 1
 end
 
 function class:update_word(s, min, max)
@@ -74,49 +74,43 @@ function class:update_word(s, min, max)
   local i = self.i
   if i < n and min + 2 < max then
     local m = min + (n - i) * 4 - 1
-    if m > max then
-      m = max
+    if max > m then
+      max = m
     end
-
-    local p
-    for j = min + 3, m, 4 do
+    for j = min + 3, max, 4 do
       p = j - 3
       local a, b, c, d = s:byte(p, j)
       i = i + 1
       self[i] = a * 0x1000000 + b * 0x10000 + c * 0x100 + d
     end
     self.i = i
-    local j = p + 4
-    return j, i == n
+    return p + 4
   else
-    return min, i == n
+    return min
   end
 end
 
 function class:update(s, i, j)
   local s = tostring(s)
   local min, max = translate_range(#s, i, j)
-  local done
-
-  assert(min <= max)
-
-  if self:is_full() then
+  if min > max then
+    return min
+  end
+  if self.i == self.n then
     self.i = 0
   end
-
-  if self.j ~= 0 then
-    min, done = self:update_byte(s, min, max)
-    if done then
+  if self.j > 0 then
+    min = self:update_byte(s, min, max)
+    if self.j > 0 then
       return min
     end
   end
-
-  min, done = self:update_word(s, min, max)
-  if done or min > max then
+  min = self:update_word(s, min, max)
+  if self.i == self.n or min > max then
     return min
   end
-
-  return (self:update_byte(s, min, max))
+  min = self:update_byte(s, min, max)
+  return min
 end
 
 function class:is_full()
