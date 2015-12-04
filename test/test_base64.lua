@@ -17,9 +17,12 @@
 
 local base64 = require "dromozoa.commons.base64"
 
-local function test(text, code)
-  local result = base64.encode(text)
-  assert(result == code)
+local function test(this, that)
+  local code = base64.encode(this)
+  assert(code == that)
+  -- print(this, that)
+  -- print(base64.decode(code))
+  assert(base64.decode(code) == this)
 end
 
 test("", "")
@@ -30,3 +33,11 @@ test("foob", "Zm9vYg==")
 test("fooba", "Zm9vYmE=")
 test("foobar", "Zm9vYmFy")
 test("ABCDEFG", "QUJDREVGRw==")
+
+assert(not base64.decode("Zm9v===="))
+assert(not base64.decode("Zm9vZ==="))
+assert(not base64.decode("Zg=/"))
+assert(not base64.decode("Zg==Zg=="))
+assert(not base64.decode("Zm8=Zg=="))
+assert(not base64.decode("Zh=="))
+assert(not base64.decode("Zm9="))

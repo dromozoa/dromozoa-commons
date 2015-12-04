@@ -15,20 +15,30 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local function add(a, b)
-  return (a + b) % 0x100000000
+local function add(a, b, x, ...)
+  local c = (a + b) % 0x100000000
+  if x == nil then
+    return c
+  else
+    return add(c, x, ...)
+  end
 end
 
 local function sub(a, b)
   return (a - b) % 0x100000000
 end
 
-local function mul(a, b)
+local function mul(a, b, x, ...)
   local a1 = a % 0x10000
   local a2 = (a - a1) / 0x10000
   local c1 = a1 * b
   local c2 = a2 * b % 0x10000
-  return (c1 + c2 * 0x10000) % 0x100000000
+  local c = (c1 + c2 * 0x10000) % 0x100000000
+  if x == nil then
+    return c
+  else
+    return mul(c, x, ...)
+  end
 end
 
 local function div(a, b)
@@ -40,7 +50,7 @@ local function mod(a, b)
   return a % b
 end
 
-local function band(a, b)
+local function band(a, b, x, ...)
   local c = 0
   local d = 1
   for i = 1, 31 do
@@ -56,10 +66,14 @@ local function band(a, b)
   if a + b == 2 then
     c = c + d
   end
-  return c
+  if x == nil then
+    return c
+  else
+    return band(c, x, ...)
+  end
 end
 
-local function bor(a, b)
+local function bor(a, b, x, ...)
   local c = 0
   local d = 1
   for i = 1, 31 do
@@ -75,10 +89,14 @@ local function bor(a, b)
   if a + b ~= 0 then
     c = c + d
   end
-  return c
+  if x == nil then
+    return c
+  else
+    return bor(c, x, ...)
+  end
 end
 
-local function bxor(a, b)
+local function bxor(a, b, x, ...)
   local c = 0
   local d = 1
   for i = 1, 31 do
@@ -94,7 +112,11 @@ local function bxor(a, b)
   if a ~= b then
     c = c + d
   end
-  return c
+  if x == nil then
+    return c
+  else
+    return bxor(c, x, ...)
+  end
 end
 
 local function bnot(v)
@@ -144,45 +166,80 @@ end
 
 if _VERSION >= "Lua 5.3" then
   return assert(load([[
+    local function add(a, b, x, ...)
+      local c = a + b & 0xffffffff
+      if x == nil then
+        return c
+      else
+        return add(c, x, ...)
+      end
+    end
+
+    local function mul(a, b, x, ...)
+      local c = a * b & 0xffffffff
+      if x == nil then
+        return c
+      else
+        return mul(c, x, ...)
+      end
+    end
+
+    local function band(a, b, x, ...)
+      local c = a & b
+      if x == nil then
+        return c
+      else
+        return band(c, x, ...)
+      end
+    end
+
+    local function bor(a, b, x, ...)
+      local c = a | b
+      if x == nil then
+        return c
+      else
+        return bor(c, x, ...)
+      end
+    end
+
+    local function bxor(a, b, x, ...)
+      local c = a ~ b
+      if x == nil then
+        return c
+      else
+        return bxor(c, x, ...)
+      end
+    end
+
     return {
-      add = function (a, b)
-        return a + b & 0xFFFFFFFF
-      end;
+      add = add;
       sub = function (a, b)
-        return a - b & 0xFFFFFFFF
+        return a - b & 0xffffffff
       end;
-      mul = function (a, b)
-        return a * b & 0xFFFFFFFF
-      end;
+      mul = mul;
       div = function (a, b)
         return a // b
       end;
       mod = function (a, b)
         return a % b
       end;
-      band = function (a, b)
-        return a & b
-      end;
-      bor = function (a, b)
-        return a | b
-      end;
-      bxor = function (a, b)
-        return a ~ b
-      end;
+      band = band;
+      bor = bor;
+      bxor = bxor;
       shl = function (a, b)
-        return a << b & 0xFFFFFFFF
+        return a << b & 0xffffffff
       end;
       shr = function (a, b)
         return a >> b
       end;
       bnot = function (v)
-        return ~v & 0xFFFFFFFF
+        return ~v & 0xffffffff
       end;
       rotl = function (a, b)
-        return (a << b | a >> 32 - b) & 0xFFFFFFFF
+        return (a << b | a >> 32 - b) & 0xffffffff
       end;
       rotr = function (a, b)
-        return (a >> b | a << 32 - b) & 0xFFFFFFFF
+        return (a >> b | a << 32 - b) & 0xffffffff
       end;
     }
   ]]))()
@@ -203,35 +260,43 @@ elseif bit32 then
     rotr = bit32.rrotate;
   }
 elseif bit then
+  local bit_band = bit.band
+  local bit_bor = bit.bor
+  local bit_bxor = bit.bxor
+  local bit_lshift = bit.lshift
+  local bit_rshift = bit.rshift
+  local bit_bnot = bit.bnot
+  local bit_rol = bit.rol
+  local bit_ror = bit.ror
   return {
     add = add;
     sub = sub;
     mul = mul;
     div = div;
     mod = mod;
-    band = function (a, b)
-      return bit.band(a, b) % 0x100000000
+    band = function (...)
+      return bit_band(...) % 0x100000000
     end;
-    bor = function (a, b)
-      return bit.bor(a, b) % 0x100000000
+    bor = function (...)
+      return bit_bor(...) % 0x100000000
     end;
-    bxor = function (a, b)
-      return bit.bxor(a, b) % 0x100000000
+    bxor = function (...)
+      return bit_bxor(...) % 0x100000000
     end;
     shl = function (a, b)
-      return bit.lshift(a, b) % 0x100000000
+      return bit_lshift(a, b) % 0x100000000
     end;
     shr = function (a, b)
-      return bit.rshift(a, b) % 0x100000000
+      return bit_rshift(a, b) % 0x100000000
     end;
     bnot = function (v)
-      return bit.bnot(v) % 0x100000000
+      return bit_bnot(v) % 0x100000000
     end;
     rotl = function (a, b)
-      return bit.rol(a, b) % 0x100000000
+      return bit_rol(a, b) % 0x100000000
     end;
     rotr = function (a, b)
-      return bit.ror(a, b) % 0x100000000
+      return bit_ror(a, b) % 0x100000000
     end;
   }
 else

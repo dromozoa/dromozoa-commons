@@ -20,28 +20,34 @@ local translate_range = require "dromozoa.commons.translate_range"
 local uint32 = require "dromozoa.commons.uint32"
 local uint64 = require "dromozoa.commons.uint64"
 
+local add = uint32.add
+local mul = uint32.mul
+local bxor = uint32.bxor
+local shr = uint32.shr
+local rotl = uint32.rotl
+
 local function update1(hash, key)
-  key = uint32.mul(key, 0xCC9E2D51)
-  key = uint32.rotl(key, 15)
-  key = uint32.mul(key, 0x1B873593)
-  hash = uint32.bxor(hash, key)
+  key = mul(key, 0xcc9e2d51)
+  key = rotl(key, 15)
+  key = mul(key, 0x1b873593)
+  hash = bxor(hash, key)
   return hash
 end
 
 local function update2(hash)
-  hash = uint32.rotl(hash, 13)
-  hash = uint32.mul(hash, 5)
-  hash = uint32.add(hash, 0xE6546B64)
+  hash = rotl(hash, 13)
+  hash = mul(hash, 5)
+  hash = add(hash, 0xe6546b64)
   return hash
 end
 
 local function finalize(hash, n)
-  hash = uint32.bxor(hash, n)
-  hash = uint32.bxor(hash, uint32.shr(hash, 16))
-  hash = uint32.mul(hash, 0x85EBCA6B)
-  hash = uint32.bxor(hash, uint32.shr(hash, 13))
-  hash = uint32.mul(hash, 0xC2B2AE35)
-  hash = uint32.bxor(hash, uint32.shr(hash, 16))
+  hash = bxor(hash, n)
+  hash = bxor(hash, shr(hash, 16))
+  hash = mul(hash, 0x85ebca6b)
+  hash = bxor(hash, shr(hash, 13))
+  hash = mul(hash, 0xc2b2ae35)
+  hash = bxor(hash, shr(hash, 16))
   return hash
 end
 
@@ -73,14 +79,14 @@ return {
   string = function (key, hash, i, j)
     local min, max = translate_range(#key, i, j)
     for i = min + 3, max, 4 do
-      local a, b, c, d = string.byte(key, i - 3, i)
+      local a, b, c, d = key:byte(i - 3, i)
       hash = update1(hash, a + b * 0x100 + c * 0x10000 + d * 0x1000000)
       hash = update2(hash)
     end
     local i = max + 1
-    local m = i - (i - min) % 4
-    if m < i then
-      local a, b, c = string.byte(key, m, max)
+    local p = i - (i - min) % 4
+    if p < i then
+      local a, b, c = key:byte(p, max)
       if c then
         hash = update1(hash, a + b * 0x100 + c * 0x10000)
       elseif b then

@@ -18,40 +18,44 @@
 local sequence_writer = require "dromozoa.commons.sequence_writer"
 local translate_range = require "dromozoa.commons.translate_range"
 
-local code_to_char = {
+local encoder = {
   [62] = "+";
   [63] = "/";
+}
+
+local decoder = {
+  [("+"):byte()] = 62;
+  [("/"):byte()] = 63;
 }
 
 local n = ("A"):byte()
 for i = 0, 25 do
   local byte = i + n
   local char = string.char(byte)
-  code_to_char[i] = char
+  encoder[i] = char
+  decoder[byte] = i
 end
 
 local n = ("a"):byte() - 26
 for i = 26, 51 do
   local byte = i + n
   local char = string.char(byte)
-  code_to_char[i] = char
+  encoder[i] = char
+  decoder[byte] = i
 end
 
 local n = ("0"):byte() - 52
 for i = 52, 61 do
   local byte = i + n
   local char = string.char(byte)
-  code_to_char[i] = char
+  encoder[i] = char
+  decoder[byte] = i
 end
 
-local class = {}
-
-local function encode(s, i, j)
-  local s = tostring(s)
-  local min, max = translate_range(#s, i, j)
-  local out = sequence_writer()
+local function encode(encoder, out, s, min, max)
   for i = min + 2, max, 3 do
-    local a, b, c = s:byte(i - 2, i)
+    local p = i - 2
+    local a, b, c = s:byte(p, i)
     local a = a * 65536 + b * 256 + c
     local d = a % 64
     local a = (a - d) / 64
@@ -59,29 +63,107 @@ local function encode(s, i, j)
     local a = (a - c) / 64
     local b = a % 64
     local a = (a - b) / 64
-    out:write(code_to_char[a], code_to_char[b], code_to_char[c], code_to_char[d])
+    out:write(encoder[a], encoder[b], encoder[c], encoder[d])
   end
+
   local i = max + 1
-  local m = i - (i - min) % 3
-  if m < i then
-    local a, b = s:byte(m, max)
+  local p = i - (i - min) % 3
+  if p < i then
+    local a, b = s:byte(p, max)
     if b then
       local a = a * 1024 + b * 4
       local c = a % 64
       local a = (a - c) / 64
       local b = a % 64
       local a = (a - b) / 64
-      out:write(code_to_char[a], code_to_char[b], code_to_char[c], "=")
+      out:write(encoder[a], encoder[b], encoder[c], "=")
     else
       local a = a * 16
       local b = a % 64
       local a = (a - b) / 64
-      out:write(code_to_char[a], code_to_char[b], "==")
+      out:write(encoder[a], encoder[b], "==")
     end
   end
-  return out:concat()
+
+  return out
 end
 
-return {
-  encode = encode;
-}
+local function decode(out, s, min, max)
+  local n = max - min + 1
+  if n == 0 then
+    return out
+  elseif n % 4 ~= 0 then
+    return nil, "length not divisible by 4"
+  end
+
+  for i = min + 3, max - 4, 4 do
+    local p = i - 3
+    if s:find("^[0-9A-Za-z%+%/][0-9A-Za-z%+%/][0-9A-Za-z%+%/][0-9A-Za-z%+%/]", p) == nil then
+      return nil, "decode error at position " .. p
+    end
+    local a, b, c, d = s:byte(p, i)
+    local a = decoder[a] * 262144 + decoder[b] * 4096 + decoder[c] * 64 + decoder[d]
+    local c = a % 256
+    local a = (a - c) / 256
+    local b = a % 256
+    local a = (a - b) / 256
+    out:write(string.char(a, b, c))
+  end
+
+  local p = max - 3
+  if s:find("^[0-9A-Za-z%+%/][0-9A-Za-z%+%/][0-9A-Za-z%+%/%=][0-9A-Za-z%+%/%=]", p) == nil then
+    return nil, "decode error at position " .. p
+  end
+  local a, b, c, d = s:byte(p, max)
+  local a = decoder[a]
+  local b = decoder[b]
+  local c = decoder[c]
+  local d = decoder[d]
+  if d == nil then
+    if c == nil then
+      if b % 16 ~= 0 then
+        return nil, "decode error at position " .. p + 1
+      end
+      local a = a * 4 + b / 16
+      out:write(string.char(a))
+    else
+      if c % 4 ~= 0 then
+        return nil, "decode error at position " .. p + 2
+      end
+      local a = a * 1024 + b * 16 + c / 4
+      local b = a % 256
+      local a = (a - b) / 256
+      out:write(string.char(a, b))
+    end
+  elseif c == nil then
+    return nil, "decode error at position " .. p + 3
+  else
+    local a = a * 262144 + b * 4096 + c * 64 + d
+    local c = a % 256
+    local a = (a - c) / 256
+    local b = a % 256
+    local a = (a - b) / 256
+    out:write(string.char(a, b, c))
+  end
+
+  return out
+end
+
+local class = {}
+
+function class.encode(s, i, j)
+  local s = tostring(s)
+  return encode(encoder, sequence_writer(), s, translate_range(#s, i, j)):concat()
+end
+
+function class.decode(s, i, j)
+  local s = tostring(s)
+  local result, message = decode(sequence_writer(), s, translate_range(#s, i, j))
+  if result == nil then
+    return nil, message
+  else
+    return result:concat()
+  end
+end
+
+return class
