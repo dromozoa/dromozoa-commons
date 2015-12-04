@@ -23,20 +23,30 @@ local function add_impl(a, b, c, ...)
   end
 end
 
-local function add(...)
-  return add_impl(...) % 0x100000000
+local function add(a, b, c, ...)
+  local r = (a + b) % 0x100000000
+  if c == nil then
+    return r
+  else
+    return add(r, c, ...)
+  end
 end
 
 local function sub(a, b)
   return (a - b) % 0x100000000
 end
 
-local function mul(a, b)
+local function mul(a, b, c, ...)
   local a1 = a % 0x10000
   local a2 = (a - a1) / 0x10000
   local c1 = a1 * b
   local c2 = a2 * b % 0x10000
-  return (c1 + c2 * 0x10000) % 0x100000000
+  local r = (c1 + c2 * 0x10000) % 0x100000000
+  if c == nil then
+    return r
+  else
+    return mul(r, c, ...)
+  end
 end
 
 local function div(a, b)
@@ -162,30 +172,39 @@ local class
 
 if _VERSION >= "Lua 5.3" then
   class = assert(load([[
-    local function add_impl(a, b, c, ...)
+    local function add(a, b, c, ...)
+      local r = a + b & 0xFFFFFFFF
       if c == nil then
-        return a + b
+        return r
       else
-        return add_impl(a + b, c, ...)
+        return add(r, c, ...)
       end
     end
-    local function bxor_impl(a, b, c, ...)
+
+    local function mul(a, b, c, ...)
+      local r = a * b & 0xFFFFFFFF
       if c == nil then
-        return a ~ b
+        return r
       else
-        return bxor_impl(a ~ b, c, ...)
+        return mul(r, c, ...)
       end
     end
+
+    local function bxor(a, b, c, ...)
+      local r = a ~ b
+      if c == nil then
+        return r
+      else
+        return bxor(r, c, ...)
+      end
+    end
+
     return {
-      add = function (...)
-        return add_impl(...) & 0xFFFFFFFF
-      end;
+      add = add;
       sub = function (a, b)
         return a - b & 0xFFFFFFFF
       end;
-      mul = function (a, b)
-        return a * b & 0xFFFFFFFF
-      end;
+      mul = mul;
       div = function (a, b)
         return a // b
       end;
@@ -198,9 +217,7 @@ if _VERSION >= "Lua 5.3" then
       bor = function (a, b)
         return a | b
       end;
-      bxor = function (...)
-        return bxor_impl(...)
-      end;
+      bxor = bxor;
       shl = function (a, b)
         return a << b & 0xFFFFFFFF
       end;
@@ -283,18 +300,5 @@ else
     rotr = rotr;
   }
 end
-
-local function multi(name)
-  local op_binary = class[name]
-  local function op_multi(a, b, c, ...)
-    if c == nil then
-      return op_binary(a, b)
-    else
-      return op_multi(op_binary(a, b), c, ...)
-    end
-  end
-  class[name] = op_multi
-end
-multi("mul")
 
 return class
