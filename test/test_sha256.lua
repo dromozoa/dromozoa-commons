@@ -21,26 +21,26 @@ local sha256 = require "dromozoa.commons.sha256"
 local shell = require "dromozoa.commons.shell"
 local unpack = require "dromozoa.commons.unpack"
 
-local d = sha256()
-print(string.format("%08x %08x %08x %08x %08x %08x %08x %08x", unpack(d.M, 1, 8)))
-print(string.format("%08x %08x %08x %08x %08x %08x %08x %08x", unpack(d.M, 9, 16)))
-print(string.format("%08x %08x %08x %08x %08x %08x %08x %08x", unpack(d.H)))
+-- local d = sha256()
+-- print(string.format("%08x %08x %08x %08x %08x %08x %08x %08x", unpack(d.M, 1, 8)))
+-- print(string.format("%08x %08x %08x %08x %08x %08x %08x %08x", unpack(d.M, 9, 16)))
+-- print(string.format("%08x %08x %08x %08x %08x %08x %08x %08x", unpack(d.H)))
 
-d:update("abc")
-print("--")
-print(string.format("%08x %08x %08x %08x %08x %08x %08x %08x", unpack(d.M, 1, 8)))
-print(string.format("%08x %08x %08x %08x %08x %08x %08x %08x", unpack(d.M, 9, 16)))
-print(string.format("%08x %08x %08x %08x %08x %08x %08x %08x", unpack(d.H)))
+-- d:update("abc")
+-- print("--")
+-- print(string.format("%08x %08x %08x %08x %08x %08x %08x %08x", unpack(d.M, 1, 8)))
+-- print(string.format("%08x %08x %08x %08x %08x %08x %08x %08x", unpack(d.M, 9, 16)))
+-- print(string.format("%08x %08x %08x %08x %08x %08x %08x %08x", unpack(d.H)))
 
-d:finalize()
-print("--")
-print(string.format("%08x %08x %08x %08x %08x %08x %08x %08x", unpack(d.M, 1, 8)))
-print(string.format("%08x %08x %08x %08x %08x %08x %08x %08x", unpack(d.M, 9, 16)))
-print(string.format("%08x %08x %08x %08x %08x %08x %08x %08x", unpack(d.H)))
+-- d:finalize()
+-- print("--")
+-- print(string.format("%08x %08x %08x %08x %08x %08x %08x %08x", unpack(d.M, 1, 8)))
+-- print(string.format("%08x %08x %08x %08x %08x %08x %08x %08x", unpack(d.M, 9, 16)))
+-- print(string.format("%08x %08x %08x %08x %08x %08x %08x %08x", unpack(d.H)))
 
-print("--")
-print(sha256.hex(""))
-print(sha256.hex("abc"))
+-- print("--")
+-- print(sha256.hex(""))
+-- print(sha256.hex("abc"))
 
 local data = dumper.decode(shell.eval("test/generate_test_sha256_data.pl"))
 for i, v in ipairs(data) do
