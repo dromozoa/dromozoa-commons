@@ -37,7 +37,7 @@ local function word(v)
       end
     end
   else
-    a = 0x7FF00000
+    a = 0x7ff00000
     if v ~= math.huge then
       a = a + 0x80000000
       if v ~= -math.huge then

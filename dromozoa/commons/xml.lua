@@ -20,8 +20,8 @@ local set = require "dromozoa.commons.set"
 local function get_named_char_refs()
   return {
     [string.char(0x26)] = "&amp;";
-    [string.char(0x3C)] = "&lt;";
-    [string.char(0x3E)] = "&gt;";
+    [string.char(0x3c)] = "&lt;";
+    [string.char(0x3e)] = "&gt;";
     [string.char(0x22)] = "&quot;";
     [string.char(0x27)] = "&apos;";
   }
