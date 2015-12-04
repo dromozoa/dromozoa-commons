@@ -42,7 +42,7 @@ local unpack = require "dromozoa.commons.unpack"
 -- print(sha256.hex(""))
 -- print(sha256.hex("abc"))
 
-local data = dumper.decode(shell.eval("test/generate_test_sha256_data.pl"))
+local data = dumper.decode(shell.eval("test/test_sha256.pl"))
 for i, v in ipairs(data) do
   local result = sha256.hex(v[1])
   assert(result == v[2])
