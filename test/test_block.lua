@@ -23,7 +23,7 @@ local function as_word(s)
   return ((a * 256 + b) * 256 + c) * 256 + d
 end
 
-local b = block(8)
+local b = block(2)
 local s = "foobarbazqux"
 local i = b:update(s, 1, 4)
 assert(i == 5)
@@ -43,15 +43,22 @@ assert(b:is_full())
 assert(b:word(1) == as_word("zqux"))
 assert(b:word(2) == as_word("0123"))
 
+-- print("---1")
 local i = b:update("1")
+-- print("ij1", b.i, b.j)
 assert(i == 2)
+-- print("---23")
 local i = b:update("23")
+-- print("ij23", b.i, b.j)
 assert(i == 3)
+-- print("---456")
 local i = b:update("456")
+-- print("ij456", b.i, b.j)
 assert(i == 4)
+-- print("---7890")
 local i = b:update("7890")
+-- print("ij7890", b.i, b.j)
+-- print(i)
 assert(i == 3)
 assert(b:word(1) == as_word("1234"))
 assert(b:word(2) == as_word("5678"))
-
-
