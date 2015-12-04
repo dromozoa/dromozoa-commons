@@ -114,14 +114,6 @@ function class:full()
   return self.i == self.n
 end
 
-function class:zero()
-  local n = self.n
-  for i = 1, n do
-    self[i] = 0
-  end
-  return self
-end
-
 function class:flush()
   local n = self.n
   local i = self.i
@@ -141,6 +133,14 @@ function class:flush()
     self[i] = 0
   end
   return i
+end
+
+function class:zero()
+  local n = self.n
+  for i = 1, n do
+    self[i] = 0
+  end
+  return self
 end
 
 local metatable = {
