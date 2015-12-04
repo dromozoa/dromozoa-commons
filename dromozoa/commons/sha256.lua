@@ -157,7 +157,7 @@ function class:finalize()
   M:update("\128", 1, 1)
   if M:flush() > 14 then
     update(self)
-    M:zero()
+    M:reset()
   end
   M[16], M[15] = uint64.word(size)
   update(self)

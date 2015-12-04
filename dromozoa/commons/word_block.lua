@@ -15,23 +15,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local sequence = require "dromozoa.commons.sequence"
-local translate_range = require "dromozoa.commons.translate_range"
-local unpack = require "dromozoa.commons.unpack"
-
-local class = {}
-
-function class.new(n)
-  return class.zero({
-    n = n;
-    i = 0;
-    j = 0;
-    byte = { 0, 0, 0, 0 };
-    size = 0;
-  })
-end
-
-function class:update_byte(s, min, max)
+local function update_byte(self, s, min, max)
   local j = self.j
   local byte = self.byte
   local m = min + 3 - j
@@ -65,7 +49,7 @@ function class:update_byte(s, min, max)
   return max + 1
 end
 
-function class:update_word(s, min, max)
+local function update_word(self, s, min, max)
   local n = self.n
   local i = self.i
   if i < n and min + 3 <= max then
@@ -86,24 +70,41 @@ function class:update_word(s, min, max)
   end
 end
 
-function class:update(s, i, j)
-  local s = tostring(s)
-  local min, max = translate_range(#s, i, j)
+local class = {}
+
+function class.new(n)
+  return class.reset({
+    n = n;
+    i = 0;
+    j = 0;
+    byte = { 0, 0, 0, 0 };
+    size = 0;
+  })
+end
+
+function class:reset()
+  local n = self.n
+  for i = 1, n do
+    self[i] = 0
+  end
+  return self
+end
+
+function class:update(s, min, max)
   if min > max then
     return min
   end
   if self.i == self.n then
     self.i = 0
   end
-
   local start = min
   if self.j > 0 then
-    min = self:update_byte(s, min, max)
+    min = update_byte(self, s, min, max)
   end
   if self.j == 0 then
-    min = self:update_word(s, min, max)
+    min = update_word(self, s, min, max)
     if self.i < self.n and min <= max then
-      min = self:update_byte(s, min, max)
+      min = update_byte(self, s, min, max)
     end
   end
   self.size = self.size + min - start
@@ -133,14 +134,6 @@ function class:flush()
     self[i] = 0
   end
   return i
-end
-
-function class:zero()
-  local n = self.n
-  for i = 1, n do
-    self[i] = 0
-  end
-  return self
 end
 
 local metatable = {
