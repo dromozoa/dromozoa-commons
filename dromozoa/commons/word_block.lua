@@ -97,7 +97,6 @@ function class:update(s, min, max)
   if self.i == self.n then
     self.i = 0
   end
-  local start = min
   if self.j > 0 then
     min = update_byte(self, s, min, max)
   end
@@ -107,7 +106,6 @@ function class:update(s, min, max)
       min = update_byte(self, s, min, max)
     end
   end
-  self.size = self.size + min - start
   return min
 end
 

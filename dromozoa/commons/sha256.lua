@@ -122,6 +122,7 @@ function class.new()
     M = word_block(16);
     W = {};
     H = {};
+    L = 0;
   })
 end
 
@@ -141,6 +142,7 @@ end
 function class:update(s, i, j)
   local s = tostring(s)
   local min, max = translate_range(#s, i, j)
+  self.L = self.L + max - min + 1
   local M = self.M
   while min <= max do
     min = M:update(s, min, max)
@@ -153,13 +155,12 @@ end
 
 function class:finalize()
   local M = self.M
-  local size = M.size * 8
   M:update("\128", 1, 1)
   if M:flush() > 14 then
     update(self)
     M:reset()
   end
-  M[16], M[15] = uint64.word(size)
+  M[16], M[15] = uint64.word(self.L * 8)
   update(self)
   return self.H
 end
