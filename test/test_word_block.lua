@@ -15,15 +15,15 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local block = require "dromozoa.commons.block"
 local equal = require "dromozoa.commons.equal"
+local word_block = require "dromozoa.commons.word_block"
 
 local function as_word(s)
   local a, b, c, d = s:byte(1, 4)
   return ((a * 256 + b) * 256 + c) * 256 + d
 end
 
-local b = block(2)
+local b = word_block(2)
 local s = "foobarbazqux"
 local i = b:update(s, 1, 4)
 assert(i == 5)
@@ -64,7 +64,7 @@ assert(b[1] == as_word("1234"))
 assert(b[2] == as_word("5678"))
 assert(b.size == 24)
 
-local b = block(2)
+local b = word_block(2)
 assert(b:update("12") == 3)
 assert(not b:is_full())
 assert(b:update("3") == 2)
