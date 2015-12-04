@@ -22,17 +22,13 @@ local unpack = require "dromozoa.commons.unpack"
 local class = {}
 
 function class.new(n)
-  local self = {
+  return class.zero({
     n = n;
     i = 0;
     j = 0;
     byte = { 0, 0, 0, 0 };
     size = 0;
-  }
-  for i = 1, n do
-    self[1] = 0
-  end
-  return self
+  })
 end
 
 function class:update_byte(s, min, max)
@@ -114,8 +110,37 @@ function class:update(s, i, j)
   return min
 end
 
-function class:is_full()
+function class:full()
   return self.i == self.n
+end
+
+function class:zero()
+  local n = self.n
+  for i = 1, n do
+    self[i] = 0
+  end
+  return self
+end
+
+function class:flush()
+  local n = self.n
+  local i = self.i
+  local j = self.j
+  if j > 0 then
+    local byte = self.byte
+    for j = j + 1, 4 do
+      byte[j] = 0
+    end
+    local a, b, c, d = byte[1], byte[2], byte[3], byte[4]
+    i = i + 1
+    self[i] = a * 0x1000000 + b * 0x10000 + c * 0x100 + d
+    self.i = i
+    self.j = 0
+  end
+  for i = i + 1, n do
+    self[i] = 0
+  end
+  return i
 end
 
 local metatable = {
