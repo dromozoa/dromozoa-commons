@@ -15,20 +15,12 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local function add_impl(a, b, c, ...)
-  if c == nil then
-    return a + b
+local function add(a, b, x, ...)
+  local c = (a + b) % 0x100000000
+  if x == nil then
+    return c
   else
-    return add_impl(a + b, c, ...)
-  end
-end
-
-local function add(a, b, c, ...)
-  local r = (a + b) % 0x100000000
-  if c == nil then
-    return r
-  else
-    return add(r, c, ...)
+    return add(c, x, ...)
   end
 end
 
@@ -36,16 +28,16 @@ local function sub(a, b)
   return (a - b) % 0x100000000
 end
 
-local function mul(a, b, c, ...)
+local function mul(a, b, x, ...)
   local a1 = a % 0x10000
   local a2 = (a - a1) / 0x10000
   local c1 = a1 * b
   local c2 = a2 * b % 0x10000
-  local r = (c1 + c2 * 0x10000) % 0x100000000
-  if c == nil then
-    return r
+  local c = (c1 + c2 * 0x10000) % 0x100000000
+  if x == nil then
+    return c
   else
-    return mul(r, c, ...)
+    return mul(c, x, ...)
   end
 end
 
@@ -96,7 +88,7 @@ local function bor(a, b)
   return c
 end
 
-local function bxor_impl(a, b)
+local function bxor(a, b, x, ...)
   local c = 0
   local d = 1
   for i = 1, 31 do
@@ -112,14 +104,10 @@ local function bxor_impl(a, b)
   if a ~= b then
     c = c + d
   end
-  return c
-end
-
-local function bxor(a, b, c, ...)
-  if c == nil then
-    return bxor_impl(a, b)
+  if x == nil then
+    return c
   else
-    return bxor(bxor_impl(a, b), c, ...)
+    return bxor(c, x, ...)
   end
 end
 
@@ -172,30 +160,30 @@ local class
 
 if _VERSION >= "Lua 5.3" then
   class = assert(load([[
-    local function add(a, b, c, ...)
-      local r = a + b & 0xFFFFFFFF
-      if c == nil then
-        return r
+    local function add(a, b, x, ...)
+      local c = a + b & 0xFFFFFFFF
+      if x == nil then
+        return c
       else
-        return add(r, c, ...)
+        return add(c, x, ...)
       end
     end
 
-    local function mul(a, b, c, ...)
-      local r = a * b & 0xFFFFFFFF
-      if c == nil then
-        return r
+    local function mul(a, b, x, ...)
+      local c = a * b & 0xFFFFFFFF
+      if x == nil then
+        return c
       else
-        return mul(r, c, ...)
+        return mul(c, x, ...)
       end
     end
 
-    local function bxor(a, b, c, ...)
-      local r = a ~ b
-      if c == nil then
-        return r
+    local function bxor(a, b, x, ...)
+      local c = a ~ b
+      if x == nil then
+        return c
       else
-        return bxor(r, c, ...)
+        return bxor(c, x, ...)
       end
     end
 
