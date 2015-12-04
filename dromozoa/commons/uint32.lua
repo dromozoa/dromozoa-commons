@@ -15,8 +15,16 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local function add(a, b)
-  return (a + b) % 0x100000000
+local function add_impl(a, b, c, ...)
+  if c == nil then
+    return a + b
+  else
+    return add_impl(a + b, c, ...)
+  end
+end
+
+local function add(...)
+  return add_impl(...) % 0x100000000
 end
 
 local function sub(a, b)
@@ -142,11 +150,20 @@ local function rotr(a, b)
   return c1 * b2 + c2
 end
 
+local class
+
 if _VERSION >= "Lua 5.3" then
-  return assert(load([[
+  class = assert(load([[
+    local function add_impl(a, b, c, ...)
+      if c == nil then
+        return a + b
+      else
+        return add_impl(a + b, c, ...)
+      end
+    end
     return {
-      add = function (a, b)
-        return a + b & 0xFFFFFFFF
+      add = function (...)
+        return add_impl(...) & 0xFFFFFFFF
       end;
       sub = function (a, b)
         return a - b & 0xFFFFFFFF
@@ -187,7 +204,7 @@ if _VERSION >= "Lua 5.3" then
     }
   ]]))()
 elseif bit32 then
-  return {
+  class = {
     add = add;
     sub = sub;
     mul = mul;
@@ -235,7 +252,7 @@ elseif bit then
     end;
   }
 else
-  return {
+  class = {
     add = add;
     sub = sub;
     mul = mul;
@@ -251,3 +268,5 @@ else
     rotr = rotr;
   }
 end
+
+return class
