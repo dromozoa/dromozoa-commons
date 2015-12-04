@@ -27,106 +27,90 @@ function class.new(n)
     i = 0;
     j = 0;
     byte = { 0, 0, 0, 0 };
+    -- ref, min, max
   }
 end
 
 function class:update_byte(s, min, max)
   local j = self.j
-  if j == 0 then
-    return min
+  local byte = self.byte
+
+  local m = min + 3 - j
+  if max > m then
+    max = m
+  end
+
+  local a, b, c = s:byte(min, max)
+  if c then
+    j = j + 3
+    byte[j - 2] = a
+    byte[j - 1] = b
+    byte[j] = c
+  elseif b then
+    j = j + 2
+    byte[j - 1] = a
+    byte[j] = b
   else
+    j = j + 1
+    byte[j] = a
+  end
+
+  if j == 4 then
     local byte = self.byte
-    local m = min + 3 - j
-    if max > m then
-      max = m
-    end
-    local a, b, c = s:byte(min, max)
-    if c then
-      j = j + 3
-      byte[j - 2] = a
-      byte[j - 1] = b
-      byte[j] = c
-    elseif b then
-      j = j + 2
-      byte[j - 1] = a
-      byte[j] = b
-    else
-      j = j + 1
-      byte[j] = a
-    end
-    if j > 3 then
-      local a, b, c, d = byte[1], byte[2], byte[3], byte[4]
-      local i = self.i + 1
-      self[i] = a * 0x1000000 + b * 0x10000 + c * 0x100 + d
-      self.i = i
-      self.j = 0
-    else
-      self.j = j
-    end
-    return max + 1
+    local a, b, c, d = byte[1], byte[2], byte[3], byte[4]
+    local i = self.i + 1
+    self[i] = a * 0x1000000 + b * 0x10000 + c * 0x100 + d
+    self.i = i
+    self.j = 0
+    return max + 1, false
+  else
+    self.j = j
+    return max + 1, true
   end
 end
 
 function class:update_word(s, min, max)
+  local _max = max
   local n = self.n
-  local j = self.i
-  local m = min + (n - j) * 4 - 1
+  local i = self.i
+  local m = min + (n - i) * 4 - 1
   if max > m then
     max = m
   end
   local x = min
-  for i = min + 3, max, 4 do
-    local p = i - 3
-    local a, b, c, d = s:byte(p, i)
-    j = j + 1
-    self[j] = a * 0x1000000 + b * 0x10000 + c * 0x100 + d
+  for j = min + 3, max, 4 do
+    local p = j - 3
+    local a, b, c, d = s:byte(p, j)
+    i = i + 1
+    self[i] = a * 0x1000000 + b * 0x10000 + c * 0x100 + d
     x = p + 4
   end
-  self.i = j
-  return x
-end
-
-function class:update_byte2(s, min, max)
-  local n = max - min + 1
-  if n <= 0 or n >= 4 then
-    return min
-  else
-    local byte = self.byte
-    local a, b, c = s:byte(min, max)
-    if c then
-      byte[1] = a
-      byte[2] = b
-      byte[3] = c
-      self.j = 3
-      return min + 3
-    elseif b then
-      byte[1] = a
-      byte[2] = b
-      self.j = 2
-      return min + 2
-    else
-      byte[1] = a
-      self.j = 1
-      return min + 1
-    end
-  end
+  self.i = i
+  return x, self:is_full() or x > max
 end
 
 function class:update(s, i, j)
   local s = tostring(s)
   local min, max = translate_range(#s, i, j)
+  local done
 
   if self:is_full() then
     self.i = 0
   end
 
-  local min1 = min
-  min = self:update_byte(s, min, max)
-  min = self:update_word(s, min, max)
-  if (not self:is_full()) or min1 == min then
-    min = self:update_byte2(s, min, max)
+  if self.j ~= 0 then
+    min, done = self:update_byte(s, min, max)
+    if done then
+      return min
+    end
   end
-  return min
+
+  min, done = self:update_word(s, min, max)
+  if done then
+    return min
+  end
+
+  return (self:update_byte(s, min, max))
 end
 
 function class:is_full()
