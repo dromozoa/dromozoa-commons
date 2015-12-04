@@ -50,7 +50,7 @@ local function mod(a, b)
   return a % b
 end
 
-local function band(a, b)
+local function band(a, b, x, ...)
   local c = 0
   local d = 1
   for i = 1, 31 do
@@ -66,10 +66,14 @@ local function band(a, b)
   if a + b == 2 then
     c = c + d
   end
-  return c
+  if x == nil then
+    return c
+  else
+    return band(c, x, ...)
+  end
 end
 
-local function bor(a, b)
+local function bor(a, b, x, ...)
   local c = 0
   local d = 1
   for i = 1, 31 do
@@ -85,7 +89,11 @@ local function bor(a, b)
   if a + b ~= 0 then
     c = c + d
   end
-  return c
+  if x == nil then
+    return c
+  else
+    return bor(c, x, ...)
+  end
 end
 
 local function bxor(a, b, x, ...)
@@ -156,10 +164,8 @@ local function rotr(a, b)
   return c1 * b2 + c2
 end
 
-local class
-
 if _VERSION >= "Lua 5.3" then
-  class = assert(load([[
+  return assert(load([[
     local function add(a, b, x, ...)
       local c = a + b & 0xFFFFFFFF
       if x == nil then
@@ -175,6 +181,24 @@ if _VERSION >= "Lua 5.3" then
         return c
       else
         return mul(c, x, ...)
+      end
+    end
+
+    local function band(a, b, x, ...)
+      local c = a & b
+      if x == nil then
+        return c
+      else
+        return band(c, x, ...)
+      end
+    end
+
+    local function bor(a, b, x, ...)
+      local c = a | b
+      if x == nil then
+        return c
+      else
+        return bor(c, x, ...)
       end
     end
 
@@ -199,12 +223,8 @@ if _VERSION >= "Lua 5.3" then
       mod = function (a, b)
         return a % b
       end;
-      band = function (a, b)
-        return a & b
-      end;
-      bor = function (a, b)
-        return a | b
-      end;
+      band = band;
+      bor = bor;
       bxor = bxor;
       shl = function (a, b)
         return a << b & 0xFFFFFFFF
@@ -224,7 +244,7 @@ if _VERSION >= "Lua 5.3" then
     }
   ]]))()
 elseif bit32 then
-  class = {
+  return {
     add = add;
     sub = sub;
     mul = mul;
@@ -240,39 +260,47 @@ elseif bit32 then
     rotr = bit32.rrotate;
   }
 elseif bit then
-  class = {
+  local bit_band = bit.band
+  local bit_bor = bit.bor
+  local bit_bxor = bit.bxor
+  local bit_lshift = bit.lshift
+  local bit_rshift = bit.rshift
+  local bit_bnot = bit.bnot
+  local bit_rol = bit.rol
+  local bit_ror = bit.ror
+  return {
     add = add;
     sub = sub;
     mul = mul;
     div = div;
     mod = mod;
-    band = function (a, b)
-      return bit.band(a, b) % 0x100000000
+    band = function (...)
+      return bit_band(...) % 0x100000000
     end;
-    bor = function (a, b)
-      return bit.bor(a, b) % 0x100000000
+    bor = function (...)
+      return bit_bor(...) % 0x100000000
     end;
     bxor = function (...)
-      return bit.bxor(...) % 0x100000000
+      return bit_bxor(...) % 0x100000000
     end;
     shl = function (a, b)
-      return bit.lshift(a, b) % 0x100000000
+      return bit_lshift(a, b) % 0x100000000
     end;
     shr = function (a, b)
-      return bit.rshift(a, b) % 0x100000000
+      return bit_rshift(a, b) % 0x100000000
     end;
     bnot = function (v)
-      return bit.bnot(v) % 0x100000000
+      return bit_bnot(v) % 0x100000000
     end;
     rotl = function (a, b)
-      return bit.rol(a, b) % 0x100000000
+      return bit_rol(a, b) % 0x100000000
     end;
     rotr = function (a, b)
-      return bit.ror(a, b) % 0x100000000
+      return bit_ror(a, b) % 0x100000000
     end;
   }
 else
-  class = {
+  return {
     add = add;
     sub = sub;
     mul = mul;
@@ -288,5 +316,3 @@ else
     rotr = rotr;
   }
 end
-
-return class
