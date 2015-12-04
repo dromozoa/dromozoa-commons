@@ -69,7 +69,7 @@ local function read(self, i, n, format, ...)
         self.position = position
       end
     elseif t ~= "string" then
-      error("bad argument #" .. (i + 1) .. " to 'write' (string expected, got " .. t .. ")")
+      error("bad argument #" .. i + 1 .. " to 'write' (string expected, got " .. t .. ")")
     elseif format:match("^%*?n") then
       v = read_number(self)
     elseif format:match("^%*?a") then

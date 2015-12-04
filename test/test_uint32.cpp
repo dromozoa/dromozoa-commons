@@ -107,6 +107,47 @@ void make_test2(std::uint32_t v) {
       ;
 }
 
+void make_test3(std::uint32_t a, std::uint32_t b, std::uint32_t c, std::uint32_t d) {
+  std::cout
+      << std::hex
+      << "assert(uint32.add("
+      << "0x" << std::setw(8) << a << ", "
+      << "0x" << std::setw(8) << b << ", "
+      << "0x" << std::setw(8) << c << ", "
+      << "0x" << std::setw(8) << d << ") == "
+      << "0x" << std::setw(8) << (a + b + c + d) << ")"
+      << "\n"
+      << "assert(uint32.mul("
+      << "0x" << std::setw(8) << a << ", "
+      << "0x" << std::setw(8) << b << ", "
+      << "0x" << std::setw(8) << c << ", "
+      << "0x" << std::setw(8) << d << ") == "
+      << "0x" << std::setw(8) << (a * b * c * d) << ")"
+      << "\n"
+      << "assert(uint32.band("
+      << "0x" << std::setw(8) << a << ", "
+      << "0x" << std::setw(8) << b << ", "
+      << "0x" << std::setw(8) << c << ", "
+      << "0x" << std::setw(8) << d << ") == "
+      << "0x" << std::setw(8) << (a & b & c & d) << ")"
+      << "\n"
+      << "assert(uint32.bor("
+      << "0x" << std::setw(8) << a << ", "
+      << "0x" << std::setw(8) << b << ", "
+      << "0x" << std::setw(8) << c << ", "
+      << "0x" << std::setw(8) << d << ") == "
+      << "0x" << std::setw(8) << (a | b | c | d) << ")"
+      << "\n"
+      << "assert(uint32.bxor("
+      << "0x" << std::setw(8) << a << ", "
+      << "0x" << std::setw(8) << b << ", "
+      << "0x" << std::setw(8) << c << ", "
+      << "0x" << std::setw(8) << d << ") == "
+      << "0x" << std::setw(8) << (a ^ b ^ c ^ d) << ")"
+      << "\n"
+      ;
+}
+
 int main(int, char*[]) {
   std::cout
       << std::setfill('0')
@@ -117,5 +158,6 @@ int main(int, char*[]) {
   make_test1(0xDEADBEEF, 0xFEEDFACE);
   make_test1(0xFEEDFACE, 5381);
   make_test2(0xFEEDFACE);
+  make_test3(0xFEEDFACE, 0xDEADBEEF, 5381, 0x87654321);
   return 0;
 }
