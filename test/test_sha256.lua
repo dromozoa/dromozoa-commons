@@ -15,7 +15,10 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
+local dumper = require "dromozoa.commons.dumper"
+local ipairs = require "dromozoa.commons.ipairs"
 local sha256 = require "dromozoa.commons.sha256"
+local shell = require "dromozoa.commons.shell"
 local unpack = require "dromozoa.commons.unpack"
 
 local d = sha256()
@@ -39,3 +42,9 @@ print("--")
 print(sha256.hex(""))
 print(sha256.hex("abc"))
 
+local data = dumper.decode(shell.eval("test/generate_test_sha256_data.pl"))
+for i, v in ipairs(data) do
+  local result = sha256.hex(v[1])
+  assert(result == v[2])
+  -- print(result)
+end
