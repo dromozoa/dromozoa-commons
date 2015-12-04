@@ -21,11 +21,23 @@ use strict;
 use warnings;
 use Digest::SHA qw{sha256_hex};
 
-print "{\n";
+print << "EOF";
+local ipairs = require "dromozoa.commons.ipairs"
+local sha256 = require "dromozoa.commons.sha256"
+
+local data = {
+EOF
+
 my $message = "";
 printf qq|  { "%s",\n    "%s" },\n|, $message, sha256_hex $message;
 for (my $i = 0; $i < 128; ++$i) {
   $message .= chr($i % 26 + 97);
   printf qq|  { "%s",\n    "%s" },\n|, $message, sha256_hex $message;
 }
-print "}\n";
+
+print << "EOF";
+}
+for i, v in ipairs(data) do
+  assert(sha256.hex(v[1]) == v[2])
+end
+EOF
