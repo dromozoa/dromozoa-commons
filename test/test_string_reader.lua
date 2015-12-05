@@ -22,8 +22,8 @@ local write_file = require "dromozoa.commons.write_file"
 
 local tmpname = os.tmpname()
 local destruct = setmetatable({}, {
+  -- Lua 5.1 doesn not support
   __gc = function ()
-    -- io.write("__gc remove ", tmpname, "\n")
     os.remove(tmpname)
   end;
 })
@@ -214,3 +214,5 @@ test("foo\nbar\nbaz\n", function (f, s)
   assert(not pcall(f.seek, f, "foo'bar"))
   assert(not pcall(s.seek, s, "foo'bar"))
 end)
+
+os.remove(tmpname)
