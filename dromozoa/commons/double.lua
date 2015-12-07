@@ -15,7 +15,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local function word(v)
+local function word(v, endian)
   local a = 0
   local b = 0
   if -math.huge < v and v < math.huge then
@@ -46,14 +46,22 @@ local function word(v)
     end
   end
   local c = b % 1
-  return c * 0x100000000, a + b - c
+  if endian == ">" then
+    return a + b - c, c * 0x100000000
+  else
+    return c * 0x100000000, a + b - c
+  end
 end
 
 if _VERSION >= "Lua 5.3" then
   return {
-    word = function (v)
-      local a, b = ("<I4I4"):unpack(("<d"):pack(v))
-      return a, b
+    word = function (v, endian)
+      local a, b = (">I4I4"):unpack((">d"):pack(v))
+      if endian == ">" then
+        return a, b
+      else
+        return b, a
+      end
     end;
   }
 else
