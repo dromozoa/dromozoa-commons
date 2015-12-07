@@ -15,7 +15,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local hmac = require "dromozoa.commons.hmac"
+local sha256 = require "dromozoa.commons.sha256"
 
-assert(hmac.sha256("", "") == "b613679a0814d9ec772f95d778c35fc5ff1697c493715653c6c712144292c5ad")
-assert(hmac.sha256("key", "The quick brown fox jumps over the lazy dog") == "f7bc83f430538424b13298e6aa6fb143ef4d59a14946175997479dbc2d1a3cd8")
+assert(sha256.hmac("", "", "hex") == "b613679a0814d9ec772f95d778c35fc5ff1697c493715653c6c712144292c5ad")
+assert(sha256.hmac("key", "The quick brown fox jumps over the lazy dog", "hex") == "f7bc83f430538424b13298e6aa6fb143ef4d59a14946175997479dbc2d1a3cd8")

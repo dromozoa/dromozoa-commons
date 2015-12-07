@@ -27,6 +27,7 @@ local bxor = uint32.bxor
 local shr = uint32.shr
 local bnot = uint32.bnot
 local rotr = uint32.rotr
+local char = uint32.char
 
 local K = {
   0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5,
@@ -189,7 +190,7 @@ function class:update_hmac(s, pad)
   return self
 end
 
-function class:finalize()
+function class:finalize(encode)
   local M = self.M
   M:update("\128", 1, 1)
   if M:flush() > 14 then
@@ -198,12 +199,31 @@ function class:finalize()
   end
   M[16], M[15] = uint64.word(self.L * 8)
   update(self)
-  return self.H
+  local H = self.H
+  if encode == "hex" then
+    return ("%08x%08x%08x%08x%08x%08x%08x%08x"):format(H[1], H[2], H[3], H[4], H[5], H[6], H[7], H[8])
+  elseif encode == "bin" then
+    local bin = sequence()
+    for i = 1, 8 do
+      bin:push(char(H[i], ">"))
+    end
+    return bin:concat()
+  else
+    return H
+  end
+end
+
+function class.hmac(K, text, encode)
+  local h = class():update_hmac(K, 0x36363636):update(text):finalize("bin")
+  return class():update_hmac(K, 0x5c5c5c5c):update(h):finalize(encode)
+end
+
+function class.bin(message)
+  return class():update(message):finalize("bin")
 end
 
 function class.hex(message)
-  local H = class():update(message):finalize()
-  return ("%08x%08x%08x%08x%08x%08x%08x%08x"):format(H[1], H[2], H[3], H[4], H[5], H[6], H[7], H[8])
+  return class():update(message):finalize("hex")
 end
 
 local metatable = {

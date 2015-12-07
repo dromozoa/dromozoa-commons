@@ -22,23 +22,11 @@ local function hmac(hash, K, text)
   local h = hash()
   h:update_hmac(K, 0x36363636)
   h:update(text)
-  local H = h:finalize()
-  local bin = sequence()
-  for i = 1, 8 do
-    local a = H[i]
-    local d = a % 256
-    local a = (a - d) / 256
-    local c = a % 256
-    local a = (a - c) / 256
-    local b = a % 256
-    local a = (a - b) / 256
-    bin:push(string.char(a, b, c, d))
-  end
+  local H = h:finalize("bin")
   local h = hash()
   h:update_hmac(K, 0x5c5c5c5c)
-  h:update(bin:concat())
-  local H = h:finalize()
-  return ("%08x%08x%08x%08x%08x%08x%08x%08x"):format(H[1], H[2], H[3], H[4], H[5], H[6], H[7], H[8])
+  h:update(H)
+  return h:finalize("hex")
 end
 
 local class = {}
