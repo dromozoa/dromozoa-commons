@@ -154,6 +154,41 @@ function class:update(s, i, j)
   return self
 end
 
+function class:update_hmac(s, pad)
+  local s = tostring(s)
+  local min = 1
+  local max = #s
+  local M = self.M
+
+  local m = 64
+  if max > 64 then
+    m = max + 63
+    m = m - m % 64
+  end
+  self.L = self.L + m
+
+  while min <= max do
+    min = M:update(s, min, max)
+    if M:full() then
+      for i = 1, 16 do
+        M[i] = bxor(M[i], pad)
+      end
+      update(self)
+    end
+  end
+
+  if max < m then
+    M:flush()
+    M.i = 16
+    for i = 1, 16 do
+      M[i] = bxor(M[i], pad)
+    end
+    update(self)
+  end
+
+  return self
+end
+
 function class:finalize()
   local M = self.M
   M:update("\128", 1, 1)
