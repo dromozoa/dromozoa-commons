@@ -176,7 +176,7 @@ function class:finalize(encode)
     update(self)
     M:reset()
   end
-  M[16], M[15] = uint64.word(self.L * 8)
+  M[15], M[16] = uint64.word(self.L * 8, ">")
   update(self)
   local H = self.H
   if encode == "hex" then
