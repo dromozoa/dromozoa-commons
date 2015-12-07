@@ -157,36 +157,15 @@ end
 
 function class:update_hmac(s, pad)
   local s = tostring(s)
-  local min = 1
-  local max = #s
+  self.L = self.L + 64
   local M = self.M
-
-  local m = 64
-  if max > 64 then
-    m = max + 63
-    m = m - m % 64
+  M:update(s, 1, #s)
+  M:flush()
+  M.i = 16
+  for i = 1, 16 do
+    M[i] = bxor(M[i], pad)
   end
-  self.L = self.L + m
-
-  while min <= max do
-    min = M:update(s, min, max)
-    if M:full() then
-      for i = 1, 16 do
-        M[i] = bxor(M[i], pad)
-      end
-      update(self)
-    end
-  end
-
-  if max < m then
-    M:flush()
-    M.i = 16
-    for i = 1, 16 do
-      M[i] = bxor(M[i], pad)
-    end
-    update(self)
-  end
-
+  update(self)
   return self
 end
 
@@ -213,17 +192,20 @@ function class:finalize(encode)
   end
 end
 
-function class.hmac(K, text, encode)
-  local h = class():update_hmac(K, 0x36363636):update(text):finalize("bin")
-  return class():update_hmac(K, 0x5c5c5c5c):update(h):finalize(encode)
-end
-
 function class.bin(message)
   return class():update(message):finalize("bin")
 end
 
 function class.hex(message)
   return class():update(message):finalize("hex")
+end
+
+function class.hmac(K, text, encode)
+  if #K > 64 then
+    K = class.bin(K)
+  end
+  local h = class():update_hmac(K, 0x36363636):update(text):finalize("bin")
+  return class():update_hmac(K, 0x5c5c5c5c):update(h):finalize(encode)
 end
 
 local metatable = {
