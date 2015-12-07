@@ -18,9 +18,10 @@
 local double = require "dromozoa.commons.double"
 local equal = require "dromozoa.commons.equal"
 
-local function test(a, b)
-  local x, y = double.word(a)
-  assert(equal({ double.word(a) }, b))
+local function test(this, that)
+  assert(equal({ double.word(this) }, that))
+  assert(equal({ double.word(this, "<") }, that))
+  assert(equal({ double.word(this, ">") }, { that[2], that[1] }))
 end
 
 local DBL_MAX = 1.7976931348623157e+308

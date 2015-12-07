@@ -78,7 +78,6 @@ function class.new(n)
     i = 0;
     j = 0;
     byte = { 0, 0, 0, 0 };
-    size = 0;
   })
 end
 

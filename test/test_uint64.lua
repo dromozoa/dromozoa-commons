@@ -18,8 +18,11 @@
 local equal = require "dromozoa.commons.equal"
 local uint64 = require "dromozoa.commons.uint64"
 
-local function test(a, b)
-  assert(equal({ uint64.word(a) }, b))
+local function test(this, that)
+  assert(equal({ uint64.word(this) }, that))
+  assert(equal({ uint64.word(this, "<") }, that))
+  assert(equal({ uint64.word(this, ">") }, { that[2], that[1] }))
 end
 
-test(0xFEEDFACE0000, { 0xFACE0000, 0x0000FEED })
+test(0xfeedface0000, { 0xface0000, 0x0000feed })
+test(0xffffffffffff, { 0xffffffff, 0x0000ffff })

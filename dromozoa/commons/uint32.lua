@@ -164,6 +164,24 @@ local function rotr(a, b)
   return c1 * b2 + c2
 end
 
+local function byte(v, endian)
+  local d = v % 0x100
+  local v = (v - d) / 0x100
+  local c = v % 0x100
+  local v = (v - c) / 0x100
+  local b = v % 0x100
+  local a = (v - b) / 0x100
+  if endian == ">" then
+    return a, b, c, d
+  else
+    return d, c, b, a
+  end
+end
+
+local function char(v, endian)
+  return string.char(byte(v, endian))
+end
+
 if _VERSION >= "Lua 5.3" then
   return assert(load([[
     local function add(a, b, x, ...)
@@ -241,6 +259,21 @@ if _VERSION >= "Lua 5.3" then
       rotr = function (a, b)
         return (a >> b | a << 32 - b) & 0xffffffff
       end;
+      byte = function (v, endian)
+        local a, b, c, d = ("BBBB"):unpack((">I4"):pack(v))
+        if endian == ">" then
+          return a, b, c, d
+        else
+          return d, c, b, a
+        end
+      end;
+      char = function (v, endian)
+        if endian == ">" then
+          return (">I4"):pack(v)
+        else
+          return ("<I4"):pack(v)
+        end
+      end;
     }
   ]]))()
 elseif bit32 then
@@ -258,6 +291,8 @@ elseif bit32 then
     bnot = bit32.bnot;
     rotl = bit32.lrotate;
     rotr = bit32.rrotate;
+    byte = byte;
+    char = char;
   }
 elseif bit then
   local bit_band = bit.band
@@ -298,6 +333,8 @@ elseif bit then
     rotr = function (a, b)
       return bit_ror(a, b) % 0x100000000
     end;
+    byte = byte;
+    char = char;
   }
 else
   return {
@@ -314,5 +351,7 @@ else
     bnot = bnot;
     rotl = rotl;
     rotr = rotr;
+    byte = byte;
+    char = char;
   }
 end

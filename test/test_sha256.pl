@@ -19,7 +19,7 @@
 
 use strict;
 use warnings;
-use Digest::SHA qw{sha256_hex};
+use Digest::SHA qw{sha256_hex hmac_sha256_hex};
 
 print << "EOF";
 local ipairs = require "dromozoa.commons.ipairs"
@@ -29,15 +29,16 @@ local data = {
 EOF
 
 my $message = "";
-printf qq|  { "%s",\n    "%s" },\n|, $message, sha256_hex $message;
+printf qq|  { "%s",\n    "%s",\n    "%s" },\n|, $message, sha256_hex($message), hmac_sha256_hex($message, $message);
 for (my $i = 0; $i < 128; ++$i) {
   $message .= chr($i % 26 + 97);
-  printf qq|  { "%s",\n    "%s" },\n|, $message, sha256_hex $message;
+  printf qq|  { "%s",\n    "%s",\n    "%s" },\n|, $message, sha256_hex($message), hmac_sha256_hex($message, $message);
 }
 
 print << "EOF";
 }
 for i, v in ipairs(data) do
   assert(sha256.hex(v[1]) == v[2])
+  assert(sha256.hmac(v[1], v[1], "hex") == v[3])
 end
 EOF
