@@ -15,6 +15,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
+local sequence = require "dromozoa.commons.sequence"
 local translate_range = require "dromozoa.commons.translate_range"
 local uint32 = require "dromozoa.commons.uint32"
 local uint64 = require "dromozoa.commons.uint64"
@@ -120,8 +121,8 @@ local class = {}
 function class.new()
   return class.reset({
     M = word_block(16);
-    W = {};
-    H = {};
+    W = sequence();
+    H = sequence();
     L = 0;
   })
 end
