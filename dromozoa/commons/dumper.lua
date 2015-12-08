@@ -25,7 +25,7 @@ local function encode_key(key)
   if t == "number" then
     return ("[%.17g]"):format(key)
   elseif t == "string" then
-    if key:match("^[%a_][%w_]*$") then
+    if key:find("^[%a_][%w_]*$") then
       return key
     else
       return ("[%q]"):format(key)
