@@ -70,14 +70,14 @@ local function read(self, i, n, format, ...)
       end
     elseif t ~= "string" then
       error("bad argument #" .. i + 1 .. " to 'write' (string expected, got " .. t .. ")")
-    elseif format:match("^%*?n") then
+    elseif format:find("^%*?n") then
       v = read_number(self)
-    elseif format:match("^%*?a") then
+    elseif format:find("^%*?a") then
       v = self.s:sub(self.position)
       self.position = #self.s + 1
-    elseif format:match("^%*?l") then
+    elseif format:find("^%*?l") then
       v = read_line(self, true)
-    elseif format:match("^%*?L") then
+    elseif format:find("^%*?L") then
       v = read_line(self, false)
     end
     if v == nil then

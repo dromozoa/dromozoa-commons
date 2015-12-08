@@ -16,6 +16,7 @@
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
 local dumper = require "dromozoa.commons.dumper"
+local empty = require "dromozoa.commons.empty"
 local equal = require "dromozoa.commons.equal"
 local linked_hash_table = require "dromozoa.commons.linked_hash_table"
 local sequence = require "dromozoa.commons.sequence"
@@ -78,3 +79,8 @@ local value, matcher = json.parse("0000")
 assert(value == 0)
 assert(not matcher:eof())
 assert(matcher.position == 2)
+
+assert(empty(json.decode("[]")))
+assert(empty(json.decode("{}")))
+assert(equal(json.decode([[ [ 17 , 23 ] ]]), { 17, 23 }))
+assert(equal(json.decode([[ { "foo" : 17 , "bar" : 23 } ]]), { foo = 17, bar = 23 }))
