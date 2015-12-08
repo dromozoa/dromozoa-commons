@@ -58,7 +58,17 @@ function class:parse_object()
   local this = self.this
   local stack = self.stack
   local that = linked_hash_table()
+  local first = true
   while true do
+    this:match(ws)
+    if this:match("%}") then
+      stack:push(that)
+      return
+    elseif first then
+      first = false
+    elseif not this:match("%,") then
+      self:raise("value-separator expected")
+    end
     this:match(ws)
     if not this:match("\"") then
       self:raise("string expected")
@@ -69,15 +79,9 @@ function class:parse_object()
     if not this:match(":") then
       self:raise("name-separator expected")
     end
+    this:match(ws)
     self:parse_value()
     that[key] = stack:pop()
-    this:match(ws)
-    if this:match("%}") then
-      stack:push(that)
-      return
-    elseif not this:match("%,") then
-      self:raise("value-separator expected")
-    end
   end
 end
 
@@ -85,17 +89,20 @@ function class:parse_array()
   local this = self.this
   local stack = self.stack
   local that = sequence()
+  local first = true
   while true do
-    this:match(ws)
-    self:parse_value()
-    that:push(stack:pop())
     this:match(ws)
     if this:match("%]") then
       stack:push(that)
       return
+    elseif first then
+      first = false
     elseif not this:match("%,") then
       self:raise("value-separator expected")
     end
+    this:match(ws)
+    self:parse_value()
+    that:push(stack:pop())
   end
 end
 
