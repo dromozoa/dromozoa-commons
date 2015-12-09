@@ -25,13 +25,13 @@ assert(b == nil)
 assert(xml.escape(42) == "42")
 assert(xml.escape("[foo]", "%W") == "&#x5b;foo&#x5d;")
 
-local x = [[
+local X = [[
 <comment lang="en" date="2012-09-11">
 I <em>love</em> &#xB5;<!-- MICRO SIGN -->XML!<br/>
 It's so clean &amp; simple.</comment>
 ]]
 
-local j = [[
+local J = [[
 [ "comment",
   { "date": "2012-09-11", "lang": "en" },
   [ "\nI ",
@@ -42,7 +42,7 @@ local j = [[
   ]
 ]
 ]]
-assert(equal(xml.decode(x), json.decode(j)))
 
-
-
+assert(equal(xml.decode(X), json.decode(J)))
+assert(equal(xml.decode(X:gsub("\n", "\r\n")), json.decode(J)))
+assert(equal(xml.decode(X:gsub("\n", "\r")), json.decode(J)))

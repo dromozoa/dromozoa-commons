@@ -21,7 +21,7 @@ local sequence = require "dromozoa.commons.sequence"
 local sequence_writer = require "dromozoa.commons.sequence_writer"
 local utf8 = require "dromozoa.commons.utf8"
 
-local ws = "[\t\n ]*"
+local ws = "[\t\r\n ]*"
 local zero_width_no_break_space = string.char(0xef, 0xbb, 0xbf)
 
 local class = {}
@@ -29,10 +29,6 @@ local class = {}
 local metatable = {
   __index = class;
 }
-
-function class.normalize_line_break(s)
-  return (tostring(s):gsub("\r\n", "\n"):gsub("\r", "\n"))
-end
 
 function class.new(this)
   if type(this) == "string" then
@@ -112,7 +108,9 @@ function class:content()
     else
       local out = sequence_writer()
       while true do
-        if this:match([[([^%<%>%&]+)]]) then
+        if this:match("\r\n") or this:match("\r") then
+          out:write("\n")
+        elseif this:match([[([^%<%>%&]+)]]) then
           out:write(this[1])
         elseif self:char_ref() then
           out:write(stack:pop())
