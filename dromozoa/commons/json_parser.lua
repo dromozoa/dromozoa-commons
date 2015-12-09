@@ -15,10 +15,10 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local string_matcher = require "dromozoa.commons.string_matcher"
+local linked_hash_table = require "dromozoa.commons.linked_hash_table"
 local sequence = require "dromozoa.commons.sequence"
 local sequence_writer = require "dromozoa.commons.sequence_writer"
-local linked_hash_table = require "dromozoa.commons.linked_hash_table"
+local string_matcher = require "dromozoa.commons.string_matcher"
 local utf8 = require "dromozoa.commons.utf8"
 
 local parse_char = {
@@ -111,7 +111,7 @@ function class:parse_string()
   local stack = self.stack
   local out = sequence_writer()
   while true do
-    if this:match([["]]) then
+    if this:match([[%"]]) then
       stack:push(out:concat())
       return
     elseif this:match([[([^%\%"]+)]]) then
@@ -169,7 +169,7 @@ function class:apply()
   self:parse_value()
   this:match(ws)
   if #stack == 1 then
-    return stack:pop(), self.this
+    return stack:pop(), this
   else
     self:raise()
   end
