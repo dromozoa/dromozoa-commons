@@ -50,120 +50,6 @@ local function mod(a, b)
   return a % b
 end
 
-local function band(a, b, x, ...)
-  local c = 0
-  local d = 1
-  for i = 1, 31 do
-    local a1 = a % 2
-    local b1 = b % 2
-    if a1 + b1 == 2 then
-      c = c + d
-    end
-    a = (a - a1) / 2
-    b = (b - b1) / 2
-    d = d * 2
-  end
-  if a + b == 2 then
-    c = c + d
-  end
-  if x == nil then
-    return c
-  else
-    return band(c, x, ...)
-  end
-end
-
-local function bor(a, b, x, ...)
-  local c = 0
-  local d = 1
-  for i = 1, 31 do
-    local a1 = a % 2
-    local b1 = b % 2
-    if a1 + b1 ~= 0 then
-      c = c + d
-    end
-    a = (a - a1) / 2
-    b = (b - b1) / 2
-    d = d * 2
-  end
-  if a + b ~= 0 then
-    c = c + d
-  end
-  if x == nil then
-    return c
-  else
-    return bor(c, x, ...)
-  end
-end
-
-local function bxor(a, b, x, ...)
-  local c = 0
-  local d = 1
-  for i = 1, 31 do
-    local a1 = a % 2
-    local b1 = b % 2
-    if a1 ~= b1 then
-      c = c + d
-    end
-    a = (a - a1) / 2
-    b = (b - b1) / 2
-    d = d * 2
-  end
-  if a ~= b then
-    c = c + d
-  end
-  if x == nil then
-    return c
-  else
-    return bxor(c, x, ...)
-  end
-end
-
-local function bnot(v)
-  local c = 0
-  local d = 1
-  for i = 1, 31 do
-    local v1 = v % 2
-    if v1 == 0 then
-      c = c + d
-    end
-    v = (v - v1) / 2
-    d = d * 2
-  end
-  if v == 0 then
-    c = c + d
-  end
-  return c
-end
-
-local function shl(a, b)
-  local b1 = 2 ^ b
-  local b2 = 0x100000000 / b1
-  return a % b2 * b1
-end
-
-local function shr(a, b)
-  local b1 = 2 ^ b
-  local c = a / b1
-  return c - c % 1
-end
-
-local function rotl(a, b)
-  local b1 = 2 ^ b
-  local b2 = 0x100000000 / b1
-  local c1 = a % b2
-  local c2 = (a - c1) / b2
-  return c1 * b1 + c2
-end
-
-local function rotr(a, b)
-  local b1 = 2 ^ b
-  local b2 = 0x100000000 / b1
-  local c1 = a % b1
-  local c2 = (a - c1) / b1
-  return c1 * b2 + c2
-end
-
 local function byte(v, endian)
   local d = v % 0x100
   local v = (v - d) / 0x100
@@ -337,18 +223,178 @@ elseif bit then
     char = char;
   }
 else
+  local function optimize_unary(fn)
+    local t = {}
+    for v = 0, 255 do
+      t[v] = fn(v) % 0x100
+    end
+    return function (v)
+      local v1 = v % 0x100 v = (v - v1) / 0x100
+      local v2 = v % 0x100 v = (v - v2) / 0x100
+      local v3 = v % 0x100 v = (v - v3) / 0x100
+      return t[v] * 0x1000000 + t[v3] * 0x10000 + t[v2] * 0x100 + t[v1]
+    end
+  end
+
+  local function optimize_binary(fn)
+    local t = {}
+    for a = 0, 15 do
+      t[a] = {}
+      for b = 0, 15 do
+        t[a][b] = fn(a, b) % 0x100
+      end
+    end
+    local function f(a, b, x, ...)
+      local a1 = a % 0x10 a = (a - a1) / 0x10
+      local a2 = a % 0x10 a = (a - a2) / 0x10
+      local a3 = a % 0x10 a = (a - a3) / 0x10
+      local a4 = a % 0x10 a = (a - a4) / 0x10
+      local a5 = a % 0x10 a = (a - a5) / 0x10
+      local a6 = a % 0x10 a = (a - a6) / 0x10
+      local a7 = a % 0x10 a = (a - a7) / 0x10
+      local b1 = b % 0x10 b = (b - b1) / 0x10
+      local b2 = b % 0x10 b = (b - b2) / 0x10
+      local b3 = b % 0x10 b = (b - b3) / 0x10
+      local b4 = b % 0x10 b = (b - b4) / 0x10
+      local b5 = b % 0x10 b = (b - b5) / 0x10
+      local b6 = b % 0x10 b = (b - b6) / 0x10
+      local b7 = b % 0x10 b = (b - b7) / 0x10
+      local c = t[a][b] * 0x10000000 + t[a7][b7] * 0x1000000 + t[a6][b6] * 0x100000 + t[a5][b5] * 0x10000 + t[a4][b4] * 0x1000 + t[a3][b3] * 0x100 + t[a2][b2] * 0x10 + t[a1][b1]
+      if x == nil then
+        return c
+      else
+        return f(c, x, ...)
+      end
+    end
+    return f
+  end
+
+  local function band(a, b, x, ...)
+    local c = 0
+    local d = 1
+    for i = 1, 31 do
+      local a1 = a % 2
+      local b1 = b % 2
+      if a1 + b1 == 2 then
+        c = c + d
+      end
+      a = (a - a1) / 2
+      b = (b - b1) / 2
+      d = d * 2
+    end
+    if a + b == 2 then
+      c = c + d
+    end
+    if x == nil then
+      return c
+    else
+      return band(c, x, ...)
+    end
+  end
+
+  local function bor(a, b, x, ...)
+    local c = 0
+    local d = 1
+    for i = 1, 31 do
+      local a1 = a % 2
+      local b1 = b % 2
+      if a1 + b1 ~= 0 then
+        c = c + d
+      end
+      a = (a - a1) / 2
+      b = (b - b1) / 2
+      d = d * 2
+    end
+    if a + b ~= 0 then
+      c = c + d
+    end
+    if x == nil then
+      return c
+    else
+      return bor(c, x, ...)
+    end
+  end
+
+  local function bxor(a, b, x, ...)
+    local c = 0
+    local d = 1
+    for i = 1, 31 do
+      local a1 = a % 2
+      local b1 = b % 2
+      if a1 ~= b1 then
+        c = c + d
+      end
+      a = (a - a1) / 2
+      b = (b - b1) / 2
+      d = d * 2
+    end
+    if a ~= b then
+      c = c + d
+    end
+    if x == nil then
+      return c
+    else
+      return bxor(c, x, ...)
+    end
+  end
+
+  local function bnot(v)
+    local c = 0
+    local d = 1
+    for i = 1, 31 do
+      local v1 = v % 2
+      if v1 == 0 then
+        c = c + d
+      end
+      v = (v - v1) / 2
+      d = d * 2
+    end
+    if v == 0 then
+      c = c + d
+    end
+    return c
+  end
+
+  local function shl(a, b)
+    local b1 = 2 ^ b
+    local b2 = 0x100000000 / b1
+    return a % b2 * b1
+  end
+
+  local function shr(a, b)
+    local b1 = 2 ^ b
+    local c = a / b1
+    return c - c % 1
+  end
+
+  local function rotl(a, b)
+    local b1 = 2 ^ b
+    local b2 = 0x100000000 / b1
+    local c1 = a % b2
+    local c2 = (a - c1) / b2
+    return c1 * b1 + c2
+  end
+
+  local function rotr(a, b)
+    local b1 = 2 ^ b
+    local b2 = 0x100000000 / b1
+    local c1 = a % b1
+    local c2 = (a - c1) / b1
+    return c1 * b2 + c2
+  end
+
   return {
     add = add;
     sub = sub;
     mul = mul;
     div = div;
     mod = mod;
-    band = band;
-    bor = bor;
-    bxor = bxor;
+    band = optimize_binary(band);
+    bor = optimize_binary(bor);
+    bxor = optimize_binary(bxor);
     shl = shl;
     shr = shr;
-    bnot = bnot;
+    bnot = optimize_unary(bnot);
     rotl = rotl;
     rotr = rotr;
     byte = byte;
