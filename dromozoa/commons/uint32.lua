@@ -229,13 +229,10 @@ else
       t[v] = fn(v) % 0x100
     end
     return function (v)
-      local v1 = v % 0x100
-      v = (v - v1) / 0x100
-      local v2 = v % 0x100
-      v = (v - v2) / 0x100
-      local v3 = v % 0x100
-      local v4 = (v - v3) / 0x100
-      return t[v4] * 0x1000000 + t[v3] * 0x10000 + t[v2] * 0x100 + t[v1]
+      local v1 = v % 0x100 v = (v - v1) / 0x100
+      local v2 = v % 0x100 v = (v - v2) / 0x100
+      local v3 = v % 0x100 v = (v - v3) / 0x100
+      return t[v] * 0x1000000 + t[v3] * 0x10000 + t[v2] * 0x100 + t[v1]
     end
   end
 
@@ -248,17 +245,21 @@ else
       end
     end
     local function f(a, b, x, ...)
-      local c = 0
-      local s = 1
-      for i = 1, 7 do
-        local a1 = a % 0x10
-        local b1 = b % 0x10
-        c = c + t[a1][b1] * s
-        a = (a - a1) / 0x10
-        b = (b - b1) / 0x10
-        s = s * 0x10
-      end
-      c = c + t[a][b] * s
+      local a1 = a % 0x10 a = (a - a1) / 0x10
+      local a2 = a % 0x10 a = (a - a2) / 0x10
+      local a3 = a % 0x10 a = (a - a3) / 0x10
+      local a4 = a % 0x10 a = (a - a4) / 0x10
+      local a5 = a % 0x10 a = (a - a5) / 0x10
+      local a6 = a % 0x10 a = (a - a6) / 0x10
+      local a7 = a % 0x10 a = (a - a7) / 0x10
+      local b1 = b % 0x10 b = (b - b1) / 0x10
+      local b2 = b % 0x10 b = (b - b2) / 0x10
+      local b3 = b % 0x10 b = (b - b3) / 0x10
+      local b4 = b % 0x10 b = (b - b4) / 0x10
+      local b5 = b % 0x10 b = (b - b5) / 0x10
+      local b6 = b % 0x10 b = (b - b6) / 0x10
+      local b7 = b % 0x10 b = (b - b7) / 0x10
+      local c = t[a][b] * 0x10000000 + t[a7][b7] * 0x1000000 + t[a6][b6] * 0x100000 + t[a5][b5] * 0x10000 + t[a4][b4] * 0x1000 + t[a3][b3] * 0x100 + t[a2][b2] * 0x10 + t[a1][b1]
       if x == nil then
         return c
       else
