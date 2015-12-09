@@ -28,7 +28,8 @@ assert(xml.escape("[foo]", "%W") == "&#x5b;foo&#x5d;")
 local X = [[
 <comment lang="en" date="2012-09-11">
 I <em>love</em> &#xB5;<!-- MICRO SIGN -->XML!<br/>
-It's so clean &amp; simple.</comment>
+It's so
+clean &amp; simple.</comment>
 ]]
 
 local J = [====[
@@ -38,7 +39,7 @@ local J = [====[
     [ "em", {}, ["love"] ],
     " \u00B5XML!",
     [ "br", {}, [] ],
-    "\nIt's so clean & simple."
+    "\nIt's so\nclean & simple."
   ]
 ]
 ]====]
@@ -105,3 +106,30 @@ local J = [====[
 assert(equal(xml.decode(X), json.decode(J)))
 assert(equal(xml.decode(X:gsub("\n", "\r\n")), json.decode(J)))
 assert(equal(xml.decode(X:gsub("\n", "\r")), json.decode(J)))
+
+assert(equal(xml.decode([[
+<?xml version="1.0"?>
+<foo/>
+]]), json.decode([====[
+["foo", {}, []]
+]====])))
+
+assert(equal(xml.decode([[
+<?xml version="1.0" charset="UTF-8"?>
+<!-- comment -->
+<!DOCTYPE html>
+<html><head></head><body><p>foo</p></body></html>
+]]), json.decode([====[
+[ "html", {}, [
+  [ "head", {}, [] ],
+  [ "body", {}, [
+    [ "p", {}, [ "foo" ] ]
+  ]]
+]]
+]====])))
+
+assert(equal(xml.decode([[
+<foo xmlns="https://example.com/"/>
+]]), json.decode([====[
+[ "foo", { "xmlns": "https://example.com/" }, [] ]
+]====])))

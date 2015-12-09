@@ -36,7 +36,8 @@ function class.new(this)
   end
   return {
     this = this;
-    stack = sequence()
+    stack = sequence();
+    strict = false;
   }
 end
 
@@ -52,16 +53,11 @@ end
 function class:document()
   local this = self.this
   local stack = self.stack
-  this:match(zero_width_no_break_space)
-  repeat
-    this:match("%s*")
-  until not self:comment()
+  self:prolog()
   if not self:element() then
-    self:raise()
+    self:raise("element expected")
   end
-  repeat
-    this:match("%s*")
-  until not self:comment()
+  self:misc()
 end
 
 function class:element()
@@ -71,14 +67,13 @@ function class:element()
     local name = this[1]
     self:attribute_list()
     local attrbute_list = stack:pop()
-    this:match("%s*")
-    if this:match(">") then
+    if this:match("%s*>") then
       stack:push({ name, attrbute_list })
-      self:content()
-      return true
-    elseif this:match("/>") then
-      stack:push({ name, attrbute_list, sequence() })
-      return true
+      return self:content()
+    elseif this:match("%s*/>") then
+      return stack:push({ name, attrbute_list, sequence() })
+    else
+      self:raise()
     end
   end
 end
@@ -98,30 +93,26 @@ function class:content()
         end
       end
       self:raise()
-    elseif self:comment() then
-      -- noop
     elseif self:element() then
       that:push(stack:pop())
     else
       local out = sequence_writer()
       while true do
-        if this:match("\r\n") or this:match("\r") then
+        if this:match("\r\n") or this:match("[\r\n]") then
           out:write("\n")
-        elseif this:match([[([^%<%>%&]+)]]) then
+        elseif this:match("([^%<%>%&\r\n]+)") then
           out:write(this[1])
         elseif self:char_ref() then
           out:write(stack:pop())
         elseif self:comment() then
-          -- noop
+          -- comment
         elseif this:lookahead("<") then
           break
         else
           self:raise()
         end
       end
-      if empty(out) then
-        -- break
-      else
+      if not empty(out) then
         that:push(out:concat())
       end
     end
@@ -137,11 +128,13 @@ function class:attribute_list()
       break
     end
     local name = this[1]
-    -- assert(name ~= "xmlns")
+    if self.strict and name == "xmlns" then
+      self:raise("attribute name xmlns found")
+    end
     if not this:match("%s*%=%s*") then
       self:raise()
     end
-    if this:match([[([%"%'])]]) then
+    if this:match("([%\"%'])") then
       self:attribute_value(this[1])
       local value = stack:pop()
       that[name] = value
@@ -149,7 +142,7 @@ function class:attribute_list()
       self:raise()
     end
   end
-  stack:push(that)
+  return stack:push(that)
 end
 
 function class:attribute_value(quote)
@@ -158,11 +151,12 @@ function class:attribute_value(quote)
   local out = sequence_writer()
   while true do
     if this:match(quote) then
-      stack:push(out:concat())
-      return true
-    elseif this:match("\r\n") or this:match("\r") then
+      return stack:push(out:concat())
+    elseif this:match("([%\"%'])") then
+      out:write(this[1])
+    elseif this:match("\r\n") or this:match("[\r\n]") then
       out:write("\n")
-    elseif this:match("([^%<%>%&%\"%'\r\n]+)") or this:match("([%\"%'\n])") then
+    elseif this:match("([^%<%>%&%\"%'\r\n]+)") then
       out:write(this[1])
     elseif self:char_ref() then
       out:write(stack:pop())
@@ -188,19 +182,37 @@ end
 function class:char_ref()
   local this = self.this
   local stack = self.stack
-  if this:match([[%&%#x(%x+)%;]]) then
+  if this:match("%&%#x(%x+)%;") then
     return stack:push(utf8.char(tonumber(this[1], 16)))
-  elseif this:match([[%&amp%;]]) then
-    return stack:push([[&]])
-  elseif this:match([[%&lt%;]]) then
-    return stack:push([[<]])
-  elseif this:match([[%&gt%;]]) then
-    return stack:push([[>]])
-  elseif this:match([[%&quot%;]]) then
-    return stack:push([["]])
-  elseif this:match([[%&apos%;]]) then
-    return stack:push([[']])
+  elseif this:match("%&amp%;") then
+    return stack:push("&")
+  elseif this:match("%&lt%;") then
+    return stack:push("<")
+  elseif this:match("%&gt%;") then
+    return stack:push(">")
+  elseif this:match("%&quot%;") then
+    return stack:push("\"")
+  elseif this:match("%&apos%;") then
+    return stack:push("'")
   end
+end
+
+function class:prolog()
+  local this = self.this
+  this:match(zero_width_no_break_space)
+  if not self.strict then
+    this:match("%s*%<%?xml .-%?%>")
+    self:misc()
+    this:match("%<%!DOCTYPE .-%>")
+  end
+  self:misc()
+end
+
+function class:misc()
+  local this = self.this
+  repeat
+    this:match("%s*")
+  until not self:comment()
 end
 
 function class:apply()
@@ -208,7 +220,7 @@ function class:apply()
   local stack = self.stack
   self:document()
   if #stack == 1 then
-    return stack:pop(), self.this
+    return stack:pop(), this
   else
     self:raise()
   end

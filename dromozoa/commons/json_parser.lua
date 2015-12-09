@@ -169,7 +169,7 @@ function class:apply()
   self:parse_value()
   this:match(ws)
   if #stack == 1 then
-    return stack:pop(), self.this
+    return stack:pop(), this
   else
     self:raise()
   end
