@@ -210,6 +210,17 @@ function class:name()
   end
 end
 
+function class:apply()
+  local this = self.this
+  local stack = self.stack
+  self:document()
+  if #stack == 1 then
+    return stack:pop(), self.this
+  else
+    self:raise()
+  end
+end
+
 return setmetatable(class, {
   __call = function (_, this)
     return setmetatable(class.new(this), metatable)

@@ -16,6 +16,7 @@
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
 local set = require "dromozoa.commons.set"
+local xml_parser = require "dromozoa.commons.xml_parser"
 
 local function get_named_char_refs()
   return {
@@ -44,6 +45,21 @@ local function escape(value, pattern)
   return (tostring(value):gsub(pattern, char_refs))
 end
 
-return {
+local function parse(this)
+  return xml_parser(this):apply()
+end
+
+local class = {
   escape = escape;
+  parse = parse;
 }
+
+function class.decode(s)
+  local v, matcher = parse(s)
+  if not matcher:eof() then
+    error("cannot reach eof at position " .. matcher.position)
+  end
+  return v
+end
+
+return class
