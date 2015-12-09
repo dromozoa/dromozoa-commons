@@ -31,7 +31,7 @@ I <em>love</em> &#xB5;<!-- MICRO SIGN -->XML!<br/>
 It's so clean &amp; simple.</comment>
 ]]
 
-local J = [[
+local J = [====[
 [ "comment",
   { "date": "2012-09-11", "lang": "en" },
   [ "\nI ",
@@ -41,8 +41,36 @@ local J = [[
     "\nIt's so clean & simple."
   ]
 ]
-]]
+]====]
 
 assert(equal(xml.decode(X), json.decode(J)))
 assert(equal(xml.decode(X:gsub("\n", "\r\n")), json.decode(J)))
 assert(equal(xml.decode(X:gsub("\n", "\r")), json.decode(J)))
+
+assert(equal(xml.decode([[
+<location><city>New York</city><country>US</country></location>
+]]), json.decode([====[
+["location", {}, [["city", {}, ["New York"]], ["country", {}, ["US"]]]]
+]====])))
+
+-- print(pcall(xml.decode, [[
+-- <location><city>New York</city><country>US</country><location>
+-- ]]))
+
+assert(equal(xml.decode([[
+<page-break/>
+]]), json.decode([====[
+["page-break", {}, []]
+]====])))
+
+assert(equal(xml.decode([[
+<location city="New York" country="US"/>
+]]), json.decode([====[
+["location", {"city": "New York", "country": "US"}, []]
+]====])))
+
+assert(equal(xml.decode([[
+<root><!-- declarations for <head> & <body> --></root>
+]]), json.decode([====[
+["root", {}, []]
+]====])))
