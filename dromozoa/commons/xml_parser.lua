@@ -73,7 +73,7 @@ function class:element()
     elseif this:match("%s*/>") then
       return stack:push({ name, attrbute_list, sequence() })
     else
-      self:raise()
+      self:raise("unclosed tag")
     end
   end
 end
@@ -90,11 +90,17 @@ function class:content()
         if tag[1] == name and tag[3] == nil then
           tag[3] = that
           return true
+        else
+          self:raise("unmatched tags")
         end
       end
-      self:raise()
+      self:raise("unclosed end tag")
     elseif self:element() then
       that:push(stack:pop())
+    elseif self:comment() then
+      -- comment
+    elseif this:lookahead("<") then
+      self:raise("invalid content")
     else
       local out = sequence_writer()
       while true do
@@ -109,7 +115,7 @@ function class:content()
         elseif this:lookahead("<") then
           break
         else
-          self:raise()
+          self:raise("invalid content")
         end
       end
       if not empty(out) then
@@ -132,14 +138,14 @@ function class:attribute_list()
       self:raise("attribute name xmlns found")
     end
     if not this:match("%s*%=%s*") then
-      self:raise()
+      self:raise("invalid attribute")
     end
     if this:match("([%\"%'])") then
       self:attribute_value(this[1])
       local value = stack:pop()
       that[name] = value
     else
-      self:raise()
+      self:raise("invalid attribute value")
     end
   end
   return stack:push(that)
@@ -161,7 +167,7 @@ function class:attribute_value(quote)
     elseif self:char_ref() then
       out:write(stack:pop())
     else
-      self:raise()
+      self:raise("invalid attribute value")
     end
   end
 end
@@ -173,7 +179,7 @@ function class:comment()
       if this:match("%-%-%>") then
         return true
       elseif not this:match("[^%-]") and not this:match("%-[^%-]") then
-        self:raise()
+        self:raise("invalid comment")
       end
     end
   end

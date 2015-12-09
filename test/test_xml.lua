@@ -133,3 +133,20 @@ assert(equal(xml.decode([[
 ]]), json.decode([====[
 [ "foo", { "xmlns": "https://example.com/" }, [] ]
 ]====])))
+
+assert(not pcall(xml.decode, [[<foo><]]))
+assert(not pcall(xml.decode, [[<foo><bar]]))
+assert(not pcall(xml.decode, [[<foo><bar>]]))
+assert(not pcall(xml.decode, [[<foo></]]))
+assert(not pcall(xml.decode, [[<foo></bar]]))
+assert(not pcall(xml.decode, [[<foo></bar>]]))
+assert(not pcall(xml.decode, [[<foo/><!--]]))
+assert(not pcall(xml.decode, [[<foo/><!-- -->&]]))
+
+assert(equal(xml.decode([[
+ <foo bar = " baz'qux " >
+ <foo bar = ' baz"qux ' />
+ </foo >
+]]), json.decode([====[
+[ "foo", { "bar": " baz'qux " }, [ "\n ", [ "foo", { "bar": " baz\"qux " }, [] ], "\n " ] ]
+]====])))
