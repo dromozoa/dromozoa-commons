@@ -53,9 +53,9 @@ assert(equal(xml.decode([[
 ["location", {}, [["city", {}, ["New York"]], ["country", {}, ["US"]]]]
 ]====])))
 
--- print(pcall(xml.decode, [[
--- <location><city>New York</city><country>US</country><location>
--- ]]))
+assert(not pcall(xml.decode, [[
+<location><city>New York</city><country>US</country><location>
+]]))
 
 assert(equal(xml.decode([[
 <page-break/>
@@ -74,3 +74,34 @@ assert(equal(xml.decode([[
 ]]), json.decode([====[
 ["root", {}, []]
 ]====])))
+
+assert(equal(xml.decode([[
+<p>&#x3C;&#x3bb;</p>
+]]), json.decode([====[
+["p", {}, ["\u003c\u03bb"]]
+]====])))
+
+assert(equal(xml.decode([[
+<p>&amp;&lt;&gt;&quot;&apos;</p>
+]]), json.decode([====[
+["p", {}, ["&<>\"'"]]
+]====])))
+
+assert(equal(xml.decode([[
+<p>&amp;&lt;&gt;&quot;&apos;</p>
+]]), json.decode([====[
+["p", {}, ["&<>\"'"]]
+]====])))
+
+local X = [[
+<doc att="hello
+world"/>
+]]
+
+local J = [====[
+["doc", {"att": "hello\nworld"}, []]
+]====]
+
+assert(equal(xml.decode(X), json.decode(J)))
+assert(equal(xml.decode(X:gsub("\n", "\r\n")), json.decode(J)))
+assert(equal(xml.decode(X:gsub("\n", "\r")), json.decode(J)))

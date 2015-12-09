@@ -160,7 +160,9 @@ function class:attribute_value(quote)
     if this:match(quote) then
       stack:push(out:concat())
       return true
-    elseif this:match([[([^%<%>%&%"%']+)]]) or this:match([[([%"%'])]]) then
+    elseif this:match("\r\n") or this:match("\r") then
+      out:write("\n")
+    elseif this:match("([^%<%>%&%\"%'\r\n]+)") or this:match("([%\"%'\n])") then
       out:write(this[1])
     elseif self:char_ref() then
       out:write(stack:pop())
@@ -190,7 +192,7 @@ function class:char_ref()
     return stack:push(utf8.char(tonumber(this[1], 16)))
   elseif this:match([[%&amp%;]]) then
     return stack:push([[&]])
-  elseif this:match([[%&lt%%;]]) then
+  elseif this:match([[%&lt%;]]) then
     return stack:push([[<]])
   elseif this:match([[%&gt%;]]) then
     return stack:push([[>]])
