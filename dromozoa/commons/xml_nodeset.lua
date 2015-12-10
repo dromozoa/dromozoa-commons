@@ -15,43 +15,26 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
+local sequence = require "dromozoa.commons.sequence"
 local sequence_writer = require "dromozoa.commons.sequence_writer"
-local xml_nodeset = require "dromozoa.commons.xml_nodeset"
 local xml_write = require "dromozoa.commons.xml_write"
 
 local class = {}
 
-function class.new(name, attribute_list, content)
-  return { name, attribute_list, content }
-end
-
-function class:attr(name, value)
-  if value == nil then
-    return self[2][name]
-  else
-    self[2][name] = value
-    return self
+function class:select(name)
+  local result = class()
+  for node in self:each() do
+    result:copy(node:select(name))
   end
+  return result
 end
 
 function class:text()
   local out = sequence_writer()
-  for node in self[3]:each() do
-    if type(node) ~= "table" then
-      xml_write(out, node)
-    end
+  for node in self:each() do
+    out:write(node:text())
   end
   return out:concat()
-end
-
-function class:select(name)
-  local result = xml_nodeset()
-  for node in self[3]:each() do
-    if type(node) == "table" and node[1] == name then
-      result:push(node)
-    end
-  end
-  return result
 end
 
 local metatable = {
@@ -59,11 +42,16 @@ local metatable = {
 }
 
 function metatable:__tostring()
-  return xml_write(sequence_writer(), self):concat()
+  local out = sequence_writer()
+  for node in self:each() do
+    xml_write(out, node)
+  end
+  return out:concat()
 end
 
 return setmetatable(class, {
-  __call = function (_, name, attribute_list, content)
-    return setmetatable(class.new(name, attribute_list, content), metatable)
+  __index = sequence;
+  __call = function ()
+    return setmetatable(class.new(), metatable)
   end;
 })

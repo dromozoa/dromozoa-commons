@@ -164,3 +164,22 @@ assert(equal(xml.decode([[
 ]]), json.decode([====[
 [ "foo", { "bar": " baz'qux " }, [ "\n ", [ "foo", { "bar": " baz\"qux " }, [] ], "\n " ] ]
 ]====])))
+
+assert(tostring(xml.decode("<foo><bar baz='qux'/></foo>")[3][1]) == [[<bar baz="qux"/>]])
+xml.encode({ "name", { foo = 17, bar = 23, baz = 37 }, { { "qux", {}, { 42 } } } })
+
+local doc = xml.decode([[
+<html>
+  <head>
+    <title>title</title>
+  </head>
+  <body>
+    <p>foo</p>
+    <p>bar</p>
+    <p>baz</p>
+    <p>qux</p>
+  </body>
+</html>
+]])
+assert(tostring(doc:select("body"):select("p")) == "<p>foo</p><p>bar</p><p>baz</p><p>qux</p>")
+assert(tostring(doc:select("body"):select("p"):text()) == "foobarbazqux")

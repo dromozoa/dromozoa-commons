@@ -16,13 +16,23 @@
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
 local empty = require "dromozoa.commons.empty"
+local ipairs = require "dromozoa.commons.ipairs"
 local pairs = require "dromozoa.commons.pairs"
 local xml_escape = require "dromozoa.commons.xml_escape"
 
 local function write(out, v)
-  if type(v) == "string" then
+  local t = type(v)
+  if t == "number" then
+    out:write(string.format("%.17g", v))
+  elseif t == "string" then
     out:write(xml_escape(v))
-  else
+  elseif t == "boolean" then
+    if v then
+      out:write("true")
+    else
+      out:write("false")
+    end
+  elseif t == "table" then
     local name = v[1]
     local attrs = v[2]
     local content = v[3]
@@ -34,7 +44,7 @@ local function write(out, v)
       out:write("/>")
     else
       out:write(">")
-      for node in content:each() do
+      for _, node in ipairs(content) do
         write(out, node)
       end
       out:write("</", name, ">")
