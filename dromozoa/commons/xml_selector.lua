@@ -15,7 +15,6 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local clone = require "dromozoa.commons.clone"
 local sequence = require "dromozoa.commons.sequence"
 local sequence_writer = require "dromozoa.commons.sequence_writer"
 local split = require "dromozoa.commons.split"
@@ -27,19 +26,38 @@ local function query(selector, stack)
   if selector(top, stack, #stack) then
     return top
   end
-  local stack = clone(stack)
   for node in top:each() do
-    stack:push(node)
-    local result = query(selector, stack)
-    stack:pop()
-    if result ~= nil then
-      return result
+    if type(node) == "table" then
+      stack:push(node)
+      local result = query(selector, stack)
+      stack:pop()
+      if result ~= nil then
+        return result
+      end
     end
   end
 end
 
+local function query_all(selector, stack, result)
+  local top = stack:top()
+  if selector(top, stack, #stack) then
+    result:push(top)
+  end
+  for node in top:each() do
+    if type(node) == "table" then
+      stack:push(node)
+      query_all(selector, stack, result)
+      stack:pop()
+    end
+  end
+  return result
+end
+
 local ws = "[ \t\r\n\f]*"
-local class = {}
+local class = {
+  query = query;
+  query_all = query_all;
+}
 
 function class.new(this)
   if type(this) == "string" then
@@ -117,9 +135,6 @@ function class:selector()
       else
         return true
       end
-      if class.debug then
-        print("selector", op)
-      end
       if self:simple_selector_sequence() then
         local b = stack:pop()
         local a = stack:pop()
@@ -135,9 +150,6 @@ function class:selector()
           end)
         elseif op == ">" then
           stack:push(function (top, stack, n)
-            if class.debug then
-              print(">", tostring(top), n)
-            end
             if n > 1 and b(top, stack, n) then
               local i = n - 1
               return a(stack[i], stack, i)
@@ -228,9 +240,6 @@ function class:attrib()
           end)
         elseif op == "=" then
           return stack:push(function (top)
-            if class.debug then
-              print("=", a, b, tostring(top))
-            end
             return top:attr(a) == b
           end)
         elseif op == "~=" then
@@ -247,9 +256,6 @@ function class:attrib()
           else
             local c = "^" .. b:gsub("[^%a]", "%%%1")
             return stack:push(function (top)
-              if class.debug then
-                print("^=", a, b, c, tostring(top))
-              end
               local u = top:attr(a)
               return u ~= nil and u:find(c)
             end)
@@ -381,12 +387,12 @@ function class:apply()
   end
 end
 
-function class.query_selector(element, all)
-
-
-
-
-
+function class.compile(s)
+  local selector, matcher = class(s):apply()
+  if not matcher:eof() then
+    error("cannot reach eof at position " .. matcher.position)
+  end
+  return selector
 end
 
 local metatable = {

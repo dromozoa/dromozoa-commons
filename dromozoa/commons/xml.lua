@@ -44,11 +44,7 @@ function class.decode(s)
 end
 
 function class.selector(s)
-  local v, matcher = xml_selector(s):apply()
-  if not matcher:eof() then
-    error("cannot reach eof at position " .. matcher.position)
-  end
-  return v
+  return xml_selector.compile(s)
 end
 
 return class

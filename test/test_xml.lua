@@ -176,13 +176,33 @@ local doc = xml.decode([[
     <title>title</title>
   </head>
   <body>
-    <p>foo</p>
-    <p>bar</p>
-    <p>baz</p>
-    <p>qux</p>
+    <div>
+      <p>foo</p>
+    </div>
+    <div>
+      <div>
+        <p class="a">bar</p>
+      </div>
+    </div>
+    <p class="a b">baz</p>
+    <p foo="17" bar="23" baz="37">qux</p>
   </body>
 </html>
 ]])
-assert(tostring(doc:select("body"):select("p")) == "<p>foo</p><p>bar</p><p>baz</p><p>qux</p>")
-assert(tostring(doc:select("body"):select("p"):text()) == "foobarbazqux")
 
+assert(doc:query("no-such-tag") == nil)
+assert(doc:query(":not(*)") == nil)
+assert(doc:query("p"):text() == "foo")
+assert(doc:query("div p"):text() == "foo")
+assert(doc:query("body p"):text() == "foo")
+assert(doc:query("html p"):text() == "foo")
+assert(doc:query("div div p"):text() == "bar")
+assert(doc:query(".a"):text() == "bar")
+assert(doc:query("body > p"):text() == "baz")
+assert(doc:query(":not(div) > p"):text() == "baz")
+assert(doc:query(".a.b"):text() == "baz")
+assert(doc:query("[foo][bar]"):text() == "qux")
+assert(doc:query("[foo][bar][baz]"):text() == "qux")
+assert(doc:query_all("p"):text() == "foobarbazqux")
+assert(doc:query_all("p.a"):text() == "barbaz")
+assert(doc:query_all("html > *"):query_all("* > title, * > p"):query(".b"):text() == "baz")

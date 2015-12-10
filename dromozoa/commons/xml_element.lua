@@ -15,9 +15,11 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
+local sequence = require "dromozoa.commons.sequence"
 local sequence_writer = require "dromozoa.commons.sequence_writer"
 local xml_node_list = require "dromozoa.commons.xml_node_list"
 local xml_write = require "dromozoa.commons.xml_write"
+local xml_selector = require "dromozoa.commons.xml_selector"
 
 local class = {}
 
@@ -39,22 +41,29 @@ end
 
 function class:text()
   local out = sequence_writer()
-  for node in self[3]:each() do
+  for node in self:each() do
     if type(node) ~= "table" then
-      xml_write(out, node)
+      out:write(node)
     end
   end
   return out:concat()
 end
 
-function class:select(name)
-  local result = xml_node_list()
-  for node in self[3]:each() do
-    if type(node) == "table" and node[1] == name then
-      result:push(node)
-    end
+function class:query(selector)
+  if type(selector) == "string" then
+    selector = xml_selector.compile(selector)
   end
-  return result
+  return xml_selector.query(selector, sequence():push(self)), selector
+end
+
+function class:query_all(selector, result)
+  if type(selector) == "string" then
+    selector = xml_selector.compile(selector)
+  end
+  if result == nil then
+    result = xml_node_list()
+  end
+  return xml_selector.query_all(selector, sequence():push(self), result), selector
 end
 
 local metatable = {
