@@ -15,11 +15,28 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
+local clone = require "dromozoa.commons.clone"
 local sequence = require "dromozoa.commons.sequence"
 local sequence_writer = require "dromozoa.commons.sequence_writer"
 local split = require "dromozoa.commons.split"
 local string_matcher = require "dromozoa.commons.string_matcher"
 local utf8 = require "dromozoa.commons.utf8"
+
+local function query(selector, stack)
+  local top = stack:top()
+  if selector(top, stack, #stack) then
+    return top
+  end
+  local stack = clone(stack)
+  for node in top:each() do
+    stack:push(node)
+    local result = query(selector, stack)
+    stack:pop()
+    if result ~= nil then
+      return result
+    end
+  end
+end
 
 local ws = "[ \t\r\n\f]*"
 local class = {}
@@ -78,12 +95,12 @@ function class:selector_group()
           return b(...) or a(...)
         end)
       else
-        self:raise("selector expected")
+        self:raise()
       end
     end
     return true
   else
-    self:raise("selector expected")
+    self:raise()
   end
 end
 
@@ -362,6 +379,14 @@ function class:apply()
   else
     self:raise()
   end
+end
+
+function class.query_selector(element, all)
+
+
+
+
+
 end
 
 local metatable = {

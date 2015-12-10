@@ -33,6 +33,10 @@ function class:attr(name, value)
   return self[2][name]
 end
 
+function class:each()
+  return self[3]:each()
+end
+
 function class:text()
   local out = sequence_writer()
   for node in self[3]:each() do

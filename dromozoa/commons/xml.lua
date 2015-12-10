@@ -18,6 +18,7 @@
 local sequence_writer = require "dromozoa.commons.sequence_writer"
 local xml_escape = require "dromozoa.commons.xml_escape"
 local xml_parser = require "dromozoa.commons.xml_parser"
+local xml_selector = require "dromozoa.commons.xml_selector"
 local xml_write = require "dromozoa.commons.xml_write"
 
 local function parse(this)
@@ -36,6 +37,14 @@ end
 
 function class.decode(s)
   local v, matcher = parse(s)
+  if not matcher:eof() then
+    error("cannot reach eof at position " .. matcher.position)
+  end
+  return v
+end
+
+function class.selector(s)
+  local v, matcher = xml_selector(s):apply()
   if not matcher:eof() then
     error("cannot reach eof at position " .. matcher.position)
   end
