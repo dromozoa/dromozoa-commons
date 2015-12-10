@@ -15,36 +15,31 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local sequence_writer = require "dromozoa.commons.sequence_writer"
-local xml_escape = require "dromozoa.commons.xml_escape"
-local xml_parser = require "dromozoa.commons.xml_parser"
-local xml_selector = require "dromozoa.commons.xml_selector"
-local xml_write = require "dromozoa.commons.xml_write"
+local set = require "dromozoa.commons.set"
 
-local function parse(this)
-  return xml_parser(this):apply()
+local function get_named_char_refs()
+  return {
+    [string.char(0x26)] = "&amp;";
+    [string.char(0x3c)] = "&lt;";
+    [string.char(0x3e)] = "&gt;";
+    [string.char(0x22)] = "&quot;";
+    [string.char(0x27)] = "&apos;";
+  }
 end
 
-local class = {
-  escape = xml_escape;
-  write = xml_write;
-  parse = parse;
-}
-
-function class.encode(v)
-  return xml_write(sequence_writer(), v):concat()
-end
-
-function class.decode(s)
-  local v, matcher = parse(s)
-  if not matcher:eof() then
-    error("cannot reach eof at position " .. matcher.position)
+local function get_numeric_char_refs(i, j)
+  local refs = {}
+  for i = i, j do
+    refs[string.char(i)] = string.format("&#x%x;", i)
   end
-  return v
+  return refs
 end
 
-function class.selector(s)
-  return xml_selector.compile(s)
-end
+local char_refs = set.set_union(get_named_char_refs(), get_numeric_char_refs(0, 127))
 
-return class
+return function (value, pattern)
+  if pattern == nil then
+    pattern = "[%z\1-\8\11\12\14-\31\127%&%<%>%\"%']"
+  end
+  return (tostring(value):gsub(pattern, char_refs))
+end

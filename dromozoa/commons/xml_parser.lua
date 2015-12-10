@@ -21,14 +21,13 @@ local string_matcher = require "dromozoa.commons.string_matcher"
 local sequence = require "dromozoa.commons.sequence"
 local sequence_writer = require "dromozoa.commons.sequence_writer"
 local utf8 = require "dromozoa.commons.utf8"
+local xml_element = require "dromozoa.commons.xml_element"
+local xml_node_list = require "dromozoa.commons.xml_node_list"
 
+local ws = "[ \t\r\n]*"
 local zero_width_no_break_space = string.char(0xef, 0xbb, 0xbf)
 
 local class = {}
-
-local metatable = {
-  __index = class;
-}
 
 function class.new(this)
   if type(this) == "string" then
@@ -66,12 +65,12 @@ function class:element()
   if this:match("<([A-Za-z%_\128-\255][A-Za-z%_0-9%-%.\128-\255]*)") then
     local name = this[1]
     self:attribute_list()
-    local attrbute_list = stack:pop()
-    if this:match("%s*>") then
-      stack:push({ name, attrbute_list })
+    local attributes = stack:pop()
+    if this:match(ws .. ">") then
+      stack:push(xml_element(name, attributes))
       return self:content()
-    elseif this:match("%s*/>") then
-      return stack:push({ name, attrbute_list, sequence() })
+    elseif this:match(ws .. "/>") then
+      return stack:push(xml_element(name, attributes, xml_node_list()))
     else
       self:raise("unclosed tag")
     end
@@ -81,11 +80,11 @@ end
 function class:content()
   local this = self.this
   local stack = self.stack
-  local that = sequence()
+  local that = xml_node_list()
   while true do
     if this:match("</([A-Za-z%_\128-\255][A-Za-z%_0-9%-%.\128-\255]*)") then
       local name = this[1]
-      if this:match("%s*>") then
+      if this:match(ws .. ">") then
         local tag = stack:top()
         if tag[1] == name and tag[3] == nil then
           tag[3] = that
@@ -106,7 +105,7 @@ function class:content()
       while true do
         if this:match("\r\n") or this:match("[\r\n]") then
           out:write("\n")
-        elseif this:match("([^%<%>%&\r\n]+)") then
+        elseif this:match("([^%z\1-\8\10-\31\127%<%>%&]+)") then
           out:write(this[1])
         elseif self:char_ref() then
           out:write(stack:pop())
@@ -130,14 +129,14 @@ function class:attribute_list()
   local stack = self.stack
   local that = linked_hash_table()
   while true do
-    if not this:match("%s*([A-Za-z%_\128-\255][A-Za-z%_0-9%-%.\128-\255]*)") then
+    if not this:match(ws .. "([A-Za-z%_\128-\255][A-Za-z%_0-9%-%.\128-\255]*)") then
       break
     end
     local name = this[1]
     if self.strict and name == "xmlns" then
       self:raise("attribute name xmlns found")
     end
-    if not this:match("%s*%=%s*") then
+    if not this:match(ws .. "%=" .. ws) then
       self:raise("invalid attribute")
     end
     if this:match("([%\"%'])") then
@@ -162,7 +161,7 @@ function class:attribute_value(quote)
       out:write(this[1])
     elseif this:match("\r\n") or this:match("[\r\n]") then
       out:write("\n")
-    elseif this:match("([^%<%>%&%\"%'\r\n]+)") then
+    elseif this:match("([^%z\1-\8\10-\31\127%<%>%&%\"%']+)") then
       out:write(this[1])
     elseif self:char_ref() then
       out:write(stack:pop())
@@ -207,7 +206,7 @@ function class:prolog()
   local this = self.this
   this:match(zero_width_no_break_space)
   if not self.strict then
-    this:match("%s*%<%?xml .-%?%>")
+    this:match(ws .. "%<%?xml .-%?%>")
     self:misc()
     this:match("%<%!DOCTYPE .-%>")
   end
@@ -217,7 +216,7 @@ end
 function class:misc()
   local this = self.this
   repeat
-    this:match("%s*")
+    this:match(ws)
   until not self:comment()
 end
 
@@ -231,6 +230,10 @@ function class:apply()
     self:raise()
   end
 end
+
+local metatable = {
+  __index = class;
+}
 
 return setmetatable(class, {
   __call = function (_, this)

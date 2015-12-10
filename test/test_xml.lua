@@ -15,6 +15,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
+local dumper = require "dromozoa.commons.dumper"
 local equal = require "dromozoa.commons.equal"
 local json = require "dromozoa.commons.json"
 local xml = require "dromozoa.commons.xml"
@@ -24,6 +25,8 @@ assert(a == "&lt;&gt;&amp;&quot;&apos;")
 assert(b == nil)
 assert(xml.escape(42) == "42")
 assert(xml.escape("[foo]", "%W") == "&#x5b;foo&#x5d;")
+assert(xml.escape("\t\r\n ") == "\t\r\n ")
+assert(xml.escape("\0\127") == "&#x0;&#x7f;")
 
 local X = [[
 <comment lang="en" date="2012-09-11">
@@ -47,6 +50,12 @@ local J = [====[
 assert(equal(xml.decode(X), json.decode(J)))
 assert(equal(xml.decode(X:gsub("\n", "\r\n")), json.decode(J)))
 assert(equal(xml.decode(X:gsub("\n", "\r")), json.decode(J)))
+
+-- print(xml.encode(json.decode(J)))
+-- print(xml.decode(xml.encode(json.decode(J))))
+assert(equal(xml.decode(X), xml.decode(xml.encode(json.decode(J)))))
+-- print(xml.encode("\0\1\2\3\4\5\6\7\8\9\10\11\12\13\14\15\16"))
+assert(xml.encode("\0\1\2\3\4\5\6\7\8\9\10\11\12\13\14\15\16") == "&#x0;&#x1;&#x2;&#x3;&#x4;&#x5;&#x6;&#x7;&#x8;\t\n&#xb;&#xc;\r&#xe;&#xf;&#x10;")
 
 assert(equal(xml.decode([[
 <location><city>New York</city><country>US</country></location>
@@ -142,6 +151,13 @@ assert(not pcall(xml.decode, [[<foo></bar]]))
 assert(not pcall(xml.decode, [[<foo></bar>]]))
 assert(not pcall(xml.decode, [[<foo/><!--]]))
 assert(not pcall(xml.decode, [[<foo/><!-- -->&]]))
+assert(not pcall(xml.decode, "<foo>\0</foo>"))
+assert(not pcall(xml.decode, "<foo bar='\0'/>"))
+assert(not pcall(xml.decode, "<foo\f/>"))
+assert(not pcall(xml.decode, "<foo>\f</foo>"))
+
+assert(equal(xml.decode("<foo>\t</foo>"), { "foo", {}, { "\t" } }))
+assert(equal(xml.decode("<foo bar='\t'/>"), { "foo", { bar = "\t" }, {} }))
 
 assert(equal(xml.decode([[
  <foo bar = " baz'qux " >
@@ -150,3 +166,43 @@ assert(equal(xml.decode([[
 ]]), json.decode([====[
 [ "foo", { "bar": " baz'qux " }, [ "\n ", [ "foo", { "bar": " baz\"qux " }, [] ], "\n " ] ]
 ]====])))
+
+assert(tostring(xml.decode("<foo><bar baz='qux'/></foo>")[3][1]) == [[<bar baz="qux"/>]])
+xml.encode({ "name", { foo = 17, bar = 23, baz = 37 }, { { "qux", {}, { 42 } } } })
+
+local doc = xml.decode([[
+<html>
+  <head>
+    <title>title</title>
+  </head>
+  <body>
+    <div>
+      <p>foo</p>
+    </div>
+    <div>
+      <div>
+        <p class="a">bar</p>
+      </div>
+    </div>
+    <p class="a b">baz</p>
+    <p foo="17" bar="23" baz="37">qux</p>
+  </body>
+</html>
+]])
+
+assert(doc:query("no-such-tag") == nil)
+assert(doc:query(":not(*)") == nil)
+assert(doc:query("p"):text() == "foo")
+assert(doc:query("div p"):text() == "foo")
+assert(doc:query("body p"):text() == "foo")
+assert(doc:query("html p"):text() == "foo")
+assert(doc:query("div div p"):text() == "bar")
+assert(doc:query(".a"):text() == "bar")
+assert(doc:query("body > p"):text() == "baz")
+assert(doc:query(":not(div) > p"):text() == "baz")
+assert(doc:query(".a.b"):text() == "baz")
+assert(doc:query("[foo][bar]"):text() == "qux")
+assert(doc:query("[foo][bar][baz]"):text() == "qux")
+assert(doc:query_all("p"):text() == "foobarbazqux")
+assert(doc:query_all("p.a"):text() == "barbaz")
+assert(doc:query_all("html > *"):query_all("* > title, * > p"):query(".b"):text() == "baz")
