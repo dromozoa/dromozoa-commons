@@ -20,15 +20,12 @@ local linked_hash_table = require "dromozoa.commons.linked_hash_table"
 local string_matcher = require "dromozoa.commons.string_matcher"
 local sequence = require "dromozoa.commons.sequence"
 local sequence_writer = require "dromozoa.commons.sequence_writer"
+local xml_element = require "dromozoa.commons.xml_element"
 local utf8 = require "dromozoa.commons.utf8"
 
 local zero_width_no_break_space = string.char(0xef, 0xbb, 0xbf)
 
 local class = {}
-
-local metatable = {
-  __index = class;
-}
 
 function class.new(this)
   if type(this) == "string" then
@@ -68,10 +65,10 @@ function class:element()
     self:attribute_list()
     local attrbute_list = stack:pop()
     if this:match("%s*>") then
-      stack:push({ name, attrbute_list })
+      stack:push(xml_element(name, attrbute_list))
       return self:content()
     elseif this:match("%s*/>") then
-      return stack:push({ name, attrbute_list, sequence() })
+      return stack:push(xml_element(name, attrbute_list, sequence))
     else
       self:raise("unclosed tag")
     end
@@ -231,6 +228,10 @@ function class:apply()
     self:raise()
   end
 end
+
+local metatable = {
+  __index = class;
+}
 
 return setmetatable(class, {
   __call = function (_, this)

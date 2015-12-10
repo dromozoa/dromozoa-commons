@@ -150,3 +150,15 @@ assert(equal(xml.decode([[
 ]]), json.decode([====[
 [ "foo", { "bar": " baz'qux " }, [ "\n ", [ "foo", { "bar": " baz\"qux " }, [] ], "\n " ] ]
 ]====])))
+
+local doc = xml.decode([[
+<comment lang="en" date="2012-09-11">
+I <em>love</em> &#xB5;<!-- MICRO SIGN -->XML!<br/>
+It's so
+clean &amp; simple.</comment>
+]])
+print(doc:attr("lang"))
+-- for node in doc:each() do
+--   print(node)
+-- end
+
