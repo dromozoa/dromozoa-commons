@@ -103,7 +103,7 @@ function class:content()
       while true do
         if this:match("\r\n") or this:match("[\r\n]") then
           out:write("\n")
-        elseif this:match("([^\0-\8\10-\31\127%<%>%&]+)") then
+        elseif this:match("([^%z\1-\8\10-\31\127%<%>%&]+)") then
           out:write(this[1])
         elseif self:char_ref() then
           out:write(stack:pop())
@@ -159,7 +159,7 @@ function class:attribute_value(quote)
       out:write(this[1])
     elseif this:match("\r\n") or this:match("[\r\n]") then
       out:write("\n")
-    elseif this:match("([^\0-\8\10-\31\127%<%>%&%\"%']+)") then
+    elseif this:match("([^%z\1-\8\10-\31\127%<%>%&%\"%']+)") then
       out:write(this[1])
     elseif self:char_ref() then
       out:write(stack:pop())

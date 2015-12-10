@@ -35,11 +35,7 @@ local function write(out, v)
     else
       out:write(">")
       for node in content:each() do
-        if type(node) == "string" then
-          out:write(xml_escape(node))
-        else
-          write(out, node)
-        end
+        write(out, node)
       end
       out:write("</", name, ">")
     end

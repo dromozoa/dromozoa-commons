@@ -54,6 +54,8 @@ assert(equal(xml.decode(X:gsub("\n", "\r")), json.decode(J)))
 -- print(xml.encode(json.decode(J)))
 -- print(xml.decode(xml.encode(json.decode(J))))
 assert(equal(xml.decode(X), xml.decode(xml.encode(json.decode(J)))))
+-- print(xml.encode("\0\1\2\3\4\5\6\7\8\9\10\11\12\13\14\15\16"))
+assert(xml.encode("\0\1\2\3\4\5\6\7\8\9\10\11\12\13\14\15\16") == "&#x0;&#x1;&#x2;&#x3;&#x4;&#x5;&#x6;&#x7;&#x8;\t\n&#xb;&#xc;\r&#xe;&#xf;&#x10;")
 
 assert(equal(xml.decode([[
 <location><city>New York</city><country>US</country></location>
@@ -162,5 +164,3 @@ assert(equal(xml.decode([[
 ]]), json.decode([====[
 [ "foo", { "bar": " baz'qux " }, [ "\n ", [ "foo", { "bar": " baz\"qux " }, [] ], "\n " ] ]
 ]====])))
-
-
