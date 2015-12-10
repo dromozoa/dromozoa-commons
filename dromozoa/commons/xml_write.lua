@@ -15,31 +15,32 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local sequence_writer = require "dromozoa.commons.sequence_writer"
+local empty = require "dromozoa.commons.empty"
+local pairs = require "dromozoa.commons.pairs"
 local xml_escape = require "dromozoa.commons.xml_escape"
-local xml_parser = require "dromozoa.commons.xml_parser"
-local xml_write = require "dromozoa.commons.xml_write"
 
-local function parse(this)
-  return xml_parser(this):apply()
-end
-
-local class = {
-  escape = xml_escape;
-  write = xml_write;
-  parse = parse;
-}
-
-function class.encode(element)
-  return xml_write(sequence_writer(), element):concat()
-end
-
-function class.decode(s)
-  local v, matcher = parse(s)
-  if not matcher:eof() then
-    error("cannot reach eof at position " .. matcher.position)
+local function write(out, element)
+  local name = element[1]
+  local attrs = element[2]
+  local content = element[3]
+  out:write("<", name)
+  for name, value in pairs(attrs) do
+    out:write(" ", name, "=\"", xml_escape(value), "\"")
   end
-  return v
+  if empty(content) then
+    out:write("/>")
+  else
+    out:write(">")
+    for node in content:each() do
+      if type(node) == "string" then
+        out:write(xml_escape(node))
+      else
+        write(out, node)
+      end
+    end
+    out:write("</", name, ">")
+  end
+  return out
 end
 
-return class
+return write
