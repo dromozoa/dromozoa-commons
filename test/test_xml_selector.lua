@@ -17,7 +17,7 @@
 
 local sequence = require "dromozoa.commons.sequence"
 local xml = require "dromozoa.commons.xml"
-local xml_selector = require "dromozoa.commons.xml_selector_parser"
+local xml_selector = require "dromozoa.commons.xml_selector"
 
 local e1 = xml.decode("<E/>")
 local e2 = xml.decode("<F foo='bar'/>")
