@@ -68,7 +68,7 @@ function class:element()
       stack:push(xml_element(name, attributes))
       return self:content()
     elseif this:match("%s*/>") then
-      return stack:push(xml_element(name, attributes, sequence))
+      return stack:push(xml_element(name, attributes, sequence()))
     else
       self:raise("unclosed tag")
     end

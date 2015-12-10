@@ -15,6 +15,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
+local dumper = require "dromozoa.commons.dumper"
 local equal = require "dromozoa.commons.equal"
 local json = require "dromozoa.commons.json"
 local xml = require "dromozoa.commons.xml"
@@ -24,6 +25,8 @@ assert(a == "&lt;&gt;&amp;&quot;&apos;")
 assert(b == nil)
 assert(xml.escape(42) == "42")
 assert(xml.escape("[foo]", "%W") == "&#x5b;foo&#x5d;")
+assert(xml.escape("\t\r\n ") == "\t\r\n ")
+assert(xml.escape("\0\127") == "&#x0;&#x7f;")
 
 local X = [[
 <comment lang="en" date="2012-09-11">
@@ -148,6 +151,9 @@ assert(not pcall(xml.decode, [[<foo/><!--]]))
 assert(not pcall(xml.decode, [[<foo/><!-- -->&]]))
 assert(not pcall(xml.decode, "<foo>\0</foo>"))
 assert(not pcall(xml.decode, "<foo bar='\0'/>"))
+
+assert(equal(xml.decode("<foo>\t</foo>"), { "foo", {}, { "\t" } }))
+assert(equal(xml.decode("<foo bar='\t'/>"), { "foo", { bar = "\t" }, {} }))
 
 assert(equal(xml.decode([[
  <foo bar = " baz'qux " >

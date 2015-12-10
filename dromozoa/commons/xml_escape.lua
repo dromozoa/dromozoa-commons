@@ -39,7 +39,7 @@ local char_refs = set.set_union(get_named_char_refs(), get_numeric_char_refs(0, 
 
 return function (value, pattern)
   if pattern == nil then
-    pattern = "[&<>\"']"
+    pattern = "[\0-\8\11\12\14-\31\127&<>\"']"
   end
   return (tostring(value):gsub(pattern, char_refs))
 end

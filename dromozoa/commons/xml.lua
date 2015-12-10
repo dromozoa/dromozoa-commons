@@ -30,8 +30,8 @@ local class = {
   parse = parse;
 }
 
-function class.encode(element)
-  return xml_write(sequence_writer(), element):concat()
+function class.encode(v)
+  return xml_write(sequence_writer(), v):concat()
 end
 
 function class.decode(s)

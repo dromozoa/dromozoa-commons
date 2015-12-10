@@ -19,26 +19,30 @@ local empty = require "dromozoa.commons.empty"
 local pairs = require "dromozoa.commons.pairs"
 local xml_escape = require "dromozoa.commons.xml_escape"
 
-local function write(out, element)
-  local name = element[1]
-  local attrs = element[2]
-  local content = element[3]
-  out:write("<", name)
-  for name, value in pairs(attrs) do
-    out:write(" ", name, "=\"", xml_escape(value), "\"")
-  end
-  if empty(content) then
-    out:write("/>")
+local function write(out, v)
+  if type(v) == "string" then
+    out:write(xml_escape(v))
   else
-    out:write(">")
-    for node in content:each() do
-      if type(node) == "string" then
-        out:write(xml_escape(node))
-      else
-        write(out, node)
-      end
+    local name = v[1]
+    local attrs = v[2]
+    local content = v[3]
+    out:write("<", name)
+    for name, value in pairs(attrs) do
+      out:write(" ", name, "=\"", xml_escape(value), "\"")
     end
-    out:write("</", name, ">")
+    if empty(content) then
+      out:write("/>")
+    else
+      out:write(">")
+      for node in content:each() do
+        if type(node) == "string" then
+          out:write(xml_escape(node))
+        else
+          write(out, node)
+        end
+      end
+      out:write("</", name, ">")
+    end
   end
   return out
 end

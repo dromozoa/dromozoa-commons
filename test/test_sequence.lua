@@ -16,6 +16,7 @@
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
 local equal = require "dromozoa.commons.equal"
+local pairs = require "dromozoa.commons.pairs"
 local sequence = require "dromozoa.commons.sequence"
 
 local s = sequence()
@@ -71,3 +72,15 @@ assert(n == 4)
 local s = sequence():push("foo", "bar", "baz", "qux")
 assert(s:concat() == "foobarbazqux")
 assert(s:concat(",") == "foo,bar,baz,qux")
+
+local n = 0
+for k, v in pairs(sequence()) do
+  n = n + 1
+end
+assert(n == 0)
+
+local n = 0
+for k, v in pairs(sequence():push("foo", "bar", "baz", "qux")) do
+  n = n + 1
+end
+assert(n == 4)
