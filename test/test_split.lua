@@ -30,3 +30,6 @@ for v in split("foo,bar,baz", ","):each() do
   data[v] = true
 end
 assert(equal(data, { foo = true, bar = true, baz = true }))
+
+assert(equal(split("", "%s+"), {""}))
+assert(equal(split(" ", "%s+"), {""}))

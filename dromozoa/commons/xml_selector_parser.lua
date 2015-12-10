@@ -17,6 +17,7 @@
 
 local sequence = require "dromozoa.commons.sequence"
 local sequence_writer = require "dromozoa.commons.sequence_writer"
+local split = require "dromozoa.commons.split"
 local string_matcher = require "dromozoa.commons.string_matcher"
 local utf8 = require "dromozoa.commons.utf8"
 
@@ -42,20 +43,45 @@ function class:raise(message)
   end
 end
 
+function class:push_noop()
+  local stack = self.stack
+  return stack:push(function () end)
+end
+
+function class:push_includes(a, b)
+  local stack = self.stack
+  if b:match("^[ \t\r\n\f]*$") then
+    return self:push_noop()
+  else
+    return stack:push(function (top)
+      local u = top:attr(a)
+      if u ~= nil then
+        for v in split(u, "[ \t\r\n\f]+"):each() do
+          if v == b then
+            return true
+          end
+        end
+      end
+    end)
+  end
+end
+
 function class:selector_group()
   local this = self.this
   local stack = self.stack
-  local that = sequence():push("selector_group")
   if self:selector() then
-    that:push(stack:pop())
     while this:match("," .. ws) do
       if self:selector() then
-        that:push(stack:pop())
+        local b = stack:pop()
+        local a = stack:pop()
+        stack:push(function (...)
+          return b(...) or a(...)
+        end)
       else
         self:raise("selector expected")
       end
     end
-    return stack:push(that)
+    return true
   else
     self:raise("selector expected")
   end
@@ -70,14 +96,39 @@ function class:selector()
       if this:match(ws .. "([%+%>%~])" .. ws) then
         op = this[1]
       elseif this:match("[ \t\r\n\f]+") then
-        op = "descendant"
+        -- descendant
       else
         return true
+      end
+      if class.debug then
+        print("selector", op)
       end
       if self:simple_selector_sequence() then
         local b = stack:pop()
         local a = stack:pop()
-        stack:push({ op, a, b })
+        if op == nil then
+          stack:push(function (top, stack, n)
+            if n > 1 and b(top, stack, n) then
+              for i = n - 1, 1, -1 do
+                if a(stack[i], stack, i) then
+                  return true
+                end
+              end
+            end
+          end)
+        elseif op == ">" then
+          stack:push(function (top, stack, n)
+            if class.debug then
+              print(">", tostring(top), n)
+            end
+            if n > 1 and b(top, stack, n) then
+              local i = n - 1
+              return a(stack[i], stack, i)
+            end
+          end)
+        else
+          self:raise("not implemented")
+        end
       else
         self:raise()
       end
@@ -87,29 +138,32 @@ end
 
 function class:simple_selector_sequence()
   local stack = self.stack
-  local that = sequence():push("simple_selector_sequence")
   if self:type_selector() or self:universal() or self:hash() or self:class() or self:attrib() or self:pseudo() then
-    that:push(stack:pop())
-  else
-    return
+    while self:hash() or self:class() or self:attrib() or self:pseudo() do
+      local b = stack:pop()
+      local a = stack:pop()
+      stack:push(function (...)
+        return b(...) and a(...)
+      end)
+    end
+    return true
   end
-  while self:hash() or self:class() or self:attrib() or self:pseudo() do
-    that:push(stack:pop())
-  end
-  return stack:push(that)
 end
 
 function class:type_selector()
   local stack = self.stack
   if self:element_name() then
-    return stack:push({ "type_selector", stack:pop() })
+    return true
   end
 end
 
 function class:element_name()
   local stack = self.stack
   if self:ident() then
-    return stack:push({ "element_name", stack:pop() })
+    local a = stack:pop()
+    return stack:push(function (top)
+      return top:name() == a
+    end)
   end
 end
 
@@ -117,7 +171,9 @@ function class:universal()
   local this = self.this
   local stack = self.stack
   if this:match("%*") then
-    return stack:push({ "*" })
+    return stack:push(function ()
+      return true
+    end)
   end
 end
 
@@ -126,7 +182,7 @@ function class:class()
   local stack = self.stack
   if this:match("%.") then
     if self:ident() then
-      return stack:push({ "class", stack:pop() })
+      return self:push_includes("class", stack:pop())
     end
     self:raise()
   end
@@ -147,11 +203,60 @@ function class:attrib()
         else
           self:raise()
         end
-      else
-        op = "attrib"
       end
       if this:match(ws .. "%]") then
-        return stack:push({ op, a, b })
+        if op == nil then
+          return stack:push(function (top)
+            return top:attr(a) ~= nil
+          end)
+        elseif op == "=" then
+          return stack:push(function (top)
+            if class.debug then
+              print("=", a, b, tostring(top))
+            end
+            return top:attr(a) == b
+          end)
+        elseif op == "~=" then
+          return self:push_includes(a, b)
+        elseif op == "|=" then
+          local c = "^" .. b:gsub("[^%a]", "%%%1") .. "%-?"
+          return stack:push(function (top)
+            local u = top:attr(a)
+            return u ~= nil and u:find(c)
+          end)
+        elseif op == "^=" then
+          if b == "" then
+            return self:push_noop()
+          else
+            local c = "^" .. b:gsub("[^%a]", "%%%1")
+            return stack:push(function (top)
+              if class.debug then
+                print("^=", a, b, c, tostring(top))
+              end
+              local u = top:attr(a)
+              return u ~= nil and u:find(c)
+            end)
+          end
+        elseif op == "$=" then
+          if b == "" then
+            return self:push_noop()
+          else
+            local c = b:gsub("[^%a]", "%%%1") .. "$"
+            return stack:push(function (top)
+              local u = top:attr(a)
+              return u ~= nil and u:find(c)
+            end)
+          end
+        elseif op == "*=" then
+          if b == "" then
+            return self:push_noop()
+          else
+            return stack:push(function (top)
+              local u = top:attr(a)
+              return u ~= nil and u:find(b, 1, true)
+            end)
+          end
+        end
       end
     end
     self:raise()
@@ -165,11 +270,14 @@ function class:pseudo()
     if self:ident() and stack:pop():match("^[Nn][Oo][Tt]$") and this:match("%(" .. ws) then
       if self:type_selector() or self:universal() or self:hash() or self:class() or self:attrib() then
         if this:match(ws .. "%)") then
-          return stack:push({ "not", stack:pop() })
+          local op = stack:pop()
+          return stack:push(function (...)
+            return not op(...)
+          end)
         end
       end
     end
-    self:raise("pseudo not implemented")
+    self:raise("not implemented")
   end
 end
 
@@ -236,8 +344,22 @@ function class:hash()
   local stack = self.stack
   if this:match("#") then
     if self:name() then
-      return stack:push({ "#", stack:pop() })
+      local a = stack:pop()
+      return stack:push(function (top)
+        return top:attr("id") == a
+      end)
     end
+    self:raise()
+  end
+end
+
+function class:apply()
+  local this = self.this
+  local stack = self.stack
+  self:selector_group()
+  if #stack == 1 then
+    return stack:pop(), this
+  else
     self:raise()
   end
 end

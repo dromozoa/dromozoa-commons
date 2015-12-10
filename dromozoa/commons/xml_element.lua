@@ -25,13 +25,12 @@ function class.new(name, attribute_list, content)
   return { name, attribute_list, content }
 end
 
+function class:name()
+  return self[1]
+end
+
 function class:attr(name, value)
-  if value == nil then
-    return self[2][name]
-  else
-    self[2][name] = value
-    return self
-  end
+  return self[2][name]
 end
 
 function class:text()
