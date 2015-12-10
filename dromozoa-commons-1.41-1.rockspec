@@ -56,7 +56,5 @@ build = {
     ["dromozoa.commons.visit"] = "dromozoa/commons/visit.lua";
     ["dromozoa.commons.word_block"] = "dromozoa/commons/word_block.lua";
     ["dromozoa.commons.write_file"] = "dromozoa/commons/write_file.lua";
-    ["dromozoa.commons.xml"] = "dromozoa/commons/xml.lua";
-    ["dromozoa.commons.xml_parser"] = "dromozoa/commons/xml_parser.lua";
   };
 }
