@@ -20,10 +20,11 @@ local linked_hash_table = require "dromozoa.commons.linked_hash_table"
 local string_matcher = require "dromozoa.commons.string_matcher"
 local sequence = require "dromozoa.commons.sequence"
 local sequence_writer = require "dromozoa.commons.sequence_writer"
+local utf8 = require "dromozoa.commons.utf8"
 local xml_element = require "dromozoa.commons.xml_element"
 local xml_nodeset = require "dromozoa.commons.xml_nodeset"
-local utf8 = require "dromozoa.commons.utf8"
 
+local ws = "[ \t\r\n]*"
 local zero_width_no_break_space = string.char(0xef, 0xbb, 0xbf)
 
 local class = {}
@@ -65,10 +66,10 @@ function class:element()
     local name = this[1]
     self:attribute_list()
     local attributes = stack:pop()
-    if this:match("%s*>") then
+    if this:match(ws .. ">") then
       stack:push(xml_element(name, attributes))
       return self:content()
-    elseif this:match("%s*/>") then
+    elseif this:match(ws .. "/>") then
       return stack:push(xml_element(name, attributes, xml_nodeset()))
     else
       self:raise("unclosed tag")
@@ -83,7 +84,7 @@ function class:content()
   while true do
     if this:match("</([A-Za-z%_\128-\255][A-Za-z%_0-9%-%.\128-\255]*)") then
       local name = this[1]
-      if this:match("%s*>") then
+      if this:match(ws .. ">") then
         local tag = stack:top()
         if tag[1] == name and tag[3] == nil then
           tag[3] = that
@@ -128,14 +129,14 @@ function class:attribute_list()
   local stack = self.stack
   local that = linked_hash_table()
   while true do
-    if not this:match("%s*([A-Za-z%_\128-\255][A-Za-z%_0-9%-%.\128-\255]*)") then
+    if not this:match(ws .. "([A-Za-z%_\128-\255][A-Za-z%_0-9%-%.\128-\255]*)") then
       break
     end
     local name = this[1]
     if self.strict and name == "xmlns" then
       self:raise("attribute name xmlns found")
     end
-    if not this:match("%s*%=%s*") then
+    if not this:match(ws .. "%=" .. ws) then
       self:raise("invalid attribute")
     end
     if this:match("([%\"%'])") then
@@ -205,7 +206,7 @@ function class:prolog()
   local this = self.this
   this:match(zero_width_no_break_space)
   if not self.strict then
-    this:match("%s*%<%?xml .-%?%>")
+    this:match(ws .. "%<%?xml .-%?%>")
     self:misc()
     this:match("%<%!DOCTYPE .-%>")
   end
@@ -215,7 +216,7 @@ end
 function class:misc()
   local this = self.this
   repeat
-    this:match("%s*")
+    this:match(ws)
   until not self:comment()
 end
 

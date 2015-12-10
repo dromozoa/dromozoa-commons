@@ -153,6 +153,8 @@ assert(not pcall(xml.decode, [[<foo/><!--]]))
 assert(not pcall(xml.decode, [[<foo/><!-- -->&]]))
 assert(not pcall(xml.decode, "<foo>\0</foo>"))
 assert(not pcall(xml.decode, "<foo bar='\0'/>"))
+assert(not pcall(xml.decode, "<foo\f/>"))
+assert(not pcall(xml.decode, "<foo>\f</foo>"))
 
 assert(equal(xml.decode("<foo>\t</foo>"), { "foo", {}, { "\t" } }))
 assert(equal(xml.decode("<foo bar='\t'/>"), { "foo", { bar = "\t" }, {} }))
@@ -183,3 +185,4 @@ local doc = xml.decode([[
 ]])
 assert(tostring(doc:select("body"):select("p")) == "<p>foo</p><p>bar</p><p>baz</p><p>qux</p>")
 assert(tostring(doc:select("body"):select("p"):text()) == "foobarbazqux")
+
