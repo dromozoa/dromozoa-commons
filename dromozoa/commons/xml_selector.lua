@@ -45,7 +45,7 @@ end
 function class:selector_group()
   local this = self.this
   local stack = self.stack
-  local that = sequence()
+  local that = sequence():push("selector_group")
   if self:selector() then
     that:push(stack:pop())
     while this:match("," .. ws) do
@@ -70,7 +70,7 @@ function class:selector()
       if this:match(ws .. "([%+%>%~])" .. ws) then
         op = this[1]
       elseif this:match("[ \t\r\n\f]+") then
-        op = "子孫"
+        op = "descendant"
       else
         return true
       end
@@ -86,11 +86,9 @@ function class:selector()
 end
 
 function class:simple_selector_sequence()
-  local that = sequence()
   local stack = self.stack
-  if self:type_selector() or self:universal() then
-    that:push(stack:pop())
-  elseif self:hash() or self:class() or self:attrib() or self:pseudo() then
+  local that = sequence():push("simple_selector_sequence")
+  if self:type_selector() or self:universal() or self:hash() or self:class() or self:attrib() or self:pseudo() then
     that:push(stack:pop())
   else
     return
@@ -102,14 +100,16 @@ function class:simple_selector_sequence()
 end
 
 function class:type_selector()
+  local stack = self.stack
   if self:element_name() then
-    return true
+    return stack:push({ "type_selector", stack:pop() })
   end
 end
 
 function class:element_name()
+  local stack = self.stack
   if self:ident() then
-    return true
+    return stack:push({ "element_name", stack:pop() })
   end
 end
 
@@ -135,23 +135,23 @@ end
 function class:attrib()
   local this = self.this
   local stack = self.stack
-  if this:match("%[") then
-    this:match(ws)
+  if this:match("%[" .. ws) then
     if self:ident() then
+      local op
       local a = stack:pop()
       local b
-      local c
-      if this:match(ws .. "([%^%$%*%~%|]?=)") then
-        b = this[1]
-        this:match(ws)
+      if this:match(ws .. "([%^%$%*%~%|]?=)" .. ws) then
+        op = this[1]
         if self:ident() or self:string() then
-          c = stack:pop()
+          b = stack:pop()
         else
           self:raise()
         end
+      else
+        op = "attrib"
       end
       if this:match(ws .. "%]") then
-        return stack:push({ "attrib", a, b, c })
+        return stack:push({ op, a, b })
       end
     end
     self:raise()
@@ -162,27 +162,14 @@ function class:pseudo()
   local this = self.this
   local stack = self.stack
   if this:match(":") then
-    if self:ident() then
-      if stack:pop():match("^[Nn][Oo][Tt]$") then
-        if this:match("%(" .. ws) then
-          if self:type_selector() or self:universal() or self:hash() or self:class() or self:attrib() then
-            local a = stack:pop()
-            if this:match(ws .. "%)") then
-              return stack:push({ "negation", a })
-            end
-          end
+    if self:ident() and stack:pop():match("^[Nn][Oo][Tt]$") and this:match("%(" .. ws) then
+      if self:type_selector() or self:universal() or self:hash() or self:class() or self:attrib() then
+        if this:match(ws .. "%)") then
+          return stack:push({ "not", stack:pop() })
         end
       end
     end
     self:raise("pseudo not implemented")
-  end
-end
-
-function class:negation()
-  -- not implemented
-  local this = self.this
-  local stack = self.stack
-  if this:match("%:not") then
   end
 end
 
@@ -222,10 +209,8 @@ function class:string()
   if this:match("([%\"%'])") then
     local quote = this[1]
     local out = sequence_writer()
-    while true do
-      if this:match(quote) then
-        return stack:push(out:concat())
-      elseif this:match("([%\"%'])") then
+    while not this:match(quote) do
+      if this:match("([%\"%'])") then
         out:write(this[1])
       elseif this:match("([^\n\r\f%\\%\"%']+)") then
         out:write(this[1])
@@ -242,6 +227,7 @@ function class:string()
         self:raise()
       end
     end
+    return stack:push(out:concat())
   end
 end
 
@@ -250,7 +236,7 @@ function class:hash()
   local stack = self.stack
   if this:match("#") then
     if self:name() then
-      return stack:push({ "hash", stack:pop() })
+      return stack:push({ "#", stack:pop() })
     end
     self:raise()
   end

@@ -22,7 +22,7 @@ local p = xml_selector([[
 foo, *, \21 bar, -baz, #--foo, [ foo ], [ foo = bar ],
 [foo="baz's"],
 [foo='"qux"'], :not([foo]),
-foo[bar=baz], abc > def ghi
+foo[bar=baz], abc > def ghi,
 .xxx]])
 p:selector_group()
 
