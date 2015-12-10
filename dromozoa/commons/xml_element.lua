@@ -16,7 +16,7 @@
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
 local sequence_writer = require "dromozoa.commons.sequence_writer"
-local xml_nodeset = require "dromozoa.commons.xml_nodeset"
+local xml_node_list = require "dromozoa.commons.xml_node_list"
 local xml_write = require "dromozoa.commons.xml_write"
 
 local class = {}
@@ -48,7 +48,7 @@ function class:text()
 end
 
 function class:select(name)
-  local result = xml_nodeset()
+  local result = xml_node_list()
   for node in self[3]:each() do
     if type(node) == "table" and node[1] == name then
       result:push(node)
