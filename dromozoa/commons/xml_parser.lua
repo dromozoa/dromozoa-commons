@@ -63,12 +63,12 @@ function class:element()
   if this:match("<([A-Za-z%_\128-\255][A-Za-z%_0-9%-%.\128-\255]*)") then
     local name = this[1]
     self:attribute_list()
-    local attrbute_list = stack:pop()
+    local attributes = stack:pop()
     if this:match("%s*>") then
-      stack:push(xml_element(name, attrbute_list))
+      stack:push(xml_element(name, attributes))
       return self:content()
     elseif this:match("%s*/>") then
-      return stack:push(xml_element(name, attrbute_list, sequence))
+      return stack:push(xml_element(name, attributes, sequence))
     else
       self:raise("unclosed tag")
     end
@@ -103,7 +103,7 @@ function class:content()
       while true do
         if this:match("\r\n") or this:match("[\r\n]") then
           out:write("\n")
-        elseif this:match("([^%<%>%&\r\n]+)") then
+        elseif this:match("([^\0-\15\127%<%>%&]+)") then
           out:write(this[1])
         elseif self:char_ref() then
           out:write(stack:pop())
@@ -159,7 +159,7 @@ function class:attribute_value(quote)
       out:write(this[1])
     elseif this:match("\r\n") or this:match("[\r\n]") then
       out:write("\n")
-    elseif this:match("([^%<%>%&%\"%'\r\n]+)") then
+    elseif this:match("([^\0-\15\127%<%>%&%\"%']+)") then
       out:write(this[1])
     elseif self:char_ref() then
       out:write(stack:pop())

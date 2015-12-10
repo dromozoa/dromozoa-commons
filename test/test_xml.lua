@@ -48,6 +48,10 @@ assert(equal(xml.decode(X), json.decode(J)))
 assert(equal(xml.decode(X:gsub("\n", "\r\n")), json.decode(J)))
 assert(equal(xml.decode(X:gsub("\n", "\r")), json.decode(J)))
 
+-- print(xml.encode(json.decode(J)))
+-- print(xml.decode(xml.encode(json.decode(J))))
+assert(equal(xml.decode(X), xml.decode(xml.encode(json.decode(J)))))
+
 assert(equal(xml.decode([[
 <location><city>New York</city><country>US</country></location>
 ]]), json.decode([====[
@@ -142,6 +146,8 @@ assert(not pcall(xml.decode, [[<foo></bar]]))
 assert(not pcall(xml.decode, [[<foo></bar>]]))
 assert(not pcall(xml.decode, [[<foo/><!--]]))
 assert(not pcall(xml.decode, [[<foo/><!-- -->&]]))
+assert(not pcall(xml.decode, "<foo>\0</foo>"))
+assert(not pcall(xml.decode, "<foo bar='\0'/>"))
 
 assert(equal(xml.decode([[
  <foo bar = " baz'qux " >
@@ -151,14 +157,4 @@ assert(equal(xml.decode([[
 [ "foo", { "bar": " baz'qux " }, [ "\n ", [ "foo", { "bar": " baz\"qux " }, [] ], "\n " ] ]
 ]====])))
 
-local doc = xml.decode([[
-<comment lang="en" date="2012-09-11">
-I <em>love</em> &#xB5;<!-- MICRO SIGN -->XML!<br/>
-It's so
-clean &amp; simple.</comment>
-]])
-print(doc:attr("lang"))
--- for node in doc:each() do
---   print(node)
--- end
 
