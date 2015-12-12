@@ -23,15 +23,18 @@ CXXFLAGS = -Wall -W -std=c++11 $(CFLAGS)
 LDFLAGS =
 LDLIBS =
 
-TARGET = test_sha256.lua test_uint32.lua
+TARGET = test_sha1.lua test_sha256.lua test_uint32.lua
 
 all: $(TARGET)
 
 clean:
 	rm -f *.o test_uint32
 
-test_sha256.lua: test_sha256.pl
-	./test_sha256.pl >$@
+test_sha1.lua: test_sha.pl
+	./test_sha.pl sha1 >$@
+
+test_sha256.lua: test_sha.pl
+	./test_sha.pl sha256 >$@
 
 test_uint32: test_uint32.o
 	$(CXX) $(LDFLAGS) $^ $(LDLIBS) -o $@

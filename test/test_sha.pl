@@ -19,26 +19,38 @@
 
 use strict;
 use warnings;
-use Digest::SHA qw{sha256_hex hmac_sha256_hex};
+use Digest::SHA qw{sha1_hex sha256_hex hmac_sha1_hex hmac_sha256_hex};
+
+my $algorithm = shift;
+
+my $sha_hex;
+my $hmac_sha_hex;
+if ($algorithm eq "sha1") {
+  $sha_hex = \&sha1_hex;
+  $hmac_sha_hex = \&hmac_sha1_hex;
+} else {
+  $sha_hex = \&sha256_hex;
+  $hmac_sha_hex = \&hmac_sha256_hex;
+}
 
 print << "EOF";
 local ipairs = require "dromozoa.commons.ipairs"
-local sha256 = require "dromozoa.commons.sha256"
+local $algorithm = require "dromozoa.commons.$algorithm"
 
 local data = {
 EOF
 
 my $message = "";
-printf qq|  { "%s",\n    "%s",\n    "%s" },\n|, $message, sha256_hex($message), hmac_sha256_hex($message, $message);
+printf qq|  { "%s",\n    "%s",\n    "%s" },\n|, $message, &$sha_hex($message), &$hmac_sha_hex($message, $message);
 for (my $i = 0; $i < 128; ++$i) {
   $message .= chr($i % 26 + 97);
-  printf qq|  { "%s",\n    "%s",\n    "%s" },\n|, $message, sha256_hex($message), hmac_sha256_hex($message, $message);
+  printf qq|  { "%s",\n    "%s",\n    "%s" },\n|, $message, &$sha_hex($message), &$hmac_sha_hex($message, $message);
 }
 
 print << "EOF";
 }
 for i, v in ipairs(data) do
-  assert(sha256.hex(v[1]) == v[2])
-  assert(sha256.hmac(v[1], v[1], "hex") == v[3])
+  assert($algorithm.hex(v[1]) == v[2])
+  assert($algorithm.hmac(v[1], v[1], "hex") == v[3])
 end
 EOF
