@@ -16,18 +16,20 @@
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
 local sequence = require "dromozoa.commons.sequence"
+local sha = require "dromozoa.commons.sha"
 local translate_range = require "dromozoa.commons.translate_range"
 local uint32 = require "dromozoa.commons.uint32"
 local uint64 = require "dromozoa.commons.uint64"
 local word_block = require "dromozoa.commons.word_block"
 
 local add = uint32.add
-local band = uint32.band
 local bxor = uint32.bxor
 local shr = uint32.shr
-local bnot = uint32.bnot
 local rotr = uint32.rotr
 local char = uint32.char
+
+local Ch = sha.Ch
+local Maj = sha.Maj
 
 local K = {
   0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5,
@@ -47,14 +49,6 @@ local K = {
   0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208,
   0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2,
 }
-
-local function Ch(x, y, z)
-  return bxor(band(x, y), band(bnot(x), z))
-end
-
-local function Maj(x, y, z)
-  return bxor(band(x, y), band(x, z), band(y, z))
-end
 
 local function sum0(x)
   return bxor(rotr(x, 2), rotr(x, 13), rotr(x, 22))
