@@ -17,16 +17,13 @@
 
 local sequence = require "dromozoa.commons.sequence"
 local sha = require "dromozoa.commons.sha"
-local translate_range = require "dromozoa.commons.translate_range"
 local uint32 = require "dromozoa.commons.uint32"
-local uint64 = require "dromozoa.commons.uint64"
 local word_block = require "dromozoa.commons.word_block"
 
 local add = uint32.add
 local bxor = uint32.bxor
 local shr = uint32.shr
 local rotr = uint32.rotr
-local char = uint32.char
 
 local Ch = sha.Ch
 local Maj = sha.Maj
@@ -66,7 +63,32 @@ local function sigma1(x)
   return bxor(rotr(x, 17), rotr(x, 19), shr(x, 10))
 end
 
-local function update(self)
+local class = {}
+
+function class.new()
+  return class.reset({
+    M = word_block(16);
+    W = sequence();
+    H = sequence();
+    L = 0;
+    hex = "%08x%08x%08x%08x%08x%08x%08x%08x";
+  })
+end
+
+function class:reset()
+  local H = self.H
+  H[1] = 0x6a09e667
+  H[2] = 0xbb67ae85
+  H[3] = 0x3c6ef372
+  H[4] = 0xa54ff53a
+  H[5] = 0x510e527f
+  H[6] = 0x9b05688c
+  H[7] = 0x1f83d9ab
+  H[8] = 0x5be0cd19
+  return self
+end
+
+function class:compute()
   local M = self.M
   local W = self.W
   local H = self.H
@@ -112,81 +134,6 @@ local function update(self)
   H[8] = add(h, H8)
 end
 
-local class = {}
-
-function class.new()
-  return class.reset({
-    M = word_block(16);
-    W = sequence();
-    H = sequence();
-    L = 0;
-  })
-end
-
-function class:reset()
-  local H = self.H
-  H[1] = 0x6a09e667
-  H[2] = 0xbb67ae85
-  H[3] = 0x3c6ef372
-  H[4] = 0xa54ff53a
-  H[5] = 0x510e527f
-  H[6] = 0x9b05688c
-  H[7] = 0x1f83d9ab
-  H[8] = 0x5be0cd19
-  return self
-end
-
-function class:update(s, i, j)
-  local s = tostring(s)
-  local min, max = translate_range(#s, i, j)
-  self.L = self.L + max - min + 1
-  local M = self.M
-  while min <= max do
-    min = M:update(s, min, max)
-    if M:full() then
-      update(self)
-    end
-  end
-  return self
-end
-
-function class:update_hmac(s, pad)
-  local s = tostring(s)
-  self.L = self.L + 64
-  local M = self.M
-  M:update(s, 1, #s)
-  M:flush()
-  M.i = 16
-  for i = 1, 16 do
-    M[i] = bxor(M[i], pad)
-  end
-  update(self)
-  return self
-end
-
-function class:finalize(encode)
-  local M = self.M
-  M:update("\128", 1, 1)
-  if M:flush() > 14 then
-    update(self)
-    M:reset()
-  end
-  M[15], M[16] = uint64.word(self.L * 8, ">")
-  update(self)
-  local H = self.H
-  if encode == "hex" then
-    return ("%08x%08x%08x%08x%08x%08x%08x%08x"):format(H[1], H[2], H[3], H[4], H[5], H[6], H[7], H[8])
-  elseif encode == "bin" then
-    local bin = sequence()
-    for i = 1, 8 do
-      bin:push(char(H[i], ">"))
-    end
-    return bin:concat()
-  else
-    return H
-  end
-end
-
 function class.bin(message)
   return class():update(message):finalize("bin")
 end
@@ -196,11 +143,7 @@ function class.hex(message)
 end
 
 function class.hmac(K, text, encode)
-  if #K > 64 then
-    K = class.bin(K)
-  end
-  local h = class():update_hmac(K, 0x36363636):update(text):finalize("bin")
-  return class():update_hmac(K, 0x5c5c5c5c):update(h):finalize(encode)
+  return sha.hmac(class, K, text, encode)
 end
 
 local metatable = {
@@ -208,6 +151,7 @@ local metatable = {
 }
 
 return setmetatable(class, {
+  __index = sha;
   __call = function ()
     return setmetatable(class.new(), metatable)
   end;
