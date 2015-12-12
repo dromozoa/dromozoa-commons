@@ -77,7 +77,7 @@ function class:finalize(encode)
   self:compute()
   local H = self.H
   if encode == "hex" then
-    return self.hex:format(unpack(H))
+    return self.hex_format:format(unpack(H))
   elseif encode == "bin" then
     local bin = sequence()
     for i = 1, #H do

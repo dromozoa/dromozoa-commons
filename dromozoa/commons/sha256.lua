@@ -71,7 +71,7 @@ function class.new()
     W = sequence();
     H = sequence();
     L = 0;
-    hex = "%08x%08x%08x%08x%08x%08x%08x%08x";
+    hex_format = "%08x%08x%08x%08x%08x%08x%08x%08x";
   })
 end
 
