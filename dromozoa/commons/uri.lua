@@ -21,7 +21,9 @@ for i = 0, 255 do
   encoder[string.char(i)] = ("%%%02X"):format(i)
 end
 
-local encoder_html5 = setmetatable({ [" "] = "+" }, { __index = encoder })
+local encoder_html5 = setmetatable({
+  [" "] = "+";
+}, { __index = encoder })
 
 local function decode(s)
   return string.char(tonumber(s, 16))
