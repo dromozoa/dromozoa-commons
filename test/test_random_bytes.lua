@@ -15,36 +15,17 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local encoder = {}
+local base64 = require "dromozoa.commons.base64"
+local random_bytes = require "dromozoa.commons.random_bytes"
 
-for i = 0, 255 do
-  encoder[string.char(i)] = ("%%%02X"):format(i)
-end
+local a = base64.encode_url(random_bytes(32))
+local b = base64.encode_url(random_bytes(32))
+local c = base64.encode_url(random_bytes(32))
+local d = base64.encode_url(random_bytes(32))
 
-local encoder_html5 = setmetatable({
-  [" "] = "+";
-}, { __index = encoder })
-
-local function decode(s)
-  return string.char(tonumber(s, 16))
-end
-
-local class = {}
-
--- https://tools.ietf.org/html/rfc3986#section-2.3
-function class.encode_rfc3986(s)
-  return (tostring(s):gsub("[^A-Za-z0-9%-%.%_%~]", encoder))
-end
-
--- http://www.w3.org/TR/html5/forms.html#url-encoded-form-data
-function class.encode_html5(s)
-  return (tostring(s):gsub("[^%*%-%.0-9A-Z_a-z]", encoder_html5))
-end
-
-function class.decode(s)
-  return (tostring(s):gsub("%+", " "):gsub("%%(%x%x)", decode))
-end
-
-class.encode = class.encode_rfc3986
-
-return class
+assert(a ~= b)
+assert(a ~= c)
+assert(a ~= d)
+assert(b ~= c)
+assert(b ~= d)
+assert(c ~= d)

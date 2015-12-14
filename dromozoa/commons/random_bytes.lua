@@ -15,36 +15,15 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local encoder = {}
-
-for i = 0, 255 do
-  encoder[string.char(i)] = ("%%%02X"):format(i)
+return function (n, filename)
+  if filename == nil then
+    filename = "/dev/urandom"
+  end
+  local handle, message = io.open(filename, "rb")
+  if handle == nil then
+    return nil, message
+  end
+  local result = handle:read(n)
+  handle:close()
+  return result
 end
-
-local encoder_html5 = setmetatable({
-  [" "] = "+";
-}, { __index = encoder })
-
-local function decode(s)
-  return string.char(tonumber(s, 16))
-end
-
-local class = {}
-
--- https://tools.ietf.org/html/rfc3986#section-2.3
-function class.encode_rfc3986(s)
-  return (tostring(s):gsub("[^A-Za-z0-9%-%.%_%~]", encoder))
-end
-
--- http://www.w3.org/TR/html5/forms.html#url-encoded-form-data
-function class.encode_html5(s)
-  return (tostring(s):gsub("[^%*%-%.0-9A-Z_a-z]", encoder_html5))
-end
-
-function class.decode(s)
-  return (tostring(s):gsub("%+", " "):gsub("%%(%x%x)", decode))
-end
-
-class.encode = class.encode_rfc3986
-
-return class
