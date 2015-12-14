@@ -21,6 +21,8 @@ local translate_range = require "dromozoa.commons.translate_range"
 local encoder = {
   [62] = "+";
   [63] = "/";
+  [64] = "=";
+  [65] = "==";
 }
 
 local decoder = {
@@ -52,6 +54,13 @@ for i = 52, 61 do
   decoder[byte] = i
 end
 
+local encoder_url = setmetatable({
+  [62] = "-";
+  [63] = "_";
+  [64] = "";
+  [65] = "";
+}, { __index = encoder })
+
 local function encode(encoder, out, s, min, max)
   for i = min + 2, max, 3 do
     local p = i - 2
@@ -76,12 +85,12 @@ local function encode(encoder, out, s, min, max)
       local a = (a - c) / 64
       local b = a % 64
       local a = (a - b) / 64
-      out:write(encoder[a], encoder[b], encoder[c], "=")
+      out:write(encoder[a], encoder[b], encoder[c], encoder[64])
     else
       local a = a * 16
       local b = a % 64
       local a = (a - b) / 64
-      out:write(encoder[a], encoder[b], "==")
+      out:write(encoder[a], encoder[b], encoder[65])
     end
   end
 
@@ -154,6 +163,11 @@ local class = {}
 function class.encode(s, i, j)
   local s = tostring(s)
   return encode(encoder, sequence_writer(), s, translate_range(#s, i, j)):concat()
+end
+
+function class.encode_url(s, i, j)
+  local s = tostring(s)
+  return encode(encoder_url, sequence_writer(), s, translate_range(#s, i, j)):concat()
 end
 
 function class.decode(s, i, j)
