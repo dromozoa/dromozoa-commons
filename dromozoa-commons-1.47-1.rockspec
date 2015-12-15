@@ -1,8 +1,8 @@
 package = "dromozoa-commons"
-version = "1.46-1"
+version = "1.47-1"
 source = {
-  url = "https://github.com/dromozoa/dromozoa-commons/archive/v1.46.tar.gz";
-  file = "dromozoa-commons-1.46.tar.gz";
+  url = "https://github.com/dromozoa/dromozoa-commons/archive/v1.47.tar.gz";
+  file = "dromozoa-commons-1.47.tar.gz";
 }
 description = {
   summary = "Reusable Lua components";
@@ -40,6 +40,7 @@ build = {
     ["dromozoa.commons.queue"] = "dromozoa/commons/queue.lua";
     ["dromozoa.commons.random_bytes"] = "dromozoa/commons/random_bytes.lua";
     ["dromozoa.commons.read_file"] = "dromozoa/commons/read_file.lua";
+    ["dromozoa.commons.searchpath"] = "dromozoa/commons/searchpath.lua";
     ["dromozoa.commons.sequence"] = "dromozoa/commons/sequence.lua";
     ["dromozoa.commons.sequence_writer"] = "dromozoa/commons/sequence_writer.lua";
     ["dromozoa.commons.set"] = "dromozoa/commons/set.lua";
