@@ -15,6 +15,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
+local lua_version_num = require "dromozoa.commons.lua_version_num"
 local sequence = require "dromozoa.commons.sequence"
 
 local function decode(a)
@@ -62,7 +63,7 @@ local function char(data, i, n, code, ...)
   end
 end
 
-if _VERSION >= "Lua 5.3" then
+if lua_version_num >= 503 then
   return {
     char = utf8.char;
   }

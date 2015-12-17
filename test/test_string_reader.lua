@@ -16,6 +16,7 @@
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
 local equal = require "dromozoa.commons.equal"
+local lua_version_num = require "dromozoa.commons.lua_version_num"
 local sequence = require "dromozoa.commons.sequence"
 local string_reader = require "dromozoa.commons.string_reader"
 local write_file = require "dromozoa.commons.write_file"
@@ -64,7 +65,7 @@ test("", test_read, "*l")
 test("foo\nbar\nbaz", test_read, "*l")
 test("foo\nbar\nbaz\n", test_read, "*l")
 
-if _VERSION >= "Lua 5.2" then
+if lua_version_num >= 502 then
   test("", test_read, "*L")
   test("foo\nbar\nbaz", test_read, "*L")
   test("foo\nbar\nbaz\n", test_read, "*L")
@@ -102,7 +103,7 @@ test("0xfeedface", test_read, "*n")
 
 test("+", test_read, "*n")
 test("-", test_read, "*n")
-if _VERSION >= "Lua 5.3" then
+if lua_version_num >= 503 then
   test("0x", test_read, "*n")
   test("0x.", test_read, "*n")
 end
@@ -137,7 +138,7 @@ test("", test_lines)
 test("foo\nbar\nbaz", test_lines)
 test("foo\nbar\nbaz\n", test_lines)
 
-if _VERSION >= "Lua 5.2" then
+if lua_version_num >= 502 then
   test("", test_lines, "*l")
   test("foo\nbar\nbaz", test_lines, "*l")
   test("foo\nbar\nbaz\n", test_lines, "*l")
