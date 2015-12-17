@@ -15,9 +15,10 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
+local lua_version_num = require "dromozoa.commons.lua_version_num"
 local sequence_writer = require "dromozoa.commons.sequence_writer"
 
-if _VERSION >= "Lua 5.2" then
+if lua_version_num >= 502 then
   return package.searchpath
 else
   return function (name, path, sep, rep)

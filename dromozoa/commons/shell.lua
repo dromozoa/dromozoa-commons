@@ -17,6 +17,7 @@
 
 local read_file = require "dromozoa.commons.read_file"
 local write_file = require "dromozoa.commons.write_file"
+local lua_version_num = require "dromozoa.commons.lua_version_num"
 
 local q = [[']]
 local e = [[\']]
@@ -32,7 +33,7 @@ local class = {
   quote = quote;
 }
 
-if _VERSION >= "Lua 5.2" then
+if lua_version_num >= 502 then
   function class.exec(command)
     return os.execute(command)
   end

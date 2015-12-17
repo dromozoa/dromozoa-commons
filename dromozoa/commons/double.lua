@@ -15,6 +15,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
+local lua_version_num = require "dromozoa.commons.lua_version_num"
+
 local function word(v, endian)
   local a = 0
   local b = 0
@@ -53,7 +55,7 @@ local function word(v, endian)
   end
 end
 
-if _VERSION >= "Lua 5.3" then
+if lua_version_num >= 503 then
   return {
     word = function (v, endian)
       local a, b = (">I4I4"):unpack((">d"):pack(v))

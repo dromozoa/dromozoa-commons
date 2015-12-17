@@ -15,6 +15,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
+local lua_version_num = require "dromozoa.commons.lua_version_num"
+
 local function add(a, b, x, ...)
   local c = (a + b) % 0x100000000
   if x == nil then
@@ -68,7 +70,7 @@ local function char(v, endian)
   return string.char(byte(v, endian))
 end
 
-if _VERSION >= "Lua 5.3" then
+if lua_version_num >= 503 then
   return assert(load([[
     local function add(a, b, x, ...)
       local c = a + b & 0xffffffff

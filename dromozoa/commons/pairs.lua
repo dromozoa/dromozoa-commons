@@ -16,8 +16,9 @@
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
 local getmetafield = require "dromozoa.commons.getmetafield"
+local lua_version_num = require "dromozoa.commons.lua_version_num"
 
-if _VERSION >= "Lua 5.2" then
+if lua_version_num >= 502 then
   return pairs
 else
   return function (self)

@@ -15,7 +15,9 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-if _VERSION >= "Lua 5.2" then
+local lua_version_num = require "dromozoa.commons.lua_version_num"
+
+if lua_version_num >= 502 then
   return load
 else
   return loadstring
