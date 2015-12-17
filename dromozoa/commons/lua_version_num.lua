@@ -15,31 +15,23 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local lua_version_num = require "dromozoa.commons.lua_version_num"
 
-local function word(v, endian)
-  local b = v % 0x100000000
-  local a = (v - b) / 0x100000000
-  if endian == ">" then
-    return a, b
+local major, minor = _VERSION:match("Lua (%d+)%.(%d+)$")
+if major == nil then
+  local loadstring = loadstring or load
+  local chunk = string.dump(loadstring(""))
+  if chunk:sub(1, 4) == "\27Lua" then
+    local v = chunk:byte(5)
+    minor = v % 16
+    major = (v - minor) / 16
+  elseif chunk:sub(1, 3) == "\27LJ" then
+    error("unsupported chunk header (LuaJIT)")
   else
-    return b, a
+    error("unsupported chunk header")
   end
+else
+  major = tonumber(major)
+  minor = tonumber(minor)
 end
 
-if lua_version_num >= 503 then
-  return {
-    word = function (v, endian)
-      local a, b = (">I4I4"):unpack((">I8"):pack(v))
-      if endian == ">" then
-        return a, b
-      else
-        return b, a
-      end
-    end;
-  }
-else
-  return {
-    word = word;
-  }
-end
+return major * 100 + minor
