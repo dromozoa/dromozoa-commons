@@ -79,7 +79,6 @@ local metatable = {
 }
 
 return setmetatable(class, {
-  __index = string_matcher;
   __call = function (_, this, endian)
     return setmetatable(class.new(this, endian), metatable)
   end;
