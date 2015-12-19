@@ -17,6 +17,20 @@
 
 local lua_version_num = require "dromozoa.commons.lua_version_num"
 
+local function byte(v, endian)
+  local b = v % 0x100
+  local a = (v - b) / 0x100
+  if endian == ">" then
+    return a, b
+  else
+    return b, a
+  end
+end
+
+local function char(v, endian)
+  return string.char(byte(v, endian))
+end
+
 local function read(handle, n, endian)
   if n == nil or n == 1 then
     local a, b = handle:read(2):byte(1, 2)
@@ -69,10 +83,28 @@ if lua_version_num >= 503 then
   end
 
   return {
+    byte = function (v, endian)
+      if endian == ">" then
+        local a, b = ("BB"):unpack((">I2"):pack(v))
+        return a, b
+      else
+        local a, b = ("BB"):unpack(("<I2"):pack(v))
+        return a, b
+      end
+    end;
+    char = function (v, endian)
+      if endian == ">" then
+        return (">I2"):pack(v)
+      else
+        return ("<I2"):pack(v)
+      end
+    end;
     read = read;
   }
 else
   return {
+    byte = byte;
+    char = char;
     read = read;
   }
 end
