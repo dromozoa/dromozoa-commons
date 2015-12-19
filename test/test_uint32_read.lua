@@ -15,32 +15,20 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local lua_version_num = require "dromozoa.commons.lua_version_num"
+local equal = require "dromozoa.commons.equal"
+local string_reader = require "dromozoa.commons.string_reader"
+local uint32 = require "dromozoa.commons.uint32"
 
-local function word(v, endian)
-  local b = v % 0x100000000
-  local a = (v - b) / 0x100000000
-  if endian == ">" then
-    return a, b
-  else
-    return b, a
-  end
+local handle = string_reader(string.char(0xfe, 0xed, 0xfa, 0xce, 0xde, 0xad, 0xbe, 0xef))
+
+local function test(n, endian, that)
+  handle:seek("set", 0)
+  local result = { uint32.read(handle, n, endian) }
+  assert(equal(result, that))
 end
 
-if lua_version_num >= 503 then
-  return {
-    word = function (v, endian)
-      if endian == ">" then
-        local a, b = (">I4I4"):unpack((">I8"):pack(v))
-        return a, b
-      else
-        local a, b = ("<I4I4"):unpack(("<I8"):pack(v))
-        return a, b
-      end
-    end;
-  }
-else
-  return {
-    word = word;
-  }
-end
+test(1, ">", { 0xfeedface })
+test(2, ">", { 0xfeedface, 0xdeadbeef })
+
+test(1, "<", { 0xcefaedfe })
+test(2, "<", { 0xcefaedfe, 0xefbeadde })
