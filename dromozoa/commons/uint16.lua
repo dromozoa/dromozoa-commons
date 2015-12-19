@@ -44,6 +44,35 @@ local function read(handle, n, endian)
   end
 end
 
-return {
-  read = read;
-}
+if lua_version_num >= 503 then
+  local function read(handle, n, endian)
+    if n == nil or n == 1 then
+      if endian == ">" then
+        return ((">I2"):unpack(handle:read(2)))
+      else
+        return (("<I2"):unpack(handle:read(2)))
+      end
+    else
+      local u
+      local v
+      if endian == ">" then
+        u, v = (">I2I2"):unpack(handle:read(4))
+      else
+        u, v = ("<I2I2"):unpack(handle:read(4))
+      end
+      if n == 2 then
+        return u, v
+      else
+        return u, v, read(handle, n - 2, endian)
+      end
+    end
+  end
+
+  return {
+    read = read;
+  }
+else
+  return {
+    read = read;
+  }
+end
