@@ -58,11 +58,12 @@ end
 if lua_version_num >= 503 then
   return {
     word = function (v, endian)
-      local a, b = (">I4I4"):unpack((">d"):pack(v))
       if endian == ">" then
+        local a, b = (">I4I4"):unpack((">d"):pack(v))
         return a, b
       else
-        return b, a
+        local a, b = ("<I4I4"):unpack(("<d"):pack(v))
+        return a, b
       end
     end;
   }
