@@ -70,6 +70,21 @@ local function char(v, endian)
   return string.char(byte(v, endian))
 end
 
+local function read(handle, n, endian)
+  local a, b, c, d = handle:read(4):byte(1, 4)
+  local v
+  if endian == ">" then
+    v = a * 0x1000000 + b * 0x10000 + c * 0x100 + d
+  else
+    v = d * 0x1000000 + c * 0x10000 + b * 0x100 + a
+  end
+  if n == nil or n == 1 then
+    return v
+  else
+    return v, read(handle, n - 1, endian)
+  end
+end
+
 if lua_version_num >= 503 then
   return assert(load([[
     local function add(a, b, x, ...)
@@ -114,6 +129,20 @@ if lua_version_num >= 503 then
         return c
       else
         return bxor(c, x, ...)
+      end
+    end
+
+    local function read(handle, n, endian)
+      local v
+      if endian == ">" then
+        v = (">I4"):unpack(handle:read(4))
+      else
+        v = ("<I4"):unpack(handle:read(4))
+      end
+      if n == nil or n == 1 then
+        return v
+      else
+        return v, read(handle, n - 1, endian)
       end
     end
 
@@ -163,6 +192,7 @@ if lua_version_num >= 503 then
           return ("<I4"):pack(v)
         end
       end;
+      read = read;
     }
   ]]))()
 elseif bit32 then
@@ -182,6 +212,7 @@ elseif bit32 then
     rotr = bit32.rrotate;
     byte = byte;
     char = char;
+    read = read;
   }
 elseif bit then
   local bit_band = bit.band
@@ -224,6 +255,7 @@ elseif bit then
     end;
     byte = byte;
     char = char;
+    read = read;
   }
 else
   local function optimize_unary(fn)
@@ -402,5 +434,6 @@ else
     rotr = rotr;
     byte = byte;
     char = char;
+    read = read;
   }
 end
