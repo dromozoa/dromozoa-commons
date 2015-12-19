@@ -148,11 +148,12 @@ if lua_version_num >= 503 then
         return (a >> b | a << 32 - b) & 0xffffffff
       end;
       byte = function (v, endian)
-        local a, b, c, d = ("BBBB"):unpack((">I4"):pack(v))
         if endian == ">" then
+          local a, b, c, d = ("BBBB"):unpack((">I4"):pack(v))
           return a, b, c, d
         else
-          return d, c, b, a
+          local a, b, c, d = ("BBBB"):unpack(("<I4"):pack(v))
+          return a, b, c, d
         end
       end;
       char = function (v, endian)
