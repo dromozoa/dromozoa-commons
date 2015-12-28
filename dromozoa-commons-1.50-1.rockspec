@@ -1,8 +1,8 @@
 package = "dromozoa-commons"
-version = "1.49-1"
+version = "1.50-1"
 source = {
-  url = "https://github.com/dromozoa/dromozoa-commons/archive/v1.49.tar.gz";
-  file = "dromozoa-commons-1.49.tar.gz";
+  url = "https://github.com/dromozoa/dromozoa-commons/archive/v1.50.tar.gz";
+  file = "dromozoa-commons-1.50.tar.gz";
 }
 description = {
   summary = "Reusable Lua components";
@@ -19,6 +19,7 @@ build = {
     ["dromozoa.commons.bitset"] = "dromozoa/commons/bitset.lua";
     ["dromozoa.commons.clone"] = "dromozoa/commons/clone.lua";
     ["dromozoa.commons.copy"] = "dromozoa/commons/copy.lua";
+    ["dromozoa.commons.dirname"] = "dromozoa/commons/dirname.lua";
     ["dromozoa.commons.double"] = "dromozoa/commons/double.lua";
     ["dromozoa.commons.dumper"] = "dromozoa/commons/dumper.lua";
     ["dromozoa.commons.empty"] = "dromozoa/commons/empty.lua";
