@@ -16,30 +16,14 @@
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
 return function (path)
-  -- step 1
-  if path == "//" then
+  local result = path:match("^(.*[^%/])%/+[^%/]+%/*$")
+  if result then
+    return result
+  elseif path:find("^%/%/[^%/]") or path == "//" then
     return "//"
-  -- step 2
-  elseif path:find("^%/+$") then
+  elseif path:find("^%/") then
     return "/"
   else
-    -- step 3
-    path = path:gsub("%/+$", "")
-    -- step 4
-    if path:find("^[^%/]*$") then
-      return "."
-    end
-    -- step 5
-    path = path:gsub("[^%/]+$", "")
-    -- step 6
-    if path == "//" then
-      return "//"
-    end
-    -- step 7
-    path = path:gsub("/+$", "")
-    if path == "" then
-      return "/"
-    end
-    return path
+    return "."
   end
 end
