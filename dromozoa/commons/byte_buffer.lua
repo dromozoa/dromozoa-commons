@@ -21,26 +21,17 @@ local class = {}
 
 function class.new()
   return {
-    S = {};
-    I = {};
-    J = {};
     min = 1;
     max = 0;
     size = 0;
-    eof = false;
   }
 end
 
-function class:write(s, i, j)
-  local i, j = translate_range(#s, i, j)
-  local n = j - i + 1
-  local max = self.max + 1
-  local size = self.size + n
-  self.S[max] = s
-  self.I[max] = i
-  self.J[max] = j
-  self.max = max
-  self.size = size
+function class:write(s)
+  local n = self.max + 1
+  self[n] = s
+  self.max = n
+  self.size = self.size + #s
   return self
 end
 
@@ -50,71 +41,100 @@ function class:close()
 end
 
 function class:find(char)
-  local S = self.S
-  local I = self.I
-  local J = self.J
-  local p = 0
-  for m = self.min, self.max do
-    local s = S[m]
-    local i = I[m]
-    local j = J[m]
-    local n = j - i + 1
-    local i = s:find(char, i, true)
-    if i == nil then
-      p = p + n
-    else
-      return p + i
+  local n = self.min
+  local s = self[n]
+  local i = self.i or 1
+  local p = s:find(char, i, true)
+  if p == nil then
+    p = #s - i + 1
+    for n = n + 1, self.max do
+      local s = self[n]
+      local q = s:find(char, 1, true)
+      if q == nil then
+        p = p + #s
+      else
+        return p + q
+      end
     end
+    return nil
+  else
+    return p - i + 1
   end
-  return nil
 end
 
 function class:read(count)
-  assert(count > 0)
   local size = self.size
-  if count <= size or self.eof then
-    local result = ""
-    local S = self.S
-    local I = self.I
-    local J = self.J
+  if count < size then
     local min = self.min
-    while count > 0 do
-      local s = S[min]
-      if s == nil then
-        break
-      end
-      local i = I[min]
-      local j = J[min]
-      local n = j - i + 1
-      if count < n then
-        local p = i + count
-        result = result .. s:sub(i, p - 1)
-        I[min] = p
-        count = 0
-        size = size - (p - i)
-        break
-      elseif count == n then
-        result = result .. s:sub(i)
-        S[min] = nil
-        I[min] = nil
-        J[min] = nil
-        min = min + 1
-        count = 0
-        size = size - n
-        break
+    local s = self[min]
+    local i = self.i
+    if i == nil then
+      i = 1
+    end
+    local j = i + count - 1
+    local n = #s
+    if j <= n then
+      if j == n then
+        s = s:sub(i)
+        self[min] = nil
+        self.min = min + 1
+        self.i = nil
       else
-        result = result .. s:sub(i)
-        S[min] = nil
-        I[min] = nil
-        J[min] = nil
-        min = min + 1
-        count = count - n
-        size = size - n
+        s = s:sub(i, j)
+        self.i = j + 1
+      end
+      self.size = size - #s
+      return s
+    else
+      if i > 1 then
+        s = s:sub(i)
+      end
+      j = j - #s
+      self[min] = s
+      for m = min + 1, self.max do
+        local s = self[m]
+        local n = #s
+        if j <= n then
+          if j == n then
+            s = table.concat(self, "", min, m)
+            for m = min, m do
+              self[m] = nil
+            end
+            self.min = m + 1
+            self.i = nil
+          else
+            local max = m - 1
+            s = table.concat(self, "", min, max) .. s:sub(1, j)
+            for m = min, max do
+              self[m] = nil
+            end
+            self.min = m
+            self.i = j + 1
+          end
+          self.size = size - #s
+          return s
+        else
+          j = j - #s
+        end
       end
     end
-    self.min = min
-    self.size = size
-    return result
+  elseif count == size or self.eof then
+    local min = self.min
+    local max = self.max
+    local s = self[min]
+    local i = self.i
+    if i ~= nil then
+      self[min] = s:sub(i)
+    end
+    s = table.concat(self, "", min, max)
+    for m = min, max do
+      self[m] = nil
+    end
+    self.i = nil
+    self.min = 1
+    self.max = 0
+    self.size = 0
+    return s
   end
 end
 
