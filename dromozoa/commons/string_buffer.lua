@@ -89,7 +89,7 @@ function class:read(count)
       if i > 1 then
         s = s:sub(i)
       end
-      j = j - #s
+      j = count - #s
       self[min] = s
       for m = min + 1, self.max do
         local s = self[m]
