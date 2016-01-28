@@ -23,14 +23,15 @@ function class.new()
   return {
     min = 1;
     max = 0;
+    i = 1;
     size = 0;
   }
 end
 
 function class:write(s)
-  local n = self.max + 1
-  self[n] = s
-  self.max = n
+  local m = self.max + 1
+  self[m] = s
+  self.max = m
   self.size = self.size + #s
   return self
 end
@@ -41,76 +42,71 @@ function class:close()
 end
 
 function class:find(char)
-  local n = self.min
-  local s = self[n]
-  local i = self.i or 1
-  local p = s:find(char, i, true)
-  if p == nil then
-    p = #s - i + 1
-    for n = n + 1, self.max do
-      local s = self[n]
-      local q = s:find(char, 1, true)
-      if q == nil then
-        p = p + #s
-      else
-        return p + q
+  local min = self.min
+  local s = self[min]
+  if s ~= nil then
+    local i = self.i
+    local p = s:find(char, i)
+    if p == nil then
+      p = #s - i + 1
+      for m = min + 1, self.max do
+        local s = self[m]
+        local i = s:find(char, 1)
+        if i == nil then
+          p = p + #s
+        else
+          return p + i
+        end
       end
+    else
+      return p - i + 1
     end
-    return nil
-  else
-    return p - i + 1
   end
 end
 
 function class:read(count)
+  local min = self.min
+  local max = self.max
+  local s = self[min]
+  local i = self.i
   local size = self.size
   if count < size then
-    local min = self.min
-    local s = self[min]
-    local i = self.i
-    if i == nil then
-      i = 1
-    end
     local j = i + count - 1
     local n = #s
     if j <= n then
       if j == n then
+        j = 0
         s = s:sub(i)
         self[min] = nil
         self.min = min + 1
-        self.i = nil
       else
         s = s:sub(i, j)
-        self.i = j + 1
       end
+      self.i = j + 1
       self.size = size - #s
       return s
     else
       if i > 1 then
         s = s:sub(i)
+        self[min] = s
       end
       j = count - #s
-      self[min] = s
-      for m = min + 1, self.max do
-        local s = self[m]
-        local n = #s
+      for m = min + 1, max do
+        s = self[m]
+        n = #s
         if j <= n then
           if j == n then
+            j = 0
             s = table.concat(self, "", min, m)
-            for m = min, m do
-              self[m] = nil
-            end
-            self.min = m + 1
-            self.i = nil
           else
-            local max = m - 1
-            s = table.concat(self, "", min, max) .. s:sub(1, j)
-            for m = min, max do
-              self[m] = nil
-            end
-            self.min = m
-            self.i = j + 1
+            m = m - 1
+            s = table.concat(self, "", min, m) .. s:sub(1, j)
           end
+          for m = min, m do
+            self[m] = nil
+          end
+          self.min = m + 1
+          self.i = j + 1
           self.size = size - #s
           return s
         else
@@ -119,22 +115,37 @@ function class:read(count)
       end
     end
   elseif count == size or self.eof then
-    local min = self.min
-    local max = self.max
     local s = self[min]
     local i = self.i
-    if i ~= nil then
+    if i > 1 then
       self[min] = s:sub(i)
     end
     s = table.concat(self, "", min, max)
     for m = min, max do
       self[m] = nil
     end
-    self.i = nil
     self.min = 1
     self.max = 0
+    self.i = 1
     self.size = 0
     return s
+  end
+end
+
+function class:read_line(chomp)
+  local p = self:find("\n")
+  if p == nil then
+    if self.eof then
+      return self:read(self.size)
+    end
+  else
+    if chomp then
+      local line = self:read(p - 1)
+      self:read(1)
+      return line
+    else
+      return self:read(p)
+    end
   end
 end
 
