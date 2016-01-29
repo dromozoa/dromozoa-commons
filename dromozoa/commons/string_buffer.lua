@@ -132,20 +132,19 @@ function class:read(count)
   end
 end
 
-function class:read_line(chomp)
-  local p = self:find("\n")
+function class:read_line(char)
+  if char == nil then
+    char = "\n"
+  end
+  local p = self:find(char)
   if p == nil then
     if self.eof then
       return self:read(self.size)
     end
   else
-    if chomp then
-      local line = self:read(p - 1)
-      self:read(1)
-      return line
-    else
-      return self:read(p)
-    end
+    local line = self:read(p - 1)
+    local char = self:read(1)
+    return line, char
   end
 end
 
