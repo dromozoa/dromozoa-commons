@@ -132,11 +132,11 @@ function class:read(count)
   end
 end
 
-function class:read_line(delimiter)
-  if delimiter == nil then
-    delimiter = "\n"
+function class:read_line(sep)
+  if sep == nil then
+    sep = "\n"
   end
-  local p = self:find(delimiter)
+  local p = self:find(sep)
   if p == nil then
     if self.eof then
       return self:read(self.size)
