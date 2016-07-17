@@ -67,7 +67,7 @@ local class = {}
 
 function class.new()
   return class.reset({
-    M = word_block(16);
+    M = word_block(16, ">");
     W = sequence();
     H = sequence();
     L = 0;

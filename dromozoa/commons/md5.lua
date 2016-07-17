@@ -20,7 +20,7 @@ local translate_range = require "dromozoa.commons.translate_range"
 local uint32 = require "dromozoa.commons.uint32"
 local uint64 = require "dromozoa.commons.uint64"
 local unpack = require "dromozoa.commons.unpack"
-local word_block = require "dromozoa.commons.word_block_le"
+local word_block = require "dromozoa.commons.word_block"
 
 local add = uint32.add
 local band = uint32.band
@@ -95,7 +95,7 @@ local class = {}
 
 function class.new()
   return class.reset({
-    M = word_block(16);
+    M = word_block(16, "<");
     H = sequence();
     L = 0;
     hex_format = "%08x%08x%08x%08x";
