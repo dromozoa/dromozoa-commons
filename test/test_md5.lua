@@ -15,6 +15,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
+local base16 = require "dromozoa.commons.base16"
 local md5 = require "dromozoa.commons.md5"
 
 data = {
@@ -35,9 +36,6 @@ data = {
 }
 
 for i, v in ipairs(data) do
-  local context = md5()
-  context:update(v[1])
-  local result = context:finalize("hex")
-  -- print(result, v[2])
-  assert(result == v[2])
+  assert(md5.hex(v[1]) == v[2])
+  assert(base16.encode_lower(md5.bin(v[1])) == v[2])
 end

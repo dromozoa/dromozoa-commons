@@ -192,6 +192,18 @@ function class:compute()
   H[4] = add(H[4], d)
 end
 
+function class.bin(message)
+  return class():update(message):finalize("bin")
+end
+
+function class.hex(message)
+  return class():update(message):finalize("hex")
+end
+
+function class.hmac(K, text, encode)
+  return message_digest.hmac(class, K, text, encode)
+end
+
 local metatable = {
   __index = class;
 }
