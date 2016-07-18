@@ -15,11 +15,9 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
+local message_digest = require "dromozoa.commons.message_digest"
 local sequence = require "dromozoa.commons.sequence"
-local translate_range = require "dromozoa.commons.translate_range"
 local uint32 = require "dromozoa.commons.uint32"
-local uint64 = require "dromozoa.commons.uint64"
-local unpack = require "dromozoa.commons.unpack"
 local word_block = require "dromozoa.commons.word_block"
 
 local add = uint32.add
@@ -28,7 +26,6 @@ local bor = uint32.bor
 local bxor = uint32.bxor
 local bnot = uint32.bnot
 local rotl = uint32.rotl
-local char = uint32.char
 
 local S11 = 7
 local S12 = 12
@@ -194,56 +191,12 @@ function class:compute()
   H[4] = add(H[4], d)
 end
 
-function class:update(s, i, j)
-  local s = tostring(s)
-  local min, max = translate_range(#s, i, j)
-  self.L = self.L + max - min + 1
-  local M = self.M
-  while min <= max do
-    min = M:update(s, min, max)
-    if M:full() then
-      self:compute()
-    end
-  end
-  return self
-end
-
-function class:finalize(encode)
-  local M = self.M
-  M:update("\128", 1, 1)
-  if M:flush() > 14 then
-    self:compute()
-    M:reset()
-  end
-  M[15], M[16] = uint64.word(self.L * 8, "<")
-  self:compute()
-  local H = self.H
-  if encode == "hex" then
-    local a = H[1]
-    local b = H[2]
-    local c = H[3]
-    local d = H[4]
-    return ("%02x%02x%02x%02x"):format(uint32.byte(a, "<"))
-        .. ("%02x%02x%02x%02x"):format(uint32.byte(b, "<"))
-        .. ("%02x%02x%02x%02x"):format(uint32.byte(c, "<"))
-        .. ("%02x%02x%02x%02x"):format(uint32.byte(d, "<"))
-    -- return self.hex_format:format(unpack(H))
-  elseif encode == "bin" then
-    local bin = sequence()
-    for i = 1, #H do
-      bin:push(char(H[i], "<"))
-    end
-    return bin:concat()
-  else
-    return H
-  end
-end
-
 local metatable = {
   __index = class;
 }
 
 return setmetatable(class, {
+  __index = message_digest;
   __call = function ()
     return setmetatable(class.new(), metatable)
   end;

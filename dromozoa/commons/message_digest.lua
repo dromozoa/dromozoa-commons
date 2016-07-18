@@ -22,6 +22,7 @@ local uint64 = require "dromozoa.commons.uint64"
 local unpack = require "dromozoa.commons.unpack"
 
 local bxor = uint32.bxor
+local byte = uint32.byte
 local char = uint32.char
 
 local class = {}
@@ -56,20 +57,30 @@ end
 
 function class:finalize(encode)
   local M = self.M
+  local endian = M.endian
   M:update("\128", 1, 1)
   if M:flush() > 14 then
     self:compute()
     M:reset()
   end
-  M[15], M[16] = uint64.word(self.L * 8, ">")
+  M[15], M[16] = uint64.word(self.L * 8, endian)
   self:compute()
   local H = self.H
   if encode == "hex" then
-    return self.hex_format:format(unpack(H))
+    if endian == ">" then
+      return self.hex_format:format(unpack(H))
+    else
+      local h = sequence()
+      for i = 1, #H do
+        local a, b, c, d = byte(H[i], endian)
+        h:push(a * 0x1000000 + b * 0x10000 + c * 0x100 + d)
+      end
+      return self.hex_format:format(unpack(h))
+    end
   elseif encode == "bin" then
     local bin = sequence()
     for i = 1, #H do
-      bin:push(char(H[i], ">"))
+      bin:push(char(H[i], endian))
     end
     return bin:concat()
   else
