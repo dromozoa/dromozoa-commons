@@ -34,7 +34,7 @@ local K3 = 0x8f1bbcdc
 local K4 = 0xca62c1d6
 
 local class = {
-  hex_format = "%08x%08x%08x%08x%08x";
+  hex_format = ("%02x"):rep(20);
 }
 
 function class.new()

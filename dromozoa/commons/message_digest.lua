@@ -67,16 +67,11 @@ function class:finalize(encode)
   self:compute()
   local H = self.H
   if encode == "hex" then
-    if endian == ">" then
-      return self.hex_format:format(unpack(H))
-    else
-      local h = sequence()
-      for i = 1, #H do
-        local a, b, c, d = byte(H[i], endian)
-        h:push(a * 0x1000000 + b * 0x10000 + c * 0x100 + d)
-      end
-      return self.hex_format:format(unpack(h))
+    local hex = sequence()
+    for i = 1, #H do
+      hex:push(byte(H[i], endian))
     end
+    return self.hex_format:format(unpack(hex))
   elseif encode == "bin" then
     local bin = sequence()
     for i = 1, #H do

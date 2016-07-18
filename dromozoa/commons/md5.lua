@@ -89,7 +89,7 @@ local function II(a, b, c, d, x, s, ac)
 end
 
 local class = {
-  hex_format = "%08x%08x%08x%08x";
+  hex_format = ("%02x"):rep(16);
 }
 
 function class.new()

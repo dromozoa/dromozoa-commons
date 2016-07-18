@@ -64,7 +64,7 @@ local function sigma1(x)
 end
 
 local class = {
-  hex_format = "%08x%08x%08x%08x%08x%08x%08x%08x";
+  hex_format = ("%02x"):rep(32);
 }
 
 function class.new()
