@@ -63,7 +63,9 @@ local function sigma1(x)
   return bxor(rotr(x, 17), rotr(x, 19), shr(x, 10))
 end
 
-local class = {}
+local class = {
+  hex_format = "%08x%08x%08x%08x%08x%08x%08x%08x";
+}
 
 function class.new()
   return class.reset({
@@ -71,7 +73,6 @@ function class.new()
     W = sequence();
     H = sequence();
     L = 0;
-    hex_format = "%08x%08x%08x%08x%08x%08x%08x%08x";
   })
 end
 

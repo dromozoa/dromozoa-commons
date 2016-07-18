@@ -38,6 +38,6 @@ for i, v in ipairs(data) do
   local context = md5()
   context:update(v[1])
   local result = context:finalize("hex")
-  print(result, v[2])
+  -- print(result, v[2])
   assert(result == v[2])
 end

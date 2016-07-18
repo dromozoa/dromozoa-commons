@@ -88,14 +88,15 @@ local function II(a, b, c, d, x, s, ac)
   return a
 end
 
-local class = {}
+local class = {
+  hex_format = "%08x%08x%08x%08x";
+}
 
 function class.new()
   return class.reset({
     M = word_block(16, "<");
     H = sequence();
     L = 0;
-    hex_format = "%08x%08x%08x%08x";
   })
 end
 

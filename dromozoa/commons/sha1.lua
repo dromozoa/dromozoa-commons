@@ -33,7 +33,9 @@ local K2 = 0x6ed9eba1
 local K3 = 0x8f1bbcdc
 local K4 = 0xca62c1d6
 
-local class = {}
+local class = {
+  hex_format = "%08x%08x%08x%08x%08x";
+}
 
 function class.new()
   return class.reset({
@@ -41,7 +43,6 @@ function class.new()
     W = sequence();
     H = sequence();
     L = 0;
-    hex_format = "%08x%08x%08x%08x%08x";
   })
 end
 
