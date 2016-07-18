@@ -1,4 +1,4 @@
--- Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2015,2016 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -40,7 +40,11 @@ local function update_byte(self, s, min, max)
     local byte = self.byte
     local a, b, c, d = byte[1], byte[2], byte[3], byte[4]
     local i = self.i + 1
-    self[i] = a * 0x1000000 + b * 0x10000 + c * 0x100 + d
+    if self.endian == ">" then
+      self[i] = a * 0x1000000 + b * 0x10000 + c * 0x100 + d
+    else
+      self[i] = d * 0x1000000 + c * 0x10000 + b * 0x100 + a
+    end
     self.i = i
     self.j = 0
   else
@@ -53,6 +57,7 @@ local function update_word(self, s, min, max)
   local n = self.n
   local i = self.i
   if i < n and min + 3 <= max then
+    local endian = self.endian
     local m = min + (n - i) * 4 - 1
     if max > m then
       max = m
@@ -61,7 +66,11 @@ local function update_word(self, s, min, max)
       p = j - 3
       local a, b, c, d = s:byte(p, j)
       i = i + 1
-      self[i] = a * 0x1000000 + b * 0x10000 + c * 0x100 + d
+      if endian == ">" then
+        self[i] = a * 0x1000000 + b * 0x10000 + c * 0x100 + d
+      else
+        self[i] = d * 0x1000000 + c * 0x10000 + b * 0x100 + a
+      end
     end
     self.i = i
     return p + 4
@@ -72,9 +81,10 @@ end
 
 local class = {}
 
-function class.new(n)
+function class.new(n, endian)
   return class.reset({
     n = n;
+    endian = endian;
     i = 0;
     j = 0;
     byte = { 0, 0, 0, 0 };
@@ -123,7 +133,11 @@ function class:flush()
     end
     local a, b, c, d = byte[1], byte[2], byte[3], byte[4]
     i = i + 1
-    self[i] = a * 0x1000000 + b * 0x10000 + c * 0x100 + d
+    if self.endian == ">" then
+      self[i] = a * 0x1000000 + b * 0x10000 + c * 0x100 + d
+    else
+      self[i] = d * 0x1000000 + c * 0x10000 + b * 0x100 + a
+    end
     self.i = i
     self.j = 0
   end
@@ -138,7 +152,7 @@ local metatable = {
 }
 
 return setmetatable(class, {
-  __call = function (_, n)
-    return setmetatable(class.new(n), metatable)
+  __call = function (_, n, endian)
+    return setmetatable(class.new(n, endian), metatable)
   end;
 })
