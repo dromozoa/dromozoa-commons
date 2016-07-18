@@ -1,4 +1,4 @@
--- Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2015,2016 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -63,15 +63,16 @@ local function sigma1(x)
   return bxor(rotr(x, 17), rotr(x, 19), shr(x, 10))
 end
 
-local class = {}
+local class = {
+  hex_format = ("%02x"):rep(32);
+}
 
 function class.new()
   return class.reset({
-    M = word_block(16);
+    M = word_block(16, ">");
     W = sequence();
     H = sequence();
     L = 0;
-    hex_format = "%08x%08x%08x%08x%08x%08x%08x%08x";
   })
 end
 

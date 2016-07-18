@@ -23,7 +23,7 @@ local function as_word(s)
   return ((a * 256 + b) * 256 + c) * 256 + d
 end
 
-local b = word_block(2)
+local b = word_block(2, ">")
 local s = "foobarbazqux"
 assert(b:update(s, 1, 4) == 5)
 assert(not b:full())
@@ -51,7 +51,7 @@ assert(b:update("7890", 1, 4) == 3)
 assert(b[1] == as_word("1234"))
 assert(b[2] == as_word("5678"))
 
-local b = word_block(2)
+local b = word_block(2, ">")
 assert(b:update("12", 1, 2) == 3)
 assert(not b:full())
 assert(b:update("3", 1, 1) == 2)

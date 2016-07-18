@@ -1,6 +1,6 @@
 #! /usr/bin/env perl
 
-# Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+# Copyright (C) 2015,2016 Tomoyuki Fujimori <moyu@dromozoa.com>
 #
 # This file is part of dromozoa-commons.
 #
@@ -34,6 +34,7 @@ if ($algorithm eq "sha1") {
 }
 
 print << "EOF";
+local base16 = require "dromozoa.commons.base16"
 local ipairs = require "dromozoa.commons.ipairs"
 local $algorithm = require "dromozoa.commons.$algorithm"
 
@@ -51,6 +52,7 @@ print << "EOF";
 }
 for i, v in ipairs(data) do
   assert($algorithm.hex(v[1]) == v[2])
+  assert(base16.encode_lower($algorithm.bin(v[1])) == v[2])
   assert($algorithm.hmac(v[1], v[1], "hex") == v[3])
 end
 EOF

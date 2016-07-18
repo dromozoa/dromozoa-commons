@@ -1,3 +1,4 @@
+local base16 = require "dromozoa.commons.base16"
 local ipairs = require "dromozoa.commons.ipairs"
 local sha256 = require "dromozoa.commons.sha256"
 
@@ -392,5 +393,6 @@ local data = {
 }
 for i, v in ipairs(data) do
   assert(sha256.hex(v[1]) == v[2])
+  assert(base16.encode_lower(sha256.bin(v[1])) == v[2])
   assert(sha256.hmac(v[1], v[1], "hex") == v[3])
 end

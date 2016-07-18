@@ -1,4 +1,4 @@
--- Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2015,2016 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -33,15 +33,16 @@ local K2 = 0x6ed9eba1
 local K3 = 0x8f1bbcdc
 local K4 = 0xca62c1d6
 
-local class = {}
+local class = {
+  hex_format = ("%02x"):rep(20);
+}
 
 function class.new()
   return class.reset({
-    M = word_block(16);
+    M = word_block(16, ">");
     W = sequence();
     H = sequence();
     L = 0;
-    hex_format = "%08x%08x%08x%08x%08x";
   })
 end
 
