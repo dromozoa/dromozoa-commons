@@ -50,7 +50,10 @@ class.metatable = {
 }
 
 return setmetatable(class, {
-  __call = function ()
-    return setmetatable(class.new(), class.metatable)
+  __call = function (_, self)
+    if self == nil then
+      self = class.new()
+    end
+    return setmetatable(self, class.metatable)
   end;
 })

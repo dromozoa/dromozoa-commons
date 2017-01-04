@@ -1,4 +1,4 @@
--- Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2015,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -24,3 +24,7 @@ out:write()
 assert(not pcall(out.write, out, true))
 assert(out:concat() == "foobar42baz")
 assert(out:concat(",") == "foo,bar,42,baz")
+
+local out = sequence_writer({ "foo" })
+out:write("bar")
+assert(out:concat() == "foobar")
