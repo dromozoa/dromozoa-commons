@@ -39,6 +39,7 @@ build = {
     ["dromozoa.commons.message_digest"] = "dromozoa/commons/message_digest.lua";
     ["dromozoa.commons.md5"] = "dromozoa/commons/md5.lua";
     ["dromozoa.commons.murmur_hash3"] = "dromozoa/commons/murmur_hash3.lua";
+    ["dromozoa.commons.pack"] = "dromozoa/commons/pack.lua";
     ["dromozoa.commons.pairs"] = "dromozoa/commons/pairs.lua";
     ["dromozoa.commons.property_map"] = "dromozoa/commons/property_map.lua";
     ["dromozoa.commons.push"] = "dromozoa/commons/push.lua";
