@@ -20,8 +20,8 @@ local equal = require "dromozoa.commons.equal"
 local set = require "dromozoa.commons.set"
 
 assert(set ~= bitset)
-assert(not equal(set, bitset))
 assert(set.set == nil)
+assert(bitset.set ~= nil)
 
 local bs = bitset():set(2, 4)
 assert(equal(bs, { [2] = true, [3] = true, [4] = true }))
