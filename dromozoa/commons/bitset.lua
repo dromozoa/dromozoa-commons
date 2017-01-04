@@ -87,22 +87,22 @@ end
 
 function class:ranges()
   local ranges = sequence()
-  local i, j = class.bounds(self)
-  if i == nil then
+  local min, max = class.bounds(self)
+  if min == nil then
     return ranges
   end
-  local min = i
-  local max = i
-  for i = i + 1, j do
+  local a = min
+  local b = min
+  for i = min + 1, max do
     if self[i] ~= nil then
-      if max ~= i - 1 then
-        ranges:push({ min, max })
-        min = i
+      if b ~= i - 1 then
+        ranges:push({ a, b })
+        a = i
       end
-      max = i
+      b = i
     end
   end
-  ranges:push({ min, max })
+  ranges:push({ a, b })
   return ranges
 end
 
