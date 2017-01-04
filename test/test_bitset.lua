@@ -1,4 +1,4 @@
--- Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2015,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -50,3 +50,4 @@ assert(equal(bs, { [4] = true }))
 local bs = bitset():set(20):set(48, 57):set(65, 90):set(97, 122)
 assert(equal({ bs:bounds() }, { 20, 122 }))
 assert(equal(bs:ranges(), { { 20, 20 }, { 48, 57 }, { 65, 90 }, { 97, 122 } }))
+assert(equal(bitset():ranges(), {}))
