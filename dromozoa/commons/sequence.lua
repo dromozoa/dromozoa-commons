@@ -1,4 +1,4 @@
--- Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2015,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -63,7 +63,7 @@ function class:each()
   end)
 end
 
-local metatable = {
+class.metatable = {
   __index = class;
 }
 
@@ -72,6 +72,6 @@ return setmetatable(class, {
     if self == nil then
       self = class.new()
     end
-    return setmetatable(self, metatable)
+    return setmetatable(self, class.metatable)
   end;
 })
