@@ -38,6 +38,22 @@ local function encode_key(key)
   end
 end
 
+local function pretty_space(self)
+  if self.options.pretty then
+    self.out:write(" ")
+  end
+end
+
+local function pretty_newline(self, depth)
+  if self.options.pretty then
+    local out = self.out
+    out:write("\n")
+    for _ = 1, depth do
+      out:write("  ")
+    end
+  end
+end
+
 local class = {}
 
 function class.new(out)
@@ -66,14 +82,10 @@ function class:stable(enabled)
   return self:option("stable", enabled)
 end
 
-function class:write_indent(depth)
-  local out = self.out
-  for _ = 1, depth do
-    out:write("  ")
+function class:write(value, depth)
+  if depth == nil then
+    depth = 0
   end
-end
-
-function class:write(value)
   local out = self.out
   local t = type(value)
   if t == "number" then
@@ -88,6 +100,7 @@ function class:write(value)
     end
   elseif t == "table" then
     out:write("{")
+    pretty_newline(self, depth + 1)
     local n = is_array(value)
     if n == nil then
       local first = true
@@ -98,19 +111,25 @@ function class:write(value)
             first = false
           else
             out:write(",")
+            pretty_newline(self, depth + 1)
           end
-          out:write(k, "=")
-          self:write(v)
+          out:write(k)
+          pretty_space(self, " ")
+          out:write("=")
+          pretty_space(self, " ")
+          self:write(v, depth + 1)
         end
       end
     else
       for i = 1, n do
         if i > 1 then
           out:write(",")
+          pretty_newline(self, depth + 1)
         end
-        self:write(value[i])
+        self:write(value[i], depth + 1)
       end
     end
+    pretty_newline(self, depth)
     out:write("}")
   else
     out:write("nil")

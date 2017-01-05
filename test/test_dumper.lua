@@ -19,6 +19,7 @@ local equal = require "dromozoa.commons.equal"
 local linked_hash_table = require "dromozoa.commons.linked_hash_table"
 local sequence = require "dromozoa.commons.sequence"
 local dumper = require "dromozoa.commons.dumper"
+local dumper_writer = require "dromozoa.commons.dumper_writer"
 
 assert(dumper.encode("foo\0bar"):match([[^"foo\0+bar"$]]))
 assert(dumper.encode(42) == [[42]])
@@ -34,3 +35,12 @@ local result = dumper.encode(t)
 -- print(result)
 assert(result == [[{foo={17,23,37,42},bar=true,baz="qux",[42]=false,["foo bar"]="baz qux",_=42}]])
 assert(equal(dumper.decode(result), t))
+
+dumper_writer(io.stdout):pretty():write({
+  foo = { 17, 23, 37, 42 };
+  ["foo bar"] = 0.25;
+  [true] = "foo";
+  bar = { 42 };
+  baz = { baz = false };
+})
+io.write("\n")
