@@ -38,13 +38,15 @@ local function encode_key(key)
   end
 end
 
-local function pretty_space(self)
+local function pretty(self, value)
   if self.options.pretty then
-    self.out:write(" ")
+    return value
+  else
+    return ""
   end
 end
 
-local function pretty_newline(self, depth)
+local function indent(self, depth)
   if self.options.pretty then
     local out = self.out
     out:write("\n")
@@ -56,10 +58,13 @@ end
 
 local class = {}
 
-function class.new(out)
+function class.new(out, options)
+  if options == nil then
+    options = {}
+  end
   return {
     out = out;
-    options = {};
+    options = options;
   }
 end
 
@@ -101,8 +106,9 @@ function class:write(value, depth)
   elseif t == "table" then
     local n = is_array(value)
     if n == nil then
+      local next_depth = depth + 1
       out:write("{")
-      pretty_newline(self, depth + 1)
+      indent(self, next_depth)
       local first = true
       for k, v in pairs(value) do
         local k = encode_key(k)
@@ -111,36 +117,32 @@ function class:write(value, depth)
             first = false
           else
             out:write(",")
-            pretty_newline(self, depth + 1)
+            indent(self, next_depth)
           end
-          out:write(k)
-          pretty_space(self, " ")
-          out:write("=")
-          pretty_space(self, " ")
-          self:write(v, depth + 1)
+          out:write(k, pretty(self, " "), "=", pretty(self, " "))
+          self:write(v, next_depth)
         end
       end
-      pretty_newline(self, depth)
+      indent(self, depth)
       out:write("}")
     elseif n == 0 then
       out:write("{}")
     elseif n == 1 then
-      out:write("{")
-      pretty_space(self, " ")
+      out:write("{", pretty(self, " "))
       self:write(value[1])
-      pretty_space(self, " ")
-      out:write("}")
+      out:write(pretty(self, " "), "}")
     else
+      local next_depth = depth + 1
       out:write("{")
-      pretty_newline(self, depth + 1)
+      indent(self, next_depth)
       for i = 1, n do
         if i > 1 then
           out:write(",")
-          pretty_newline(self, depth + 1)
+          indent(self, next_depth)
         end
-        self:write(value[i], depth + 1)
+        self:write(value[i], next_depth)
       end
-      pretty_newline(self, depth)
+      indent(self, depth)
       out:write("}")
     end
   else
@@ -153,7 +155,7 @@ class.metatable = {
 }
 
 return setmetatable(class, {
-  __call = function (_, out)
-    return setmetatable(class.new(out), class.metatable)
+  __call = function (_, out, options)
+    return setmetatable(class.new(out, options), class.metatable)
   end;
 })
