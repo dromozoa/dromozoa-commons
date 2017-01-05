@@ -1,4 +1,4 @@
--- Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2015,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -16,6 +16,7 @@
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
 local ipairs = require "dromozoa.commons.ipairs"
+local is_array = require "dromozoa.commons.is_array"
 local loadstring = require "dromozoa.commons.loadstring"
 local pairs = require "dromozoa.commons.pairs"
 local sequence_writer = require "dromozoa.commons.sequence_writer"
@@ -53,7 +54,8 @@ local function write(out, value)
     end
   elseif t == "table" then
     out:write("{")
-    if value[1] == nil then
+    local n = is_array(value)
+    if n == nil then
       local first = true
       for k, v in pairs(value) do
         local k = encode_key(k)
@@ -68,11 +70,11 @@ local function write(out, value)
         end
       end
     else
-      for i, v in ipairs(value) do
+      for i = 1, n do
         if i > 1 then
           out:write(",")
         end
-        write(out, v)
+        write(out, value[i])
       end
     end
     out:write("}")
