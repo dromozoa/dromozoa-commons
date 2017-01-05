@@ -42,5 +42,9 @@ dumper_writer(io.stdout):pretty():write({
   [true] = "foo";
   bar = { 42 };
   baz = { baz = false };
+  qux = {};
+  [1] = { { {} } };
+  [2] = { foo = { bar = { baz = "qux" } } };
+  [function () end] = "ignore";
 })
 io.write("\n")

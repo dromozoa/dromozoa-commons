@@ -99,10 +99,10 @@ function class:write(value, depth)
       out:write("false")
     end
   elseif t == "table" then
-    out:write("{")
-    pretty_newline(self, depth + 1)
     local n = is_array(value)
     if n == nil then
+      out:write("{")
+      pretty_newline(self, depth + 1)
       local first = true
       for k, v in pairs(value) do
         local k = encode_key(k)
@@ -120,7 +120,19 @@ function class:write(value, depth)
           self:write(v, depth + 1)
         end
       end
+      pretty_newline(self, depth)
+      out:write("}")
+    elseif n == 0 then
+      out:write("{}")
+    elseif n == 1 then
+      out:write("{")
+      pretty_space(self, " ")
+      self:write(value[1])
+      pretty_space(self, " ")
+      out:write("}")
     else
+      out:write("{")
+      pretty_newline(self, depth + 1)
       for i = 1, n do
         if i > 1 then
           out:write(",")
@@ -128,9 +140,9 @@ function class:write(value, depth)
         end
         self:write(value[i], depth + 1)
       end
+      pretty_newline(self, depth)
+      out:write("}")
     end
-    pretty_newline(self, depth)
-    out:write("}")
   else
     out:write("nil")
   end
