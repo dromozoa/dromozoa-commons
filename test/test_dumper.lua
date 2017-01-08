@@ -36,6 +36,8 @@ local result = dumper.encode(t)
 -- print(result)
 assert(result == [[{foo={17,23,37,42},bar=true,baz="qux",[42]=false,["foo bar"]="baz qux",_=42}]])
 assert(equal(dumper.decode(result), t))
+-- print(dumper.encode(t, { stable = true }))
+assert(result == dumper.encode(t, { stable = true }))
 
 local t = {
   foo = { 17, 23, 37, 42 };

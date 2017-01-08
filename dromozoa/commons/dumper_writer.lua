@@ -17,6 +17,7 @@
 
 local ipairs = require "dromozoa.commons.ipairs"
 local is_array = require "dromozoa.commons.is_array"
+local is_stable = require "dromozoa.commons.is_stable"
 local pairs = require "dromozoa.commons.pairs"
 local sequence = require "dromozoa.commons.sequence"
 
@@ -110,7 +111,7 @@ function class:write(value, depth)
       local next_depth = depth + 1
       out:write("{")
       indent(self, next_depth)
-      if self.options.stable then
+      if self.options.stable and not is_stable(value) then
         local key_value_pairs = sequence()
         for k, v in pairs(value) do
           local k = encode_key(k)
