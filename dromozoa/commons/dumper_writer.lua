@@ -18,6 +18,7 @@
 local ipairs = require "dromozoa.commons.ipairs"
 local is_array = require "dromozoa.commons.is_array"
 local pairs = require "dromozoa.commons.pairs"
+local sequence = require "dromozoa.commons.sequence"
 
 local function encode_key(key)
   local t = type(key)
@@ -109,18 +110,42 @@ function class:write(value, depth)
       local next_depth = depth + 1
       out:write("{")
       indent(self, next_depth)
-      local first = true
-      for k, v in pairs(value) do
-        local k = encode_key(k)
-        if k ~= nil then
+      if self.options.stable then
+        local key_value_pairs = sequence()
+        for k, v in pairs(value) do
+          local k = encode_key(k)
+          if k ~= nil then
+            key_value_pairs:push({ k, v })
+          end
+        end
+        key_value_pairs:sort(function (a, b)
+          return a[1] < b[1]
+        end)
+        local first = true
+        for key_value_pair in key_value_pairs:each() do
           if first then
             first = false
           else
             out:write(",")
             indent(self, next_depth)
           end
-          out:write(k, pretty(self, " "), "=", pretty(self, " "))
-          self:write(v, next_depth)
+          out:write(key_value_pair[1], pretty(self, " "), "=", pretty(self, " "))
+          self:write(key_value_pair[2], next_depth)
+        end
+      else
+        local first = true
+        for k, v in pairs(value) do
+          local k = encode_key(k)
+          if k ~= nil then
+            if first then
+              first = false
+            else
+              out:write(",")
+              indent(self, next_depth)
+            end
+            out:write(k, pretty(self, " "), "=", pretty(self, " "))
+            self:write(v, next_depth)
+          end
         end
       end
       indent(self, depth)
