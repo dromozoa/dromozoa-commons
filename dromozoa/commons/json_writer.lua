@@ -36,11 +36,13 @@ for i = 0x00, 0x1f do
   end
 end
 
-local class = {}
-
-function class.quote(value)
+local function quote(value)
   return "\"" .. tostring(value):gsub("[\"\\/%c]", quote_char) .. "\""
 end
+
+local class = {
+  quote = quote;
+}
 
 function class.new(out, options)
   if options == nil then
@@ -80,7 +82,7 @@ function class:write(value, depth)
   if t == "number" then
     out:write(("%.17g"):format(value))
   elseif t == "string" then
-    out:write(class.quote(value))
+    out:write(quote(value))
   elseif t == "boolean" then
     if value then
       out:write("true")
@@ -98,7 +100,7 @@ function class:write(value, depth)
           else
             out:write(",")
           end
-          out:write(class.quote(k), ":")
+          out:write(quote(k), ":")
           self:write(v)
         end
       end
