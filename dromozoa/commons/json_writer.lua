@@ -40,6 +40,22 @@ local function quote(value)
   return "\"" .. tostring(value):gsub("[\"\\/%c]", quote_char) .. "\""
 end
 
+local function encode_key(key)
+  local t = type(key)
+  if t == "number" then
+    return quote(("%.17g"):format(key))
+  elseif t == "string" then
+    return quote(key)
+  elseif t == "boolean" then
+    if key then
+      return quote("true")
+    else
+      return quote("false")
+    end
+  end
+
+end
+
 local class = {
   quote = quote;
 }
@@ -95,13 +111,16 @@ function class:write(value, depth)
       local first = true
       for k, v in pairs(value) do
         if type(k) == "string" then
-          if first then
-            first = false
-          else
-            out:write(",")
+          local k = encode_key(k)
+          if k ~= nil then
+            if first then
+              first = false
+            else
+              out:write(",")
+            end
+            out:write(k, ":")
+            self:write(v)
           end
-          out:write(quote(k), ":")
-          self:write(v)
         end
       end
       out:write("}")
