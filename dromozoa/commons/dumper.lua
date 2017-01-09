@@ -19,21 +19,19 @@ local dumper_writer = require "dromozoa.commons.dumper_writer"
 local loadstring = require "dromozoa.commons.loadstring"
 local sequence_writer = require "dromozoa.commons.sequence_writer"
 
-local function write(out, value, options)
+local class = {}
+
+function class.write(out, value, options)
   dumper_writer(out, options):write(value)
   return out
 end
 
-local function encode(value, options)
-  return write(sequence_writer(), value, options):concat()
+function class.encode(value, options)
+  return class.write(sequence_writer(), value, options):concat()
 end
 
-local function decode(code)
+function class.decode(code)
   return assert(loadstring("return " .. code))()
 end
 
-return {
-  write = write;
-  encode = encode;
-  decode = decode;
-}
+return class
