@@ -16,7 +16,9 @@
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
 local ipairs = require "dromozoa.commons.ipairs"
+local is_array = require "dromozoa.commons.is_array"
 local pairs = require "dromozoa.commons.pairs"
+local sequence = require "dromozoa.commons.sequence"
 
 local quote_char = {
   [string.char(0x22)] = [[\"]];
@@ -106,7 +108,8 @@ function class:write(value, depth)
       out:write("false")
     end
   elseif t == "table" then
-    if value[1] == nil then
+    local n = is_array(value)
+    if n == nil then
       out:write("{")
       local first = true
       for k, v in pairs(value) do
@@ -124,16 +127,19 @@ function class:write(value, depth)
         end
       end
       out:write("}")
+    elseif n == 0 then
+      if getmetatable(value) == sequence.metatable then
+        out:write("[]")
+      else
+        out:write("{}")
+      end
     else
       out:write("[")
-      local first = true
-      for _, v in ipairs(value) do
-        if first then
-          first = false
-        else
+      for i = 1, n do
+        if i > 1 then
           out:write(",")
         end
-        self:write(v)
+        self:write(value[i])
       end
       out:write("]")
     end

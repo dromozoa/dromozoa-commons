@@ -1,4 +1,4 @@
--- Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2015,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -84,3 +84,10 @@ assert(empty(json.decode("[]")))
 assert(empty(json.decode("{}")))
 assert(equal(json.decode([[ [ 17 , 23 ] ]]), { 17, 23 }))
 assert(equal(json.decode([[ { "foo" : 17 , "bar" : 23 } ]]), { foo = 17, bar = 23 }))
+
+local t = {
+  array = sequence();
+  table = {};
+  one = { 42 };
+}
+print(json.encode(t, { stable = true }))
