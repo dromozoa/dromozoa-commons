@@ -90,4 +90,4 @@ local t = {
   table = {};
   one = { 42 };
 }
-print(json.encode(t, { stable = true }))
+assert(json.encode(t, { stable = true }) == [[{"array":[],"one":[42],"table":{}}]])

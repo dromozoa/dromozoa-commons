@@ -30,8 +30,8 @@ function class.write(out, value, options)
   return out
 end
 
-function class.encode(value)
-  return class.write(sequence_writer(), value):concat()
+function class.encode(value, options)
+  return class.write(sequence_writer(), value, options):concat()
 end
 
 function class.parse(this)

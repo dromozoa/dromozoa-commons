@@ -17,6 +17,7 @@
 
 local ipairs = require "dromozoa.commons.ipairs"
 local is_array = require "dromozoa.commons.is_array"
+local is_stable = require "dromozoa.commons.is_stable"
 local pairs = require "dromozoa.commons.pairs"
 local sequence = require "dromozoa.commons.sequence"
 
@@ -111,18 +112,41 @@ function class:write(value, depth)
     local n = is_array(value)
     if n == nil then
       out:write("{")
-      local first = true
-      for k, v in pairs(value) do
-        if type(k) == "string" then
+      if self.options.stable and not is_stable(value) then
+        local key_value_pairs = sequence()
+        for k, v in pairs(value) do
           local k = encode_key(k)
           if k ~= nil then
-            if first then
-              first = false
-            else
-              out:write(",")
+            key_value_pairs:push({ k, v })
+          end
+        end
+        key_value_pairs:sort(function (a, b)
+          return a[1] < b[1]
+        end)
+        local first = true
+        for key_value_pair in key_value_pairs:each() do
+          if first then
+            first = false
+          else
+            out:write(",")
+          end
+          out:write(key_value_pair[1], ":")
+          self:write(key_value_pair[2])
+        end
+      else
+        local first = true
+        for k, v in pairs(value) do
+          if type(k) == "string" then
+            local k = encode_key(k)
+            if k ~= nil then
+              if first then
+                first = false
+              else
+                out:write(",")
+              end
+              out:write(k, ":")
+              self:write(v)
             end
-            out:write(k, ":")
-            self:write(v)
           end
         end
       end
