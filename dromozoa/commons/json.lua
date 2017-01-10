@@ -21,7 +21,6 @@ local sequence_writer = require "dromozoa.commons.sequence_writer"
 
 local class = {
   quote = json_writer.quote;
-  parse = parse;
   null = json_parser.null;
 }
 
