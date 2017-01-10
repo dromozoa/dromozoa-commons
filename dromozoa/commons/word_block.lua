@@ -1,4 +1,4 @@
--- Copyright (C) 2015,2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2015-2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -147,12 +147,12 @@ function class:flush()
   return i
 end
 
-local metatable = {
+class.metatable = {
   __index = class;
 }
 
 return setmetatable(class, {
   __call = function (_, n, endian)
-    return setmetatable(class.new(n, endian), metatable)
+    return setmetatable(class.new(n, endian), class.metatable)
   end;
 })
