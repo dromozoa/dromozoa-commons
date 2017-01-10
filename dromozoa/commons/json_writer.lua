@@ -56,7 +56,24 @@ local function encode_key(key)
       return quote("false")
     end
   end
+end
 
+local function pretty(self, value)
+  if self.options.pretty then
+    return value
+  else
+    return ""
+  end
+end
+
+local function indent(self, depth)
+  if self.options.pretty then
+    local out = self.out
+    out:write("\n")
+    for _ = 1, depth do
+      out:write("  ")
+    end
+  end
 end
 
 local class = {
@@ -111,7 +128,9 @@ function class:write(value, depth)
   elseif t == "table" then
     local n = is_array(value)
     if n == nil then
+      local next_depth = depth + 1
       out:write("{")
+      indent(self, next_depth)
       if self.options.stable and not is_stable(value) then
         local key_value_pairs = sequence()
         for k, v in pairs(value) do
@@ -129,9 +148,10 @@ function class:write(value, depth)
             first = false
           else
             out:write(",")
+            indent(self, next_depth)
           end
-          out:write(key_value_pair[1], ":")
-          self:write(key_value_pair[2])
+          out:write(key_value_pair[1], ":", pretty(self, " "))
+          self:write(key_value_pair[2], next_depth)
         end
       else
         local first = true
@@ -142,12 +162,14 @@ function class:write(value, depth)
               first = false
             else
               out:write(",")
+              indent(self, next_depth)
             end
-            out:write(k, ":")
+            out:write(k, ":", pretty(self, " "))
             self:write(v)
           end
         end
       end
+      indent(self, depth)
       out:write("}")
     elseif n == 0 then
       if getmetatable(value) == sequence.metatable then
@@ -155,14 +177,22 @@ function class:write(value, depth)
       else
         out:write("{}")
       end
+    elseif n == 1 then
+      out:write("[", pretty(self, " "))
+      self:write(value[1])
+      out:write(pretty(self, " "), "]")
     else
+      local next_depth = depth + 1
       out:write("[")
+      indent(self, next_depth)
       for i = 1, n do
         if i > 1 then
           out:write(",")
+          indent(self, next_depth)
         end
-        self:write(value[i])
+        self:write(value[i], next_depth)
       end
+      indent(self, depth)
       out:write("]")
     end
   else

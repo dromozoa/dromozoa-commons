@@ -97,7 +97,7 @@ local t = {
   bar = { 42 };
   baz = { baz = false };
   qux = {};
-  [1] = { { {} } };
+  [1] = { { sequence() } };
   [2] = { foo = { bar = { baz = "qux" } } };
   [function () end] = "ignore";
 }
@@ -106,10 +106,11 @@ local result1 = json.encode(t)
 local result2 = json.encode(t, { pretty = true })
 local result3 = json.encode(t, { stable = true })
 local result4 = json.encode(t, { pretty = true, stable = true })
-print(result1)
-print(result2)
-print(result3)
-print(result4)
+-- print(result1)
+-- print(result2)
+-- print(result3)
+-- print(result4)
 assert(equal(json.decode(result1), json.decode(result2)))
 assert(equal(json.decode(result1), json.decode(result3)))
 assert(equal(json.decode(result1), json.decode(result4)))
+assert(result3 == [=[{"1":[[[]]],"2":{"foo":{"bar":{"baz":"qux"}}},"bar":[42],"baz":{"baz":false},"foo bar":0.25,"foo":[17,23,37,42],"qux":{},"true":"foo"}]=])
