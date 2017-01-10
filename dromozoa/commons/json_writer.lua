@@ -136,17 +136,15 @@ function class:write(value, depth)
       else
         local first = true
         for k, v in pairs(value) do
-          if type(k) == "string" then
-            local k = encode_key(k)
-            if k ~= nil then
-              if first then
-                first = false
-              else
-                out:write(",")
-              end
-              out:write(k, ":")
-              self:write(v)
+          local k = encode_key(k)
+          if k ~= nil then
+            if first then
+              first = false
+            else
+              out:write(",")
             end
+            out:write(k, ":")
+            self:write(v)
           end
         end
       end
