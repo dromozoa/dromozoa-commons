@@ -163,7 +163,7 @@ function class:parse_value()
   end
 end
 
-function class:apply()
+function class:parse()
   local this = self.this
   local stack = self.stack
   self:parse_value()

@@ -34,7 +34,7 @@ function class.encode(value, options)
 end
 
 function class.parse(this)
-  return json_parser(this):apply()
+  return json_parser(this):parse()
 end
 
 function class.decode(code)
