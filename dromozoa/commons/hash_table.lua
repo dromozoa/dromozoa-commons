@@ -91,7 +91,7 @@ end
 
 function class:set(key, value)
   if value == nil then
-    return class.remove(self, key, value)
+    return class.remove(self, key)
   else
     return class.insert(self, key, value, true)
   end
