@@ -16,11 +16,18 @@
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
 local linked_hash_table = require "dromozoa.commons.linked_hash_table"
+local multimap = require "dromozoa.commons.multimap"
+local multimap_handle = require "dromozoa.commons.multimap_handle"
+
+local stable_metatables = {
+  [linked_hash_table.metatable] = true;
+  [multimap.metatable] = true;
+  [multimap_handle.metatable] = true;
+}
 
 return function (self)
   if type(self) == "table" then
-    local metatable = getmetatable(self)
-    if metatable == linked_hash_table.metatable then
+    if stable_metatables[getmetatable(self)] then
       return true
     end
   end

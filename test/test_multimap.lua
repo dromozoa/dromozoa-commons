@@ -16,6 +16,7 @@
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
 local equal = require "dromozoa.commons.equal"
+local is_stable = require "dromozoa.commons.is_stable"
 local multimap = require "dromozoa.commons.multimap"
 local pairs = require "dromozoa.commons.pairs"
 local sequence = require "dromozoa.commons.sequence"
@@ -153,3 +154,6 @@ for k, v in pairs(m:lower_bound(3)) do
   data:push(k, v)
 end
 assert(equal(data, { 3, "baz", 4, "qux" }))
+
+assert(is_stable(m))
+assert(is_stable(m:lower_bound(3)))
