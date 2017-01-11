@@ -17,6 +17,8 @@
 
 local equal = require "dromozoa.commons.equal"
 local multimap = require "dromozoa.commons.multimap"
+local pairs = require "dromozoa.commons.pairs"
+local sequence = require "dromozoa.commons.sequence"
 
 local function count(range)
   local count = 0
@@ -134,3 +136,20 @@ assert(equal({ m:tail() }, { 3 }))
 for k, v, h in m:each() do
   h:delete()
 end
+
+local m = multimap()
+m:insert(2, "bar")
+m:insert(3, "baz")
+m:insert(1, "foo")
+m:insert(4, "qux")
+local data = sequence()
+for k, v in pairs(m) do
+  data:push(k, v)
+end
+assert(equal(data, { 1, "foo", 2, "bar", 3, "baz", 4, "qux" }))
+
+local data = sequence()
+for k, v in pairs(m:lower_bound(3)) do
+  data:push(k, v)
+end
+assert(equal(data, { 3, "baz", 4, "qux" }))
