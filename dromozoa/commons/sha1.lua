@@ -1,4 +1,4 @@
--- Copyright (C) 2015,2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2015-2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -131,13 +131,13 @@ function class.hmac(K, text, encode)
   return sha.hmac(class, K, text, encode)
 end
 
-local metatable = {
+class.metatable = {
   __index = class;
 }
 
 return setmetatable(class, {
   __index = sha;
   __call = function ()
-    return setmetatable(class.new(), metatable)
+    return setmetatable(class.new(), class.metatable)
   end;
 })
