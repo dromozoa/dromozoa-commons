@@ -97,12 +97,12 @@ function class:set(key, value)
   end
 end
 
-local metatable = {
+class.metatable = {
   __newindex = class.set;
   __pairs = class.each;
 }
 
-function metatable:__index(key)
+function class.metatable:__index(key)
   local v = class.get(self, key)
   if v == nil then
     return class[key]
@@ -113,6 +113,6 @@ end
 
 return setmetatable(class, {
   __call = function ()
-    return setmetatable(class.new(), metatable)
+    return setmetatable(class.new(), class.metatable)
   end;
 })
