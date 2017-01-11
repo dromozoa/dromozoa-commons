@@ -1,24 +1,25 @@
--- Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2015,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
--- This file is part of dromozoa-bitset.
+-- This file is part of dromozoa-commons.
 --
--- dromozoa-bitset is free software: you can redistribute it and/or modify
+-- dromozoa-commons is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
 -- the Free Software Foundation, either version 3 of the License, or
 -- (at your option) any later version.
 --
--- dromozoa-bitset is distributed in the hope that it will be useful,
+-- dromozoa-commons is distributed in the hope that it will be useful,
 -- but WITHOUT ANY WARRANTY; without even the implied warranty of
 -- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 -- GNU General Public License for more details.
 --
 -- You should have received a copy of the GNU General Public License
--- along with dromozoa-bitset.  If not, see <http://www.gnu.org/licenses/>.
+-- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
 local pairs = require "dromozoa.commons.pairs"
 local sequence = require "dromozoa.commons.sequence"
 local set = require "dromozoa.commons.set"
 
+local super = set
 local class = {}
 
 function class:set(i, j)
@@ -87,27 +88,32 @@ end
 
 function class:ranges()
   local ranges = sequence()
-  local i, j = class.bounds(self)
-  for i = i, j do
+  local min, max = class.bounds(self)
+  if min == nil then
+    return ranges
+  end
+  local a = min
+  local b = min
+  for i = min + 1, max do
     if self[i] ~= nil then
-      local top = ranges:top()
-      if top == nil or top[2] ~= i - 1 then
-        ranges:push({ i, i })
-      else
-        top[2] = i
+      if b ~= i - 1 then
+        ranges:push({ a, b })
+        a = i
       end
+      b = i
     end
   end
+  ranges:push({ a, b })
   return ranges
 end
 
-local metatable = {
+class.metatable = {
   __index = class;
 }
 
 return setmetatable(class, {
-  __index = set;
+  __index = super;
   __call = function ()
-    return setmetatable(class.new(), metatable)
+    return setmetatable(class.new(), class.metatable)
   end;
 })

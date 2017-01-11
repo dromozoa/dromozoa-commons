@@ -1,4 +1,4 @@
--- Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2015,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -20,8 +20,8 @@ local equal = require "dromozoa.commons.equal"
 local set = require "dromozoa.commons.set"
 
 assert(set ~= bitset)
-assert(not equal(set, bitset))
 assert(set.set == nil)
+assert(bitset.set ~= nil)
 
 local bs = bitset():set(2, 4)
 assert(equal(bs, { [2] = true, [3] = true, [4] = true }))
@@ -50,3 +50,6 @@ assert(equal(bs, { [4] = true }))
 local bs = bitset():set(20):set(48, 57):set(65, 90):set(97, 122)
 assert(equal({ bs:bounds() }, { 20, 122 }))
 assert(equal(bs:ranges(), { { 20, 20 }, { 48, 57 }, { 65, 90 }, { 97, 122 } }))
+assert(equal(bitset():ranges(), {}))
+assert(equal(bitset():set(20):ranges(), { { 20, 20 } }))
+assert(equal(bitset():set(48, 57):ranges(), { { 48, 57 } }))

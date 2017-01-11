@@ -1,4 +1,4 @@
--- Copyright (C) 2015,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -15,16 +15,29 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local sequence_writer = require "dromozoa.commons.sequence_writer"
+local equal = require "dromozoa.commons.equal"
+local json = require "dromozoa.commons.json"
+local map = require "dromozoa.commons.map"
+local pairs = require "dromozoa.commons.pairs"
+local sequence = require "dromozoa.commons.sequence"
 
-local out = sequence_writer()
-out:write("foo"):write("bar", 42)
-out:write("baz")
-out:write()
-assert(not pcall(out.write, out, true))
-assert(out:concat() == "foobar42baz")
-assert(out:concat(",") == "foo,bar,42,baz")
+local m = map()
+m.foo = 17
+m.bar = 23
+m.baz = 37
+m.qux = 42
+m.foo = 0.5
+m.qux = nil
 
-local out = sequence_writer({ "foo" })
-out:write("bar")
-assert(out:concat() == "foobar")
+assert(m.foo == 0.5)
+assert(m.bar == 23)
+assert(m.baz == 37)
+assert(m.qux == nil)
+
+local data = sequence()
+for k, v in m:each() do
+  data:push(k, v)
+end
+assert(equal(data, { "bar", 23, "baz", 37, "foo", 0.5 }))
+
+assert(json.encode(m) == [[{"bar":23,"baz":37,"foo":0.5}]])

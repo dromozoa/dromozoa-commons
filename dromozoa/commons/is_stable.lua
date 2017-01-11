@@ -1,4 +1,4 @@
--- Copyright (C) 2015,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -15,16 +15,22 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local sequence_writer = require "dromozoa.commons.sequence_writer"
+local linked_hash_table = require "dromozoa.commons.linked_hash_table"
+local map = require "dromozoa.commons.map"
+local multimap = require "dromozoa.commons.multimap"
+local multimap_handle = require "dromozoa.commons.multimap_handle"
 
-local out = sequence_writer()
-out:write("foo"):write("bar", 42)
-out:write("baz")
-out:write()
-assert(not pcall(out.write, out, true))
-assert(out:concat() == "foobar42baz")
-assert(out:concat(",") == "foo,bar,42,baz")
+local stable_metatables = {
+  [linked_hash_table.metatable] = true;
+  [map.metatable] = true;
+  [multimap.metatable] = true;
+  [multimap_handle.metatable] = true;
+}
 
-local out = sequence_writer({ "foo" })
-out:write("bar")
-assert(out:concat() == "foobar")
+return function (self)
+  if type(self) == "table" then
+    if stable_metatables[getmetatable(self)] then
+      return true
+    end
+  end
+end

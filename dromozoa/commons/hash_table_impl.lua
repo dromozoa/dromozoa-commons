@@ -1,4 +1,4 @@
--- Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2015,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -45,6 +45,10 @@ end
 local class = {}
 
 function class.new()
+  -- 1: K
+  -- 2: V
+  -- 3: KS
+  -- 4: VS
   return { {}, {}, {}, {} }
 end
 
@@ -183,12 +187,12 @@ function class:remove(key)
   return nil
 end
 
-local metatable = {
+class.metatable = {
   __index = class;
 }
 
 return setmetatable(class, {
   __call = function ()
-    return setmetatable(class.new(), metatable)
+    return setmetatable(class.new(), class.metatable)
   end;
 })

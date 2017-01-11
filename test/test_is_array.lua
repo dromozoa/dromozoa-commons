@@ -1,4 +1,4 @@
--- Copyright (C) 2015,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -15,16 +15,12 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local sequence_writer = require "dromozoa.commons.sequence_writer"
+local is_array = require "dromozoa.commons.is_array"
 
-local out = sequence_writer()
-out:write("foo"):write("bar", 42)
-out:write("baz")
-out:write()
-assert(not pcall(out.write, out, true))
-assert(out:concat() == "foobar42baz")
-assert(out:concat(",") == "foo,bar,42,baz")
-
-local out = sequence_writer({ "foo" })
-out:write("bar")
-assert(out:concat() == "foobar")
+assert(is_array({}) == 0)
+assert(is_array({ 17, 23, 37, 42, 69 }) == 5)
+assert(is_array({ 17, nil, 23, nil, 37, nil, 42, nil, 69 }) == 9)
+assert(is_array({ 17, nil, nil, 69}) == nil)
+assert(is_array({ [0] = 42 }) == nil)
+assert(is_array({ [1.5] = 42 }) == nil)
+assert(is_array({ 42, foo = "bar" }) == nil)

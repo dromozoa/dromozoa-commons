@@ -1,4 +1,4 @@
--- Copyright (C) 2015,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -15,16 +15,12 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local sequence_writer = require "dromozoa.commons.sequence_writer"
+local pack = require "dromozoa.commons.pack"
 
-local out = sequence_writer()
-out:write("foo"):write("bar", 42)
-out:write("baz")
-out:write()
-assert(not pcall(out.write, out, true))
-assert(out:concat() == "foobar42baz")
-assert(out:concat(",") == "foo,bar,42,baz")
-
-local out = sequence_writer({ "foo" })
-out:write("bar")
-assert(out:concat() == "foobar")
+local t = pack(17, 23, nil, 37, 42)
+assert(t[1] == 17)
+assert(t[2] == 23)
+assert(t[3] == nil)
+assert(t[4] == 37)
+assert(t[5] == 42)
+assert(t.n == 5)

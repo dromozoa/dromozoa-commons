@@ -1,4 +1,4 @@
--- Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2015,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -57,12 +57,12 @@ function class:eof()
   return self.position > #self.s
 end
 
-local metatable = {
+class.metatable = {
   __index = class;
 }
 
 return setmetatable(class, {
   __call = function (_, s, position)
-    return setmetatable(class.new(s, position), metatable)
+    return setmetatable(class.new(s, position), class.metatable)
   end;
 })
