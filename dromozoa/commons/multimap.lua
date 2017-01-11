@@ -18,22 +18,24 @@
 local multimap_handle = require "dromozoa.commons.multimap_handle"
 local rb_tree = require "dromozoa.commons.rb_tree"
 
+local private_tree = function () end
+
 local class = {}
 
 function class.new(compare)
   return {
-    tree = rb_tree(compare);
+    [private_tree] = rb_tree(compare);
   }
 end
 
 function class:insert(k, v)
-  local tree = self.tree
+  local tree = self[private_tree]
   local h = tree:insert(k, v)
   return multimap_handle(tree, h)
 end
 
 function class:lower_bound(k)
-  local tree = self.tree
+  local tree = self[private_tree]
   local h = tree:lower_bound(k)
   if h == nil then
     return multimap_handle(tree)
@@ -42,7 +44,7 @@ function class:lower_bound(k)
 end
 
 function class:upper_bound(k)
-  local tree = self.tree
+  local tree = self[private_tree]
   local h = tree:upper_bound(k)
   if h == nil then
     return multimap_handle(tree)
@@ -51,7 +53,7 @@ function class:upper_bound(k)
 end
 
 function class:equal_range(k)
-  local tree = self.tree
+  local tree = self[private_tree]
   local h = tree:search(k)
   if h == nil then
     return multimap_handle(tree)
@@ -61,7 +63,7 @@ function class:equal_range(k)
 end
 
 function class:each()
-  local tree = self.tree
+  local tree = self[private_tree]
   local a = tree:minimum()
   if a == nil then
     return function () end
@@ -83,17 +85,17 @@ function class:each()
 end
 
 function class:empty()
-  local tree = self.tree
+  local tree = self[private_tree]
   return tree:empty()
 end
 
 function class:single()
-  local tree = self.tree
+  local tree = self[private_tree]
   return tree:single()
 end
 
 function class:head()
-  local tree = self.tree
+  local tree = self[private_tree]
   local h = tree:minimum()
   if h ~= nil then
     return tree:get(h)
@@ -101,7 +103,7 @@ function class:head()
 end
 
 function class:tail()
-  local tree = self.tree
+  local tree = self[private_tree]
   local h = tree:maximum()
   if h ~= nil then
     return tree:get(h)
