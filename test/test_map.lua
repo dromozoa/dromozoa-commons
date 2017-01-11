@@ -15,22 +15,29 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local linked_hash_table = require "dromozoa.commons.linked_hash_table"
+local equal = require "dromozoa.commons.equal"
+local json = require "dromozoa.commons.json"
 local map = require "dromozoa.commons.map"
-local multimap = require "dromozoa.commons.multimap"
-local multimap_handle = require "dromozoa.commons.multimap_handle"
+local pairs = require "dromozoa.commons.pairs"
+local sequence = require "dromozoa.commons.sequence"
 
-local stable_metatables = {
-  [linked_hash_table.metatable] = true;
-  [map.metatable] = true;
-  [multimap.metatable] = true;
-  [multimap_handle.metatable] = true;
-}
+local m = map()
+m.foo = 17
+m.bar = 23
+m.baz = 37
+m.qux = 42
+m.foo = 0.5
+m.qux = nil
 
-return function (self)
-  if type(self) == "table" then
-    if stable_metatables[getmetatable(self)] then
-      return true
-    end
-  end
+assert(m.foo == 0.5)
+assert(m.bar == 23)
+assert(m.baz == 37)
+assert(m.qux == nil)
+
+local data = sequence()
+for k, v in m:each() do
+  data:push(k, v)
 end
+assert(equal(data, { "bar", 23, "baz", 37, "foo", 0.5 }))
+
+assert(json.encode(m) == [[{"bar":23,"baz":37,"foo":0.5}]])
