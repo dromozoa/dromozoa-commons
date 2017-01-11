@@ -19,6 +19,7 @@ local empty = require "dromozoa.commons.empty"
 local hash_table = require "dromozoa.commons.hash_table"
 local linked_hash_table = require "dromozoa.commons.linked_hash_table"
 local queue = require "dromozoa.commons.queue"
+local single = require "dromozoa.commons.single"
 
 local t = linked_hash_table()
 assert(empty(""))
@@ -27,13 +28,39 @@ assert(empty(hash_table()))
 assert(empty(linked_hash_table()))
 assert(empty(queue()))
 
+assert(not single(""))
+assert(not single({}))
+assert(not single(hash_table()))
+assert(not single(linked_hash_table()))
+assert(not single(queue()))
+
+assert(not empty("f"))
 assert(not empty("foo"))
 assert(not empty({ 42 }))
 assert(not empty({ foo = 42 }))
 local t = hash_table()
 t.foo = 42
 assert(not empty(t))
-local t = hash_table()
+local t = linked_hash_table()
 t.foo = 42
 assert(not empty(t))
 assert(not empty(queue():push("foo")))
+
+assert(single("f"))
+assert(not single("foo"))
+assert(single({ 42 }))
+assert(single({ foo = 42 }))
+local t = hash_table()
+t.foo = 42
+assert(single(t))
+t.bar = 69
+assert(not single(t))
+local t = linked_hash_table()
+t.foo = 42
+assert(single(t))
+t.bar = 69
+assert(not single(t))
+assert(single(queue():push("foo")))
+
+
+
