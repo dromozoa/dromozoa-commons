@@ -99,6 +99,7 @@ local function lines(result, ...)
   end
 end
 
+local super = string_matcher
 local class = {}
 
 function class:read(...)
@@ -146,7 +147,7 @@ class.metatable = {
 }
 
 return setmetatable(class, {
-  __index = string_matcher;
+  __index = super;
   __call = function (_, s)
     return setmetatable(class.new(s), class.metatable)
   end;

@@ -63,6 +63,7 @@ local function sigma1(x)
   return bxor(rotr(x, 17), rotr(x, 19), shr(x, 10))
 end
 
+local super = sha
 local class = {
   hex_format = ("%02x"):rep(32);
 }
@@ -144,7 +145,7 @@ function class.hex(message)
 end
 
 function class.hmac(K, text, encode)
-  return sha.hmac(class, K, text, encode)
+  return super.hmac(class, K, text, encode)
 end
 
 class.metatable = {
@@ -152,7 +153,7 @@ class.metatable = {
 }
 
 return setmetatable(class, {
-  __index = sha;
+  __index = super;
   __call = function ()
     return setmetatable(class.new(), class.metatable)
   end;

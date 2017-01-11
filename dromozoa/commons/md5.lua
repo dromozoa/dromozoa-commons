@@ -88,6 +88,7 @@ local function II(a, b, c, d, x, s, ac)
   return a
 end
 
+local super = message_digest
 local class = {
   hex_format = ("%02x"):rep(16);
 }
@@ -201,7 +202,7 @@ function class.hex(message)
 end
 
 function class.hmac(K, text, encode)
-  return message_digest.hmac(class, K, text, encode)
+  return super.hmac(class, K, text, encode)
 end
 
 class.metatable = {
@@ -209,7 +210,7 @@ class.metatable = {
 }
 
 return setmetatable(class, {
-  __index = message_digest;
+  __index = super;
   __call = function ()
     return setmetatable(class.new(), class.metatable)
   end;

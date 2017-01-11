@@ -19,6 +19,7 @@ local pairs = require "dromozoa.commons.pairs"
 local sequence = require "dromozoa.commons.sequence"
 local set = require "dromozoa.commons.set"
 
+local super = set
 local class = {}
 
 function class:set(i, j)
@@ -111,7 +112,7 @@ class.metatable = {
 }
 
 return setmetatable(class, {
-  __index = set;
+  __index = super;
   __call = function ()
     return setmetatable(class.new(), class.metatable)
   end;
