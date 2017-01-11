@@ -17,11 +17,8 @@
 
 local multimap = require "dromozoa.commons.multimap"
 
+local super = multimap
 local class = {}
-
-function class.new(compare)
-  return multimap.new(compare)
-end
 
 function class:get(key)
   if key == nil then
@@ -45,7 +42,7 @@ function class:insert(key, value, overwrite)
   end
   local handle = class.equal_range(self, key)
   if handle:empty() then
-    multimap.insert(self, key, value)
+    super.insert(self, key, value)
     return nil
   else
     local _, v = handle:head()
@@ -80,7 +77,7 @@ end
 
 class.metatable = {
   __newindex = class.set;
-  __pairs = multimap.each;
+  __pairs = super.each;
 }
 
 function class.metatable:__index(key)
@@ -93,7 +90,7 @@ function class.metatable:__index(key)
 end
 
 return setmetatable(class, {
-  __index = multimap;
+  __index = super;
   __call = function (_, compare)
     return setmetatable(class.new(compare), class.metatable)
   end;
