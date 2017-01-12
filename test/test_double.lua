@@ -1,4 +1,4 @@
--- Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2015,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -17,11 +17,21 @@
 
 local double = require "dromozoa.commons.double"
 local equal = require "dromozoa.commons.equal"
+local uint32 = require "dromozoa.commons.uint32"
 
 local function test(this, that)
+  -- print(this, ("%08x %08x"):format(double.word(this)))
   assert(equal({ double.word(this) }, that))
   assert(equal({ double.word(this, "<") }, that))
   assert(equal({ double.word(this, ">") }, { that[2], that[1] }))
+end
+
+local function test_nan(this)
+  local a, b = double.word(this)
+  -- print(this, ("%08x %08x"):format(a, b))
+  assert(uint32.band(b, 0x7ff00000) == 0x7ff00000)
+  assert(uint32.band(b, 0x00080000) == 0x00080000) -- qNaN
+  assert(uint32.band(b, 0x000fffff) ~= 0 or a ~= 0)
 end
 
 local DBL_MAX = 1.7976931348623157e+308
@@ -39,4 +49,4 @@ test(0,              { 0x00000000, 0x00000000 })
 test(-1 / math.huge, { 0x00000000, 0x80000000 })
 test(math.huge,      { 0x00000000, 0x7ff00000 })
 test(-math.huge,     { 0x00000000, 0xfff00000 })
-test(0 / 0,          { 0x00000000, 0xfff80000 })
+test_nan(0 / 0)
