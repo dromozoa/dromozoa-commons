@@ -1,4 +1,4 @@
--- Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2015,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -45,12 +45,15 @@ function class:concat(sep)
   return table.concat(self, sep)
 end
 
-local metatable = {
+class.metatable = {
   __index = class;
 }
 
 return setmetatable(class, {
-  __call = function ()
-    return setmetatable(class.new(), metatable)
+  __call = function (_, self)
+    if self == nil then
+      self = class.new()
+    end
+    return setmetatable(self, class.metatable)
   end;
 })

@@ -1,4 +1,4 @@
--- Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2015,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -99,6 +99,7 @@ local function lines(result, ...)
   end
 end
 
+local super = string_matcher
 local class = {}
 
 function class:read(...)
@@ -141,13 +142,13 @@ function class:seek(whence, offset)
   return pos
 end
 
-local metatable = {
+class.metatable = {
   __index = class;
 }
 
 return setmetatable(class, {
-  __index = string_matcher;
+  __index = super;
   __call = function (_, s)
-    return setmetatable(class.new(s), metatable)
+    return setmetatable(class.new(s), class.metatable)
   end;
 })

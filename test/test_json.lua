@@ -1,4 +1,4 @@
--- Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2015,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -15,7 +15,6 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local dumper = require "dromozoa.commons.dumper"
 local empty = require "dromozoa.commons.empty"
 local equal = require "dromozoa.commons.equal"
 local linked_hash_table = require "dromozoa.commons.linked_hash_table"
@@ -24,7 +23,6 @@ local json = require "dromozoa.commons.json"
 
 local function test(this, that)
   local value = json.decode(this)
-  -- print(dumper.encode(value))
   local code = json.encode(value)
   if that == nil then
     assert(equal(code, this))
@@ -84,3 +82,35 @@ assert(empty(json.decode("[]")))
 assert(empty(json.decode("{}")))
 assert(equal(json.decode([[ [ 17 , 23 ] ]]), { 17, 23 }))
 assert(equal(json.decode([[ { "foo" : 17 , "bar" : 23 } ]]), { foo = 17, bar = 23 }))
+
+local t = {
+  array = sequence();
+  table = {};
+  one = { 42 };
+}
+assert(json.encode(t, { stable = true }) == [[{"array":[],"one":[42],"table":{}}]])
+
+local t = {
+  foo = { 17, 23, 37, 42 };
+  ["foo bar"] = 0.25;
+  [true] = "foo";
+  bar = { 42 };
+  baz = { baz = false };
+  qux = {};
+  [1] = { { sequence() } };
+  [2] = { foo = { bar = { baz = "qux" } } };
+  [function () end] = "ignore";
+}
+
+local result1 = json.encode(t)
+local result2 = json.encode(t, { pretty = true })
+local result3 = json.encode(t, { stable = true })
+local result4 = json.encode(t, { pretty = true, stable = true })
+-- print(result1)
+-- print(result2)
+-- print(result3)
+-- print(result4)
+assert(equal(json.decode(result1), json.decode(result2)))
+assert(equal(json.decode(result1), json.decode(result3)))
+assert(equal(json.decode(result1), json.decode(result4)))
+assert(result3 == [=[{"1":[[[]]],"2":{"foo":{"bar":{"baz":"qux"}}},"bar":[42],"baz":{"baz":false},"foo bar":0.25,"foo":[17,23,37,42],"qux":{},"true":"foo"}]=])

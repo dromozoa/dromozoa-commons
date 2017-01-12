@@ -1,4 +1,4 @@
--- Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2015,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -17,16 +17,6 @@
 
 local lua_version_num = require "dromozoa.commons.lua_version_num"
 
-local function word(v, endian)
-  local b = v % 0x100000000
-  local a = (v - b) / 0x100000000
-  if endian == ">" then
-    return a, b
-  else
-    return b, a
-  end
-end
-
 if lua_version_num >= 503 then
   return {
     word = function (v, endian)
@@ -41,6 +31,14 @@ if lua_version_num >= 503 then
   }
 else
   return {
-    word = word;
+    word = function (v, endian)
+      local b = v % 0x100000000
+      local a = (v - b) / 0x100000000
+      if endian == ">" then
+        return a, b
+      else
+        return b, a
+      end
+    end;
   }
 end

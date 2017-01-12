@@ -1,4 +1,4 @@
--- Copyright (C) 2015,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -15,16 +15,23 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local sequence_writer = require "dromozoa.commons.sequence_writer"
-
-local out = sequence_writer()
-out:write("foo"):write("bar", 42)
-out:write("baz")
-out:write()
-assert(not pcall(out.write, out, true))
-assert(out:concat() == "foobar42baz")
-assert(out:concat(",") == "foo,bar,42,baz")
-
-local out = sequence_writer({ "foo" })
-out:write("bar")
-assert(out:concat() == "foobar")
+return function (self)
+  if type(self) == "table" then
+    local m = 0
+    local n = 0
+    for k in pairs(self) do
+      if type(k) == "number" and k > 0 and k % 1 == 0 then
+        if m < k then
+          m = k
+        end
+        n = n + 1
+      else
+        return
+      end
+    end
+    if n * 1.8 < m then
+      return
+    end
+    return m
+  end
+end

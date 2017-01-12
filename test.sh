@@ -1,6 +1,6 @@
 #! /bin/sh -e
 
-# Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+# Copyright (C) 2015,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 #
 # This file is part of dromozoa-commons.
 #
@@ -26,3 +26,5 @@ for i in test/test*.lua
 do
   "$lua" "$i"
 done
+
+rm -f test.dot

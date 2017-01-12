@@ -1,4 +1,4 @@
--- Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2015,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -15,9 +15,9 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
+local lua_version_num = require "dromozoa.commons.lua_version_num"
 local read_file = require "dromozoa.commons.read_file"
 local write_file = require "dromozoa.commons.write_file"
-local lua_version_num = require "dromozoa.commons.lua_version_num"
 
 local q = [[']]
 local e = [[\']]
@@ -25,13 +25,11 @@ local qeq = q .. e .. q
 local eqq = e .. q .. q
 local qqe = q .. q .. e
 
-local function quote(value)
+local class = {}
+
+function class.quote(value)
   return ((q .. tostring(value):gsub(q, qeq) .. q):gsub(eqq, e):gsub(qqe, e))
 end
-
-local class = {
-  quote = quote;
-}
 
 if lua_version_num >= 502 then
   function class.exec(command)
@@ -51,7 +49,7 @@ if lua_version_num >= 502 then
     else
       local tmpin = os.tmpname()
       assert(write_file(tmpin, tostring(stdin)))
-      local handle = assert(io.popen("(" .. command .. ")<" .. quote(tmpin)))
+      local handle = assert(io.popen("(" .. command .. ")<" .. class.quote(tmpin)))
       local stdout = assert(handle:read("*a"))
       local result, what, status = handle:close()
       os.remove(tmpin)
@@ -104,7 +102,7 @@ else
   function class.eval(command, stdin)
     if stdin == nil then
       local tmpout = os.tmpname()
-      local result, what, status = class.exec("(" .. command .. ")>" .. quote(tmpout))
+      local result, what, status = class.exec("(" .. command .. ")>" .. class.quote(tmpout))
       local stdout = assert(read_file(tmpout))
       os.remove(tmpout)
       if result == nil then
@@ -116,7 +114,7 @@ else
       local tmpin = os.tmpname()
       assert(write_file(tmpin, tostring(stdin)))
       local tmpout = os.tmpname()
-      local result, what, status = class.exec("(" .. command .. ")<" .. quote(tmpin) .. ">" .. quote(tmpout))
+      local result, what, status = class.exec("(" .. command .. ")<" .. class.quote(tmpin) .. ">" .. class.quote(tmpout))
       local stdout = assert(read_file(tmpout))
       os.remove(tmpin)
       os.remove(tmpout)

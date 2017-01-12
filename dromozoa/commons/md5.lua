@@ -1,4 +1,4 @@
--- Copyright (C) 2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -88,6 +88,7 @@ local function II(a, b, c, d, x, s, ac)
   return a
 end
 
+local super = message_digest
 local class = {
   hex_format = ("%02x"):rep(16);
 }
@@ -201,16 +202,16 @@ function class.hex(message)
 end
 
 function class.hmac(K, text, encode)
-  return message_digest.hmac(class, K, text, encode)
+  return super.hmac(class, K, text, encode)
 end
 
-local metatable = {
+class.metatable = {
   __index = class;
 }
 
 return setmetatable(class, {
-  __index = message_digest;
+  __index = super;
   __call = function ()
-    return setmetatable(class.new(), metatable)
+    return setmetatable(class.new(), class.metatable)
   end;
 })

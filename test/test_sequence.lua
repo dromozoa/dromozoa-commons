@@ -1,4 +1,4 @@
--- Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2015,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -84,3 +84,5 @@ for k, v in pairs(sequence():push("foo", "bar", "baz", "qux")) do
   n = n + 1
 end
 assert(n == 4)
+
+assert(sequence.metatable ~= nil)

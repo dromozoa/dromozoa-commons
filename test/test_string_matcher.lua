@@ -1,4 +1,4 @@
--- Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2015,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -84,4 +84,3 @@ assert(not m:eof())
 
 assert(string_matcher(""):eof())
 assert(not string_matcher("foo"):eof())
-

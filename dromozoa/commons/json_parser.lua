@@ -1,4 +1,4 @@
--- Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2015,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -163,7 +163,7 @@ function class:parse_value()
   end
 end
 
-function class:apply()
+function class:parse()
   local this = self.this
   local stack = self.stack
   self:parse_value()
@@ -175,12 +175,12 @@ function class:apply()
   end
 end
 
-local metatable = {
+class.metatable = {
   __index = class;
 }
 
 return setmetatable(class, {
   __call = function (_, this)
-    return setmetatable(class.new(this), metatable)
+    return setmetatable(class.new(this), class.metatable)
   end;
 })

@@ -1,4 +1,4 @@
--- Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2015,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -61,11 +61,11 @@ function class:each()
   end)
 end
 
-local metatable = {
+class.metatable = {
   __index = class;
 }
 
-function metatable:__pairs()
+function class.metatable:__pairs()
   return coroutine.wrap(function ()
     for i = self.min, self.max do
       coroutine.yield(i, self[i])
@@ -75,6 +75,6 @@ end
 
 return setmetatable(class, {
   __call = function ()
-    return setmetatable(class.new(), metatable)
+    return setmetatable(class.new(), class.metatable)
   end;
 })

@@ -1,4 +1,4 @@
--- Copyright (C) 2015,2016 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2015-2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -22,6 +22,7 @@ local band = uint32.band
 local bxor = uint32.bxor
 local bnot = uint32.bnot
 
+local super = message_digest
 local class = {
   Parity = bxor;
 }
@@ -35,5 +36,5 @@ function class.Maj(x, y, z)
 end
 
 return setmetatable(class, {
-  __index = message_digest;
+  __index = super;
 })

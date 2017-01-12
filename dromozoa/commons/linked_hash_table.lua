@@ -1,4 +1,4 @@
--- Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2015,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -135,11 +135,11 @@ function class:set(key, value)
   end
 end
 
-local metatable = {
+class.metatable = {
   __newindex = class.set;
 }
 
-function metatable:__index(key)
+function class.metatable:__index(key)
   local v = class.get(self, key)
   if v == nil then
     return class[key]
@@ -148,7 +148,7 @@ function metatable:__index(key)
   end
 end
 
-function metatable:__pairs()
+function class.metatable:__pairs()
   return coroutine.wrap(function ()
     for k, v in class.each(self) do
       coroutine.yield(k, v)
@@ -158,6 +158,6 @@ end
 
 return setmetatable(class, {
   __call = function ()
-    return setmetatable(class.new(), metatable)
+    return setmetatable(class.new(), class.metatable)
   end;
 })

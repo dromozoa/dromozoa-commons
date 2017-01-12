@@ -1,4 +1,4 @@
--- Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2015,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -98,12 +98,12 @@ function class:set_symmetric_difference(that)
   return self
 end
 
-local metatable = {
+class.metatable = {
   __index = class;
 }
 
 return setmetatable(class, {
   __call = function ()
-    return setmetatable(class.new(), metatable)
+    return setmetatable(class.new(), class.metatable)
   end;
 })
