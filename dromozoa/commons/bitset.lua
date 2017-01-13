@@ -113,7 +113,7 @@ class.metatable = {
 
 return setmetatable(class, {
   __index = super;
-  __call = function ()
-    return setmetatable(class.new(), class.metatable)
+  __call = function (_, self)
+    return setmetatable(class.new(self), class.metatable)
   end;
 })

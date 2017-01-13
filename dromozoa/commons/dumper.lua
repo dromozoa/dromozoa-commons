@@ -22,8 +22,7 @@ local sequence_writer = require "dromozoa.commons.sequence_writer"
 local class = {}
 
 function class.write(out, value, options)
-  dumper_writer(out, options):write(value)
-  return out
+  return dumper_writer(out, options):write(value)
 end
 
 function class.encode(value, options)

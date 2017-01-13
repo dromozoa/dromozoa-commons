@@ -19,8 +19,12 @@ local pairs = require "dromozoa.commons.pairs"
 
 local class = {}
 
-function class.new()
-  return {}
+function class.new(self)
+  if self == nil then
+    return {}
+  else
+    return self
+  end
 end
 
 function class:includes(that)
@@ -103,7 +107,7 @@ class.metatable = {
 }
 
 return setmetatable(class, {
-  __call = function ()
-    return setmetatable(class.new(), class.metatable)
+  __call = function (_, self)
+    return setmetatable(class.new(self), class.metatable)
   end;
 })
