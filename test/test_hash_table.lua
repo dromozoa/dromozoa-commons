@@ -135,3 +135,11 @@ t.foo = 17
 t.bar = 23
 assert(equal(t, { foo = 17, bar = 23 }))
 assert(equal({ foo = 17, bar = 23 }, t))
+
+local t = hash_table()
+t.get = 17
+t.set = 23
+assert(equal(t, { get = 17, set = 23 }))
+
+t[{ foo = 42 }] = 69
+assert(t[{ foo = 42 }] == 69)
