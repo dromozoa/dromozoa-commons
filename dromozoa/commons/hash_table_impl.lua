@@ -16,32 +16,8 @@
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
 local equal = require "dromozoa.commons.equal"
-local murmur_hash3 = require "dromozoa.commons.murmur_hash3"
+local hash = require "dromozoa.commons.hash"
 local pairs = require "dromozoa.commons.pairs"
-local uint32 = require "dromozoa.commons.uint32"
-
-local function hash(key)
-  local t = type(key)
-  if t == "number" then
-    return murmur_hash3.double(key, 1)
-  elseif t == "string" then
-    return murmur_hash3.string(key, 2)
-  elseif t == "boolean" then
-    if key then
-      return murmur_hash3.uint32(1, 3)
-    else
-      return murmur_hash3.uint32(0, 3)
-    end
-  elseif t == "table" then
-    local h = murmur_hash3.uint32(0, 4)
-    for k, v in pairs(key) do
-      h = uint32.add(h, hash(k), hash(v))
-    end
-    return h
-  else
-    return 0
-  end
-end
 
 local class = {}
 
