@@ -78,6 +78,7 @@ end
 class.metatable = {
   __newindex = class.set;
   __pairs = super.each;
+  ["dromozoa.commons.is_stable"] = true;
 }
 
 function class.metatable:__index(key)

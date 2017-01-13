@@ -119,6 +119,7 @@ end
 class.metatable = {
   __index = class;
   __pairs = class.each;
+  ["dromozoa.commons.is_stable"] = true;
 }
 
 return setmetatable(class, {
