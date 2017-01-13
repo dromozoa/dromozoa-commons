@@ -37,49 +37,49 @@ function class:includes(that)
 end
 
 function class:intersection(that)
-  local count = 0
+  local n = 0
   for k in pairs(self) do
     if that[k] == nil then
-      count = count + 1
+      n = n + 1
       self[k] = nil
     end
   end
-  return count
+  return n
 end
 
 function class:difference(that)
-  local count = 0
+  local n = 0
   for k in pairs(self) do
     if that[k] ~= nil then
-      count = count + 1
+      n = n + 1
       self[k] = nil
     end
   end
-  return count
+  return n
 end
 
 function class:union(that)
-  local count = 0
+  local n = 0
   for k, v in pairs(that) do
     if self[k] == nil then
-      count = count + 1
+      n = n + 1
       self[k] = v
     end
   end
-  return count
+  return n
 end
 
 function class:symmetric_difference(that)
-  local count = 0
+  local n = 0
   for k, v in pairs(that) do
-    count = count + 1
+    n = n + 1
     if self[k] == nil then
       self[k] = v
     else
       self[k] = nil
     end
   end
-  return count
+  return n
 end
 
 function class:set_intersection(that)

@@ -19,14 +19,14 @@ local pairs = require "dromozoa.commons.pairs"
 
 return function (self)
   if type(self) == "table" then
-    local count = 0
+    local n = 0
     for _ in pairs(self) do
-      count = count + 1
-      if count > 1 then
+      n = n + 1
+      if n > 1 then
         return false
       end
     end
-    return count == 1
+    return n == 1
   else
     return #self == 1
   end

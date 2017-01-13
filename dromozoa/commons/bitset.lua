@@ -65,11 +65,11 @@ function class:each()
 end
 
 function class:count()
-  local count = 0
+  local n = 0
   for _ in pairs(self) do
-    count = count + 1
+    n = n + 1
   end
-  return count
+  return n
 end
 
 function class:bounds()

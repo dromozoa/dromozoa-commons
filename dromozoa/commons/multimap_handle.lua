@@ -37,13 +37,13 @@ function class:delete()
   else
     local tree = self.tree
     local b = self.b
-    local count = 0
+    local n = 0
     while true do
       local s = tree:successor(a)
       tree:delete(a)
-      count = count + 1
+      n = n + 1
       if a == b then
-        return count
+        return n
       end
       a = s
     end
@@ -57,13 +57,13 @@ function class:set(value)
   else
     local tree = self.tree
     local b = self.b
-    local count = 0
+    local n = 0
     while true do
       local s = tree:successor(a)
       tree:set(a, value)
-      count = count + 1
+      n = n + 1
       if a == b then
-        return count
+        return n
       end
       a = s
     end
