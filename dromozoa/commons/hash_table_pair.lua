@@ -18,88 +18,89 @@
 local class = {}
 
 function class.new()
-  -- 1: P (prev)
-  -- 2: N (next)
-  -- 3: K (key)
-  -- 4: V (value)
-  -- 5: H (handle)
-  -- 6: F (front)
-  return { {}, {}, {}, {}, 0 }
+  return {
+    P = {}; -- prev
+    N = {}; -- next
+    K = {}; -- key
+    V = {}; -- value
+    h = 0; -- handle
+    f = nil; -- front
+  }
 end
 
 function class:find(handle)
-  local K = self[3]
-  local V = self[4]
+  local K = self.K
+  local V = self.V
   local k = K[handle]
   local v = V[handle]
   return k, v
 end
 
 function class:get(handle)
-  local V = self[4]
+  local V = self.V
   local v = V[handle]
   return v
 end
 
 function class:each()
-  local F = self[6]
-  if F == nil then
+  local f = self.f
+  if f == nil then
     return function () end
   else
-    local N = self[2]
-    local K = self[3]
-    local V = self[4]
+    local N = self.N
+    local K = self.K
+    local V = self.V
     return coroutine.wrap(function ()
-      local handle = F
+      local handle = f
       repeat
         coroutine.yield(K[handle], V[handle], handle)
         handle = N[handle]
-      until handle == F
+      until handle == f
     end)
   end
 end
 
 function class:set(handle, value)
-  local V = self[4]
+  local V = self.V
   local v = V[handle]
   V[handle] = value
   return v
 end
 
 function class:insert(key, value)
-  local P = self[1]
-  local N = self[2]
-  local K = self[3]
-  local V = self[4]
-  local h = self[5] + 1
-  local F = self[6]
-  if F == nil then
+  local P = self.P
+  local N = self.N
+  local K = self.K
+  local V = self.V
+  local h = self.h + 1
+  local f = self.f
+  if f == nil then
     P[h] = h
     N[h] = h
-    self[6] = h
+    self.f = h
   else
-    local p = P[F]
+    local p = P[f]
     P[h] = p
-    N[h] = F
-    P[F] = h
+    N[h] = f
+    P[f] = h
     N[p] = h
   end
   K[h] = key
   V[h] = value
-  self[5] = h
+  self.h = h
   return h
 end
 
 function class:remove(handle)
-  local P = self[1]
-  local N = self[2]
-  local K = self[3]
-  local V = self[4]
+  local P = self.P
+  local N = self.N
+  local K = self.K
+  local V = self.V
   local p = P[handle]
   local n = N[handle]
   local v = V[handle]
   if handle == p then
-    self[6] = nil
+    self.f = nil
   else
     P[n] = p
     N[p] = n
