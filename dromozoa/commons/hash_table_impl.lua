@@ -18,6 +18,7 @@
 local equal = require "dromozoa.commons.equal"
 local murmur_hash3 = require "dromozoa.commons.murmur_hash3"
 local pairs = require "dromozoa.commons.pairs"
+local uint32 = require "dromozoa.commons.uint32"
 
 local function hash(key)
   local t = type(key)
@@ -32,9 +33,9 @@ local function hash(key)
       return murmur_hash3.uint32(0, 3)
     end
   elseif t == "table" then
-    local h = murmur_hash3.uint64(#key, 4)
-    for i = 1, #key do
-      h = murmur_hash3.uint32(hash(key[i]), h)
+    local h = murmur_hash3.uint32(0, 4)
+    for k, v in pairs(key) do
+      h = uint32.add(h, hash(k), hash(v))
     end
     return h
   else
