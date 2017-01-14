@@ -84,11 +84,11 @@ assert(count(m:lower_bound(4)) == 0)
 assert(count(m:upper_bound(1.5)) == 3)
 assert(count(m:lower_bound(2.5)) == 3)
 
-assert(m:upper_bound(0.5):delete() == 0)
-assert(m:upper_bound(1.5):delete() == 3)
+assert(m:upper_bound(0.5):remove() == 0)
+assert(m:upper_bound(1.5):remove() == 3)
 
-assert(m:lower_bound(3.5):delete() == 0)
-assert(m:lower_bound(2.5):delete() == 3)
+assert(m:lower_bound(3.5):remove() == 0)
+assert(m:lower_bound(2.5):remove() == 3)
 assert(count(m) == 3)
 
 m:insert(42, "qux")
@@ -135,7 +135,7 @@ assert(equal({ m:head() }, { 1 }))
 assert(equal({ m:tail() }, { 3 }))
 
 for k, v, h in m:each() do
-  h:delete()
+  h:remove()
 end
 
 local m = multimap()

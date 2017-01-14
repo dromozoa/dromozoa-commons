@@ -30,7 +30,7 @@ function class:reset(a, b)
   return self
 end
 
-function class:delete()
+function class:remove()
   local a = self.a
   if a == nil then
     return 0
