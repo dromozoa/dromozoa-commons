@@ -25,8 +25,7 @@ local class = {
 }
 
 function class.write(out, value, options)
-  json_writer(out, options):write(value)
-  return out
+  return json_writer(out, options):write(value)
 end
 
 function class.encode(value, options)

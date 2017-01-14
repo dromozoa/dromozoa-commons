@@ -30,20 +30,20 @@ function class:reset(a, b)
   return self
 end
 
-function class:delete()
+function class:remove()
   local a = self.a
   if a == nil then
     return 0
   else
     local tree = self.tree
     local b = self.b
-    local count = 0
+    local n = 0
     while true do
       local s = tree:successor(a)
       tree:delete(a)
-      count = count + 1
+      n = n + 1
       if a == b then
-        return count
+        return n
       end
       a = s
     end
@@ -57,13 +57,13 @@ function class:set(value)
   else
     local tree = self.tree
     local b = self.b
-    local count = 0
+    local n = 0
     while true do
       local s = tree:successor(a)
       tree:set(a, value)
-      count = count + 1
+      n = n + 1
       if a == b then
-        return count
+        return n
       end
       a = s
     end
@@ -118,8 +118,29 @@ end
 
 class.metatable = {
   __index = class;
-  __pairs = class.each;
+  ["dromozoa.commons.is_stable"] = true;
 }
+
+function class.metatable:__pairs()
+  local a = self.a
+  if a == nil then
+    return function () end
+  else
+    local tree = self.tree
+    local b = self.b
+    return coroutine.wrap(function ()
+      while true do
+        local s = tree:successor(a)
+        local k, v = tree:get(a)
+        coroutine.yield(k, v)
+        if a == b then
+          break
+        end
+        a = s
+      end
+    end)
+  end
+end
 
 return setmetatable(class, {
   __call = function (_, tree, a, b)

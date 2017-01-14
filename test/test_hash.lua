@@ -1,4 +1,4 @@
--- Copyright (C) 2015,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -15,22 +15,27 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local dumper_writer = require "dromozoa.commons.dumper_writer"
-local loadstring = require "dromozoa.commons.loadstring"
-local sequence_writer = require "dromozoa.commons.sequence_writer"
+local hash = require "dromozoa.commons.hash"
 
-local class = {}
-
-function class.write(out, value, options)
-  return dumper_writer(out, options):write(value)
+local map = {}
+local function test(key)
+  local h = hash(key)
+  -- print(("%08x"):format(h))
+  assert(map[h] == nil)
+  map[h] = true
 end
 
-function class.encode(value, options)
-  return class.write(sequence_writer(), value, options):concat()
-end
-
-function class.decode(code)
-  return assert(loadstring("return " .. code))()
-end
-
-return class
+test(0)
+test(1)
+test(2)
+test(true)
+test(false)
+test("foo")
+test("f")
+test("f\0")
+test("f\0\0")
+test({})
+test({{}})
+test({{{}}})
+test({ foo = "bar" })
+test({ bar = "foo" })

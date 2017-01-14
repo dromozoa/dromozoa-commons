@@ -21,9 +21,9 @@ local private_impl = function () end
 
 local class = {}
 
-function class.new()
+function class.new(hasher)
   return {
-    [private_impl] = hash_table_impl();
+    [private_impl] = hash_table_impl(hasher);
   }
 end
 
@@ -112,7 +112,7 @@ function class.metatable:__index(key)
 end
 
 return setmetatable(class, {
-  __call = function ()
-    return setmetatable(class.new(), class.metatable)
+  __call = function (_, hasher)
+    return setmetatable(class.new(hasher), class.metatable)
   end;
 })

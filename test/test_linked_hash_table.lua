@@ -138,3 +138,8 @@ end
 for k, v, i in pairs(t) do
   assert(i == nil)
 end
+
+local t = linked_hash_table()
+t.get = 17
+t.set = 23
+assert(equal(t, { get = 17, set = 23 }))

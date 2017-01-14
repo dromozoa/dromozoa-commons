@@ -24,10 +24,10 @@ local private_pair = function () end
 
 local class = {}
 
-function class.new()
+function class.new(hasher)
   return {
     [private_base] = {};
-    [private_impl] = hash_table_impl();
+    [private_impl] = hash_table_impl(hasher);
     [private_pair] = hash_table_pair();
   }
 end
@@ -137,6 +137,7 @@ end
 
 class.metatable = {
   __newindex = class.set;
+  ["dromozoa.commons.is_stable"] = true;
 }
 
 function class.metatable:__index(key)
@@ -157,7 +158,7 @@ function class.metatable:__pairs()
 end
 
 return setmetatable(class, {
-  __call = function ()
-    return setmetatable(class.new(), class.metatable)
+  __call = function (_, hasher)
+    return setmetatable(class.new(hasher), class.metatable)
   end;
 })

@@ -174,6 +174,7 @@ function class:write(value, depth)
   else
     out:write("nil")
   end
+  return out
 end
 
 class.metatable = {
