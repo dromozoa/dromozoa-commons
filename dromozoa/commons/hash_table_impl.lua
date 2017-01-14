@@ -96,8 +96,8 @@ function class:insert(key, value, overwrite)
   end
   local KS = self.KS
   local ks = KS[h]
+  local VS = self.VS
   if ks == nil then
-    local VS = self.VS
     KS[h] = { key }
     VS[h] = { value }
     return nil
@@ -105,8 +105,6 @@ function class:insert(key, value, overwrite)
   local n = #ks
   for i = 1, n do
     if equal(ks[i], key) then
-      -- TODO: ??? VS
-      local VS = self.VS
       local vs = VS[h]
       local v = vs[i]
       if overwrite then
@@ -115,7 +113,6 @@ function class:insert(key, value, overwrite)
       return v
     end
   end
-  local VS = self.VS
   local vs = VS[h]
   n = n + 1
   ks[n] = key
