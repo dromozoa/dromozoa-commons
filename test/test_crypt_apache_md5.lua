@@ -17,9 +17,13 @@
 
 local crypt_apache_md5 = require "dromozoa.commons.crypt_apache_md5"
 
+local mode = ...
+
 local function test(key, salt_string, expected)
   local result = crypt_apache_md5(key, salt_string)
-  print(result)
+  if mode == "all" then
+    print(result)
+  end
   assert(result == expected)
 end
 
@@ -27,15 +31,18 @@ test(
     "password",
     "$apr1$Gvvu.7Ji$w0G/FLFmHCrKxNYRhtAvM1",
     "$apr1$Gvvu.7Ji$w0G/FLFmHCrKxNYRhtAvM1")
-test(
-    "password",
-    "$apr1$Gvvu.7Ji",
-    "$apr1$Gvvu.7Ji$w0G/FLFmHCrKxNYRhtAvM1")
-test(
-    "password",
-    "$apr1$Gvvu.7Jixxxxxxxxxxxxxxxxxxxxxxx",
-    "$apr1$Gvvu.7Ji$w0G/FLFmHCrKxNYRhtAvM1")
-test(
-    "01234567890123456789012345678901234567890123456789012345678901234567890123456789",
-    "$apr1$D9MRDWjh$G8V8I9G.d69pM7yWkGUlk0",
-    "$apr1$D9MRDWjh$G8V8I9G.d69pM7yWkGUlk0")
+
+if mode == "all" then
+  test(
+      "password",
+      "$apr1$Gvvu.7Ji",
+      "$apr1$Gvvu.7Ji$w0G/FLFmHCrKxNYRhtAvM1")
+  test(
+      "password",
+      "$apr1$Gvvu.7Jixxxxxxxxxxxxxxxxxxxxxxx",
+      "$apr1$Gvvu.7Ji$w0G/FLFmHCrKxNYRhtAvM1")
+  test(
+      "01234567890123456789012345678901234567890123456789012345678901234567890123456789",
+      "$apr1$D9MRDWjh$G8V8I9G.d69pM7yWkGUlk0",
+      "$apr1$D9MRDWjh$G8V8I9G.d69pM7yWkGUlk0")
+end
