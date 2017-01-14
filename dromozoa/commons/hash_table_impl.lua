@@ -19,10 +19,16 @@ local equal = require "dromozoa.commons.equal"
 local hash = require "dromozoa.commons.hash"
 local pairs = require "dromozoa.commons.pairs"
 
+local default_hasher = hash
+
 local class = {}
 
-function class.new()
+function class.new(hasher)
+  if hasher == nil then
+    hasher = default_hasher
+  end
   return {
+    hasher = hasher;
     K = {}; -- key
     V = {}; -- value
     KS = {}; -- key set
@@ -31,7 +37,7 @@ function class.new()
 end
 
 function class:get(key)
-  local h = hash(key)
+  local h = self.hasher(key)
   local K = self.K
   local k = K[h]
   if k == nil then
@@ -77,7 +83,7 @@ function class:each()
 end
 
 function class:insert(key, value, overwrite)
-  local h = hash(key)
+  local h = self.hasher(key)
   local K = self.K
   local k = K[h]
   if k == nil then
@@ -121,7 +127,7 @@ function class:insert(key, value, overwrite)
 end
 
 function class:remove(key)
-  local h = hash(key)
+  local h = self.hasher(key)
   local K = self.K
   local k = K[h]
   if k == nil then
@@ -168,7 +174,7 @@ class.metatable = {
 }
 
 return setmetatable(class, {
-  __call = function ()
-    return setmetatable(class.new(), class.metatable)
+  __call = function (_, hasher)
+    return setmetatable(class.new(hasher), class.metatable)
   end;
 })
