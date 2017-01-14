@@ -118,9 +118,29 @@ end
 
 class.metatable = {
   __index = class;
-  __pairs = class.each;
   ["dromozoa.commons.is_stable"] = true;
 }
+
+function class.metatable:__pairs()
+  local a = self.a
+  if a == nil then
+    return function () end
+  else
+    local tree = self.tree
+    local b = self.b
+    return coroutine.wrap(function ()
+      while true do
+        local s = tree:successor(a)
+        local k, v = tree:get(a)
+        coroutine.yield(k, v)
+        if a == b then
+          break
+        end
+        a = s
+      end
+    end)
+  end
+end
 
 return setmetatable(class, {
   __call = function (_, tree, a, b)

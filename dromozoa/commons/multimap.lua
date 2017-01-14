@@ -112,9 +112,29 @@ end
 
 class.metatable = {
   __index = class;
-  __pairs = class.each;
   ["dromozoa.commons.is_stable"] = true;
 }
+
+function class.metatable:__pairs()
+  local impl = self[private_impl]
+  local a = impl:minimum()
+  if a == nil then
+    return function () end
+  else
+    local b = impl:maximum()
+    return coroutine.wrap(function ()
+      while true do
+        local s = impl:successor(a)
+        local k, v = impl:get(a)
+        coroutine.yield(k, v)
+        if a == b then
+          break
+        end
+        a = s
+      end
+    end)
+  end
+end
 
 return setmetatable(class, {
   __call = function (_, compare)
