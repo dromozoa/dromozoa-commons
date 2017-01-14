@@ -22,10 +22,15 @@ if lua_version_num >= 502 then
   return pairs
 else
   return function (self)
+    local t = type(self)
+    if t ~= "table" then
+      error("bad argument #1 to 'pairs' (table expected, got " .. t .. ")")
+    end
     local metafield = getmetafield(self, "__pairs")
     if metafield == nil then
       return next, self, nil
+    else
+      return metafield(self)
     end
-    return metafield(self)
   end
 end
