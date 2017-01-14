@@ -15,22 +15,10 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local linked_hash_table = require "dromozoa.commons.linked_hash_table"
-local map = require "dromozoa.commons.map"
-local multimap = require "dromozoa.commons.multimap"
-local multimap_handle = require "dromozoa.commons.multimap_handle"
-
-local stable_metatables = {
-  [linked_hash_table.metatable] = true;
-  [map.metatable] = true;
-  [multimap.metatable] = true;
-  [multimap_handle.metatable] = true;
-}
+local getmetafield = require "dromozoa.commons.getmetafield"
 
 return function (self)
   if type(self) == "table" then
-    if stable_metatables[getmetatable(self)] then
-      return true
-    end
+    return getmetafield(self, "dromozoa.commons.is_stable")
   end
 end

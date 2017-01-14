@@ -15,21 +15,50 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local multimap = require "dromozoa.commons.multimap"
+local rb_tree = require "dromozoa.commons.rb_tree"
 
-local super = multimap
+local private_impl = function () end
+
 local class = {}
+
+function class.new(compare)
+  return {
+    [private_impl] = rb_tree(compare);
+  }
+end
 
 function class:get(key)
   if key == nil then
     return nil
   end
-  local handle = class.equal_range(self, key)
-  if handle:empty() then
+  local impl = self[private_impl]
+  local h = impl:search(key)
+  if h == nil then
     return nil
   else
-    local _, v = handle:head()
+    local _, v = impl:get(h)
     return v
+  end
+end
+
+function class:each()
+  local impl = self[private_impl]
+  local a = impl:minimum()
+  if a == nil then
+    return function () end
+  else
+    local b = impl:maximum()
+    return coroutine.wrap(function ()
+      while true do
+        local s = impl:successor(a)
+        local k, v = impl:get(a)
+        coroutine.yield(k, v)
+        if a == b then
+          break
+        end
+        a = s
+      end
+    end)
   end
 end
 
@@ -40,14 +69,15 @@ function class:insert(key, value, overwrite)
   if value == nil then
     value = true
   end
-  local handle = class.equal_range(self, key)
-  if handle:empty() then
-    super.insert(self, key, value)
+  local impl = self[private_impl]
+  local h = impl:search(key)
+  if h == nil then
+    impl:insert(key, value)
     return nil
   else
-    local _, v = handle:head()
+    local _, v = impl:get(h)
     if overwrite then
-      handle:set(value)
+      impl:set(h, value)
     end
     return v
   end
@@ -57,12 +87,13 @@ function class:remove(key)
   if key == nil then
     error "table index is nil"
   end
-  local handle = class.equal_range(self, key)
-  if handle:empty() then
+  local impl = self[private_impl]
+  local h = impl:search(key)
+  if h == nil then
     return nil
   else
-    local _, v = handle:head()
-    handle:delete()
+    local _, v = impl:get(h)
+    impl:delete(h)
     return v
   end
 end
@@ -77,7 +108,8 @@ end
 
 class.metatable = {
   __newindex = class.set;
-  __pairs = super.each;
+  __pairs = class.each;
+  ["dromozoa.commons.is_stable"] = true;
 }
 
 function class.metatable:__index(key)

@@ -1,4 +1,4 @@
--- Copyright (C) 2015,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -15,22 +15,18 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local dumper_writer = require "dromozoa.commons.dumper_writer"
-local loadstring = require "dromozoa.commons.loadstring"
-local sequence_writer = require "dromozoa.commons.sequence_writer"
+local crypt_apache_md5 = require "dromozoa.commons.crypt_apache_md5"
+local crypt_apache_sha1 = require "dromozoa.commons.crypt_apache_sha1"
+local crypt_sha256 = require "dromozoa.commons.crypt_sha256"
 
-local class = {}
-
-function class.write(out, value, options)
-  return dumper_writer(out, options):write(value)
+return function (key, salt)
+  if salt:match("^%$apr1%$") then
+    return crypt_apache_md5(key, salt)
+  elseif salt:match("^{SHA}") then
+    return crypt_apache_sha1(key, salt)
+  elseif salt:match("^%$5%$") then
+    return crypt_sha256(key, salt)
+  else
+    return nil, "unsupported salt"
+  end
 end
-
-function class.encode(value, options)
-  return class.write(sequence_writer(), value, options):concat()
-end
-
-function class.decode(code)
-  return assert(loadstring("return " .. code))()
-end
-
-return class

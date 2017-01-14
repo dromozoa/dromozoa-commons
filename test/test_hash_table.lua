@@ -16,7 +16,9 @@
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
 local clone = require "dromozoa.commons.clone"
+local dumper = require "dromozoa.commons.dumper"
 local equal = require "dromozoa.commons.equal"
+local hash = require "dromozoa.commons.hash"
 local hash_table = require "dromozoa.commons.hash_table"
 local pairs = require "dromozoa.commons.pairs"
 
@@ -135,3 +137,24 @@ t.foo = 17
 t.bar = 23
 assert(equal(t, { foo = 17, bar = 23 }))
 assert(equal({ foo = 17, bar = 23 }, t))
+
+local t = hash_table()
+t.get = 17
+t.set = 23
+assert(equal(t, { get = 17, set = 23 }))
+
+t[{ foo = 42 }] = 69
+assert(t[{ foo = 42 }] == 69)
+
+local count = 0
+local t = hash_table(function (key)
+  local h = hash(key)
+  count = count + 1
+  -- print(("%08x"):format(h), dumper.encode(key))
+  return h
+end)
+t.foo = 17
+t[{}] = 23
+t[{"foo"}] = 37
+t[{"foo","bar"}] = 42
+assert(count == 3)

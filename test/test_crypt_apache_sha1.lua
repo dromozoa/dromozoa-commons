@@ -1,4 +1,4 @@
--- Copyright (C) 2015,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -15,22 +15,6 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local dumper_writer = require "dromozoa.commons.dumper_writer"
-local loadstring = require "dromozoa.commons.loadstring"
-local sequence_writer = require "dromozoa.commons.sequence_writer"
+local crypt_apache_sha1 = require "dromozoa.commons.crypt_apache_sha1"
 
-local class = {}
-
-function class.write(out, value, options)
-  return dumper_writer(out, options):write(value)
-end
-
-function class.encode(value, options)
-  return class.write(sequence_writer(), value, options):concat()
-end
-
-function class.decode(code)
-  return assert(loadstring("return " .. code))()
-end
-
-return class
+assert(crypt_apache_sha1("password") == "{SHA}W6ph5Mm5Pz8GgiULbPgzG37mj9g=")

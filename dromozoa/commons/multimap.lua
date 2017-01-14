@@ -18,62 +18,62 @@
 local multimap_handle = require "dromozoa.commons.multimap_handle"
 local rb_tree = require "dromozoa.commons.rb_tree"
 
-local private_tree = function () end
+local private_impl = function () end
 
 local class = {}
 
 function class.new(compare)
   return {
-    [private_tree] = rb_tree(compare);
+    [private_impl] = rb_tree(compare);
   }
 end
 
 function class:insert(k, v)
-  local tree = self[private_tree]
-  local h = tree:insert(k, v)
-  return multimap_handle(tree, h)
+  local impl = self[private_impl]
+  local h = impl:insert(k, v)
+  return multimap_handle(impl, h)
 end
 
 function class:lower_bound(k)
-  local tree = self[private_tree]
-  local h = tree:lower_bound(k)
+  local impl = self[private_impl]
+  local h = impl:lower_bound(k)
   if h == nil then
-    return multimap_handle(tree)
+    return multimap_handle(impl)
   end
-  return multimap_handle(tree, h, tree:maximum())
+  return multimap_handle(impl, h, impl:maximum())
 end
 
 function class:upper_bound(k)
-  local tree = self[private_tree]
-  local h = tree:upper_bound(k)
+  local impl = self[private_impl]
+  local h = impl:upper_bound(k)
   if h == nil then
-    return multimap_handle(tree)
+    return multimap_handle(impl)
   end
-  return multimap_handle(tree, tree:minimum(), h)
+  return multimap_handle(impl, impl:minimum(), h)
 end
 
 function class:equal_range(k)
-  local tree = self[private_tree]
-  local h = tree:search(k)
+  local impl = self[private_impl]
+  local h = impl:search(k)
   if h == nil then
-    return multimap_handle(tree)
+    return multimap_handle(impl)
   else
-    return multimap_handle(tree, h, tree:upper_bound(k))
+    return multimap_handle(impl, h, impl:upper_bound(k))
   end
 end
 
 function class:each()
-  local tree = self[private_tree]
-  local a = tree:minimum()
+  local impl = self[private_impl]
+  local a = impl:minimum()
   if a == nil then
     return function () end
   else
-    local b = tree:maximum()
-    local that = multimap_handle(tree)
+    local b = impl:maximum()
+    local that = multimap_handle(impl)
     return coroutine.wrap(function ()
       while true do
-        local s = tree:successor(a)
-        local k, v = tree:get(a)
+        local s = impl:successor(a)
+        local k, v = impl:get(a)
         coroutine.yield(k, v, that:reset(a))
         if a == b then
           break
@@ -85,35 +85,56 @@ function class:each()
 end
 
 function class:empty()
-  local tree = self[private_tree]
-  return tree:empty()
+  local impl = self[private_impl]
+  return impl:empty()
 end
 
 function class:single()
-  local tree = self[private_tree]
-  return tree:single()
+  local impl = self[private_impl]
+  return impl:single()
 end
 
 function class:head()
-  local tree = self[private_tree]
-  local h = tree:minimum()
+  local impl = self[private_impl]
+  local h = impl:minimum()
   if h ~= nil then
-    return tree:get(h)
+    return impl:get(h)
   end
 end
 
 function class:tail()
-  local tree = self[private_tree]
-  local h = tree:maximum()
+  local impl = self[private_impl]
+  local h = impl:maximum()
   if h ~= nil then
-    return tree:get(h)
+    return impl:get(h)
   end
 end
 
 class.metatable = {
   __index = class;
-  __pairs = class.each;
+  ["dromozoa.commons.is_stable"] = true;
 }
+
+function class.metatable:__pairs()
+  local impl = self[private_impl]
+  local a = impl:minimum()
+  if a == nil then
+    return function () end
+  else
+    local b = impl:maximum()
+    return coroutine.wrap(function ()
+      while true do
+        local s = impl:successor(a)
+        local k, v = impl:get(a)
+        coroutine.yield(k, v)
+        if a == b then
+          break
+        end
+        a = s
+      end
+    end)
+  end
+end
 
 return setmetatable(class, {
   __call = function (_, compare)

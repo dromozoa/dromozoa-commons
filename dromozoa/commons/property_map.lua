@@ -68,11 +68,11 @@ function class:count_item(key)
   if data == nil then
     return 0
   else
-    local count = 0
+    local n = 0
     for _ in pairs(data) do
-      count = count + 1
+      n = n + 1
     end
-    return count
+    return n
   end
 end
 

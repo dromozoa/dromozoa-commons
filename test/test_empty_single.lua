@@ -18,6 +18,7 @@
 local empty = require "dromozoa.commons.empty"
 local hash_table = require "dromozoa.commons.hash_table"
 local linked_hash_table = require "dromozoa.commons.linked_hash_table"
+local multimap = require "dromozoa.commons.multimap"
 local queue = require "dromozoa.commons.queue"
 local single = require "dromozoa.commons.single"
 
@@ -62,5 +63,12 @@ t.bar = 69
 assert(not single(t))
 assert(single(queue():push("foo")))
 
-
-
+local t = multimap()
+assert(empty(t))
+assert(not single(t))
+t:insert("foo", 42)
+assert(not empty(t))
+assert(single(t))
+t:insert("bar", 69)
+assert(not empty(t))
+assert(not single(t))

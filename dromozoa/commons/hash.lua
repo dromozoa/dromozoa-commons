@@ -15,19 +15,37 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
+local murmur_hash3 = require "dromozoa.commons.murmur_hash3"
 local pairs = require "dromozoa.commons.pairs"
+local uint32 = require "dromozoa.commons.uint32"
 
-return function (self)
-  if type(self) == "table" then
-    local n = 0
-    for _ in pairs(self) do
-      n = n + 1
-      if n > 1 then
-        return false
-      end
-    end
-    return n == 1
-  else
-    return #self == 1
+local function hash(key, h)
+  if h == nil then
+    h = 0
   end
+  local t = type(key)
+  if t == "number" then
+    h = murmur_hash3.uint32(1, h)
+    h = murmur_hash3.double(key, h)
+  elseif t == "string" then
+    h = murmur_hash3.uint32(2, h)
+    h = murmur_hash3.string(key, h)
+  elseif t == "boolean" then
+    h = murmur_hash3.uint32(3, h)
+    if key then
+      h = murmur_hash3.uint32(1, h)
+    else
+      h = murmur_hash3.uint32(0, h)
+    end
+  elseif t == "table" then
+    h = murmur_hash3.uint32(4, h)
+    local H = 0
+    for k, v in pairs(key) do
+      H = uint32.add(H, hash(v, hash(k, h)))
+    end
+    h = murmur_hash3.uint32(H, h)
+  end
+  return h
 end
+
+return hash

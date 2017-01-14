@@ -21,8 +21,12 @@ local push = require "dromozoa.commons.push"
 
 local class = {}
 
-function class.new()
-  return {}
+function class.new(self)
+  if self == nil then
+    return {}
+  else
+    return self
+  end
 end
 
 function class:top()
@@ -69,9 +73,6 @@ class.metatable = {
 
 return setmetatable(class, {
   __call = function (_, self)
-    if self == nil then
-      self = class.new()
-    end
-    return setmetatable(self, class.metatable)
+    return setmetatable(class.new(self), class.metatable)
   end;
 })

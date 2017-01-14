@@ -1,4 +1,4 @@
--- Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2015,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -51,50 +51,52 @@ local function finalize(hash, n)
   return hash
 end
 
-return {
-  uint32 = function (key, hash)
-    hash = update1(hash, key)
-    hash = update2(hash)
-    return finalize(hash, 4)
-  end;
+local class = {}
 
-  uint64 = function (key, hash)
-    local a, b = uint64.word(key)
-    hash = update1(hash, a)
-    hash = update2(hash)
-    hash = update1(hash, b)
-    hash = update2(hash)
-    return finalize(hash, 8)
-  end;
+function class.uint32(key, hash)
+  hash = update1(hash, key)
+  hash = update2(hash)
+  return finalize(hash, 4)
+end
 
-  double = function (key, hash)
-    local a, b = double.word(key)
-    hash = update1(hash, a)
-    hash = update2(hash)
-    hash = update1(hash, b)
-    hash = update2(hash)
-    return finalize(hash, 8)
-  end;
+function class.uint64(key, hash)
+  local a, b = uint64.word(key)
+  hash = update1(hash, a)
+  hash = update2(hash)
+  hash = update1(hash, b)
+  hash = update2(hash)
+  return finalize(hash, 8)
+end
 
-  string = function (key, hash, i, j)
-    local min, max = translate_range(#key, i, j)
-    for i = min + 3, max, 4 do
-      local a, b, c, d = key:byte(i - 3, i)
-      hash = update1(hash, a + b * 0x100 + c * 0x10000 + d * 0x1000000)
-      hash = update2(hash)
+function class.double(key, hash)
+  local a, b = double.word(key)
+  hash = update1(hash, a)
+  hash = update2(hash)
+  hash = update1(hash, b)
+  hash = update2(hash)
+  return finalize(hash, 8)
+end
+
+function class.string(key, hash, i, j)
+  local min, max = translate_range(#key, i, j)
+  for i = min + 3, max, 4 do
+    local a, b, c, d = key:byte(i - 3, i)
+    hash = update1(hash, a + b * 0x100 + c * 0x10000 + d * 0x1000000)
+    hash = update2(hash)
+  end
+  local i = max + 1
+  local p = i - (i - min) % 4
+  if p < i then
+    local a, b, c = key:byte(p, max)
+    if c then
+      hash = update1(hash, a + b * 0x100 + c * 0x10000)
+    elseif b then
+      hash = update1(hash, a + b * 0x100)
+    else
+      hash = update1(hash, a)
     end
-    local i = max + 1
-    local p = i - (i - min) % 4
-    if p < i then
-      local a, b, c = key:byte(p, max)
-      if c then
-        hash = update1(hash, a + b * 0x100 + c * 0x10000)
-      elseif b then
-        hash = update1(hash, a + b * 0x100)
-      else
-        hash = update1(hash, a)
-      end
-    end
-    return finalize(hash, i - min)
-  end;
-}
+  end
+  return finalize(hash, i - min)
+end
+
+return class
