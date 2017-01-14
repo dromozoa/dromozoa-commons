@@ -22,33 +22,34 @@ local pairs = require "dromozoa.commons.pairs"
 local class = {}
 
 function class.new()
-  -- 1: K
-  -- 2: V
-  -- 3: KS
-  -- 4: VS
-  return { {}, {}, {}, {} }
+  return {
+    K = {}; -- key
+    V = {}; -- value
+    KS = {}; -- key set
+    VS = {}; -- value set
+  }
 end
 
 function class:get(key)
   local h = hash(key)
-  local K = self[1]
+  local K = self.K
   local k = K[h]
   if k == nil then
     return nil
   end
   if equal(k, key) then
-    local V = self[2]
+    local V = self.V
     local v = V[h]
     return v
   end
-  local KS = self[3]
+  local KS = self.KS
   local ks = KS[h]
   if ks == nil then
     return nil
   end
   for i = 1, #ks do
     if equal(ks[i], key) then
-      local VS = self[4]
+      local VS = self.VS
       local vs = VS[h]
       local v = vs[i]
       return v
@@ -59,13 +60,13 @@ end
 
 function class:each()
   return coroutine.wrap(function ()
-    local K = self[1]
-    local V = self[2]
+    local K = self.K
+    local V = self.V
     for h, k in pairs(K) do
       coroutine.yield(k, V[h])
     end
-    local KS = self[3]
-    local VS = self[4]
+    local KS = self.KS
+    local VS = self.VS
     for h, ks in pairs(KS) do
       local vs = VS[h]
       for i = 1, #ks do
@@ -77,26 +78,26 @@ end
 
 function class:insert(key, value, overwrite)
   local h = hash(key)
-  local K = self[1]
+  local K = self.K
   local k = K[h]
   if k == nil then
-    local V = self[2]
+    local V = self.V
     K[h] = key
     V[h] = value
     return nil
   end
   if equal(k, key) then
-    local V = self[2]
+    local V = self.V
     local v = V[h]
     if overwrite then
       V[h] = value
     end
     return v
   end
-  local KS = self[3]
+  local KS = self.KS
   local ks = KS[h]
   if ks == nil then
-    local VS = self[4]
+    local VS = self.VS
     KS[h] = { key }
     VS[h] = { value }
     return nil
@@ -104,7 +105,8 @@ function class:insert(key, value, overwrite)
   local n = #ks
   for i = 1, n do
     if equal(ks[i], key) then
-      local VS = self[4]
+      -- TODO: ??? VS
+      local VS = self.VS
       local vs = VS[h]
       local v = vs[i]
       if overwrite then
@@ -113,7 +115,7 @@ function class:insert(key, value, overwrite)
       return v
     end
   end
-  local VS = self[4]
+  local VS = self.VS
   local vs = VS[h]
   n = n + 1
   ks[n] = key
@@ -123,21 +125,21 @@ end
 
 function class:remove(key)
   local h = hash(key)
-  local K = self[1]
+  local K = self.K
   local k = K[h]
   if k == nil then
     return nil
   end
-  local KS = self[3]
+  local KS = self.KS
   local ks = KS[h]
   if equal(k, key) then
-    local V = self[2]
+    local V = self.V
     local v = V[h]
     if ks == nil then
       K[h] = nil
       V[h] = nil
     else
-      local VS = self[4]
+      local VS = self.VS
       local vs = VS[h]
       K[h] = table.remove(ks, 1)
       V[h] = table.remove(vs, 1)
@@ -151,7 +153,7 @@ function class:remove(key)
   for i = 1, #ks do
     if equal(ks[i], key) then
       table.remove(ks, i)
-      local VS = self[4]
+      local VS = self.VS
       local vs = VS[h]
       local v = table.remove(vs, i)
       if #ks == 0 then
