@@ -27,6 +27,7 @@ build = {
     ["dromozoa.commons.empty"] = "dromozoa/commons/empty.lua";
     ["dromozoa.commons.equal"] = "dromozoa/commons/equal.lua";
     ["dromozoa.commons.getmetafield"] = "dromozoa/commons/getmetafield.lua";
+    ["dromozoa.commons.hash"] = "dromozoa/commons/hash.lua";
     ["dromozoa.commons.hash_table"] = "dromozoa/commons/hash_table.lua";
     ["dromozoa.commons.hash_table_impl"] = "dromozoa/commons/hash_table_impl.lua";
     ["dromozoa.commons.hash_table_pair"] = "dromozoa/commons/hash_table_pair.lua";
