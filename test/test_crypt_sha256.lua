@@ -21,7 +21,9 @@ local mode = ...
 
 local function test(key, salt_string, expected)
   local result = crypt_sha256(key, salt_string)
-  print(result)
+  if mode == "all" then
+    print(result)
+  end
   assert(result == expected)
 end
 
