@@ -114,3 +114,19 @@ assert(equal(json.decode(result1), json.decode(result2)))
 assert(equal(json.decode(result1), json.decode(result3)))
 assert(equal(json.decode(result1), json.decode(result4)))
 assert(result3 == [=[{"1":[[[]]],"2":{"foo":{"bar":{"baz":"qux"}}},"bar":[42],"baz":{"baz":false},"foo bar":0.25,"foo":[17,23,37,42],"qux":{},"true":"foo"}]=])
+
+local t = linked_hash_table()
+t.foo = linked_hash_table()
+t.foo.bar = 17;
+t.foo.baz = 23;
+t.foo.qux = 42;
+local result = json.encode(t, { pretty = true, stable = true })
+-- print(result)
+assert(result == [[
+{
+  "foo": {
+    "bar": 17,
+    "baz": 23,
+    "qux": 42
+  }
+}]])
