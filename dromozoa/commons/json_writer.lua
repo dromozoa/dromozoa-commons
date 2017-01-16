@@ -165,7 +165,7 @@ function class:write(value, depth)
               indent(self, next_depth)
             end
             out:write(k, ":", pretty(self, " "))
-            self:write(v)
+            self:write(v, next_depth)
           end
         end
       end
