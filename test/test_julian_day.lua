@@ -32,15 +32,8 @@ local function test(jd, year, month, day, hour, min, sec)
   if sec == nil then
     sec = 0
   end
-  local result = julian_day.decode(jd)
-  assert(equal(result, {
-    year = year;
-    month = month;
-    day = day;
-    hour = hour;
-    min = min;
-    sec = sec;
-  }))
+  local result = { julian_day.decode(jd) }
+  assert(equal(result, { year, month, day, hour, min, sec }))
 end
 
 -- wikipedia

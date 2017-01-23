@@ -81,14 +81,7 @@ function class.decode(jd)
   min = min - sec
   sec = floor(sec * 60)
 
-  return {
-    year = year;
-    month = month;
-    day = day;
-    hour = hour;
-    min = min;
-    sec = sec;
-  }
+  return year, month, day, hour, min, sec
 end
 
 return class
