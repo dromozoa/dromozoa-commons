@@ -35,26 +35,24 @@ function class.encode(year, month, day, hour, min, sec)
     month = month + 12
   end
   day = day + hour / 24 + min / 1440 + sec / 86400
+
   local jd = floor(365.25 * (year + 4716)) + floor(30.6001 * (month + 1)) + day - 1524.5
-  if jd < 2299160.5 then
-    return jd
-  else
+  if jd >= 2299160.5 then
     local A = floor(year / 100)
     local B = 2 - A + floor(A / 4)
-    return jd + B
+    jd = jd + B
   end
+
+  return jd
 end
 
 function class.decode(jd)
   jd = jd + 0.5
   local F = jd % 1
-  local Z = jd - F
-  local A
-  if Z < 2299161 then
-    A = Z
-  else
-    local alpha = floor((Z - 1867216.25) / 36524.25)
-    A = Z + 1 + alpha - floor(alpha / 4)
+  local A = jd - F
+  if A >= 2299161 then
+    local alpha = floor((A - 1867216.25) / 36524.25)
+    A = A + 1 + alpha - floor(alpha / 4)
   end
   local B = A + 1524
   local C = floor((B - 122.1) / 365.25)
