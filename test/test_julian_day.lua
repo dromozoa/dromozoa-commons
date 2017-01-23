@@ -17,6 +17,7 @@
 
 local equal = require "dromozoa.commons.equal"
 local julian_day = require "dromozoa.commons.julian_day"
+local unpack = require "dromozoa.commons.unpack"
 
 assert(math.abs(julian_day.encode(2013, 1, 1, 0, 30) - 2456293.520833) < 0.000001)
 
@@ -64,3 +65,18 @@ test(2299160.46875, 1582, 10, 4, 23, 15)
 test(2299160.5, 1582, 10, 15, 0)
 test(2299160.53125, 1582, 10, 15, 0, 45)
 test(2299161, 1582, 10, 15, 12)
+
+local jd = julian_day.encode(1999, 1, 1, 0, 0, 0)
+local t = 915148800
+for i = 0, 86400 do
+  local jd = jd + i / 86400
+  local t = t + i
+  local result1 = { julian_day.decode(jd) }
+  local result2 = ("%d-%02d-%02d %02d:%02d:%02d"):format(unpack(result1))
+  local result3 = os.date("!%Y-%m-%d %H:%M:%S", t)
+  assert(result2 == result3)
+  local result4 = julian_day.encode(unpack(result1))
+  assert(jd == result4)
+  local result5 = { julian_day.decode(result4) }
+  assert(equal(result1, result5))
+end
