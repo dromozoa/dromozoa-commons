@@ -29,6 +29,7 @@ function class.encode(year, month, day, hour, min, sec)
   if sec == nil then
     sec = 0
   end
+
   if month < 3 then
     year = year - 1
     month = month + 12
@@ -38,16 +39,16 @@ function class.encode(year, month, day, hour, min, sec)
   if jd < 2299160.5 then
     return jd
   else
-    local a = floor(year / 100)
-    local b = 2 - a + floor(a / 4)
-    return jd + b
+    local A = floor(year / 100)
+    local B = 2 - A + floor(A / 4)
+    return jd + B
   end
 end
 
 function class.decode(jd)
   jd = jd + 0.5
-  local Z = floor(jd)
-  local F = jd - Z
+  local F = jd % 1
+  local Z = jd - F
   local A
   if Z < 2299161 then
     A = Z
@@ -59,7 +60,8 @@ function class.decode(jd)
   local C = floor((B - 122.1) / 365.25)
   local D = floor(365.25 * C)
   local E = floor((B - D) / 30.6001)
-  local day = B - D - floor(30.6001 * E) + F
+
+  local day = B - D - floor(30.6001 * E)
   local month
   if E < 14 then
     month = E - 1
@@ -72,10 +74,22 @@ function class.decode(jd)
   else
     year = C - 4716
   end
+
+  local hour = F * 24
+  local min = hour % 1
+  hour = hour - min
+  min = min * 60
+  local sec = min % 1
+  min = min - sec
+  sec = floor(sec * 60)
+
   return {
     year = year;
     month = month;
     day = day;
+    hour = hour;
+    min = min;
+    sec = sec;
   }
 end
 
