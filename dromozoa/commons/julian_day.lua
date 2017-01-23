@@ -15,9 +15,9 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
-local class = {}
-
 local floor = math.floor
+
+local class = {}
 
 function class.encode(year, month, day, hour, min, sec)
   if hour == nil then
