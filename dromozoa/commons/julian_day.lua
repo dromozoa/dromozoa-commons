@@ -32,11 +32,13 @@ function class.encode(year, month, day, hour, min, sec)
 
   if month < 3 then
     year = year - 1
-    month = month + 12
+    month = month + 13
+  else
+    month = month + 1
   end
   day = day + hour / 24 + min / 1440 + sec / 86400
 
-  local jd = floor(365.25 * (year + 4716)) + floor(30.6001 * (month + 1)) + day - 1524.5
+  local jd = floor(365.25 * (year + 4716)) + floor(30.6001 * month) + day - 1524.5
   if jd >= 2299160.5 then
     local A = floor(year / 100)
     local B = 2 - A + floor(A / 4)
