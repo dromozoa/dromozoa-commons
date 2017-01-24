@@ -80,6 +80,7 @@ build = {
     ["dromozoa.commons.uint64"] = "dromozoa/commons/uint64.lua";
     ["dromozoa.commons.unpack"] = "dromozoa/commons/unpack.lua";
     ["dromozoa.commons.utf8"] = "dromozoa/commons/utf8.lua";
+    ["dromozoa.commons.unix_time"] = "dromozoa/commons/unix_time.lua";
     ["dromozoa.commons.uri"] = "dromozoa/commons/uri.lua";
     ["dromozoa.commons.values"] = "dromozoa/commons/values.lua";
     ["dromozoa.commons.visit"] = "dromozoa/commons/visit.lua";
