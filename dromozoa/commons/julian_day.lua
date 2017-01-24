@@ -41,8 +41,7 @@ function class.encode(year, month, day, hour, min, sec)
   local jd = floor(365.25 * (year + 4716)) + floor(30.6001 * month) + day - 1524.5
   if jd >= 2299160.5 then
     local A = floor(year / 100)
-    local B = 2 - A + floor(A / 4)
-    jd = jd + B
+    jd = jd + 2 - A + floor(A / 4)
   end
 
   return jd
