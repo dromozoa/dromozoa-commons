@@ -19,22 +19,30 @@ local equal = require "dromozoa.commons.equal"
 local julian_day = require "dromozoa.commons.julian_day"
 local unpack = require "dromozoa.commons.unpack"
 
-assert(math.abs(julian_day.encode(2013, 1, 1, 0, 30) - 2456293.520833) < 0.000001)
+assert(math.abs(julian_day.encode({ year = 2013, month = 1, day = 1, hour = 0, min = 30 }) - 2456293.520833) < 0.000001)
 
 local function test(jd, year, month, day, hour, min, sec)
-  local result = julian_day.encode(year, month, day, hour, min, sec)
+  local calendar = {
+    year = year;
+    month = month;
+    day = day;
+    hour = hour;
+    min = min;
+    sec = sec;
+  }
+  local result = julian_day.encode(calendar)
   assert(result == jd)
-  if hour == nil then
-    hour = 12
+  if calendar.hour == nil then
+    calendar.hour = 12
   end
-  if min == nil then
-    min = 0
+  if calendar.min == nil then
+    calendar.min = 0
   end
-  if sec == nil then
-    sec = 0
+  if calendar.sec == nil then
+    calendar.sec = 0
   end
-  local result = { julian_day.decode(jd) }
-  assert(equal(result, { year, month, day, hour, min, sec }))
+  local result = julian_day.decode(jd)
+  assert(equal(result, calendar))
 end
 
 -- wikipedia
@@ -66,17 +74,17 @@ test(2299160.5, 1582, 10, 15, 0)
 test(2299160.53125, 1582, 10, 15, 0, 45)
 test(2299161, 1582, 10, 15, 12)
 
-local jd = julian_day.encode(1999, 1, 1, 0, 0, 0)
+local jd = julian_day.encode({ year = 1999, month = 1, day = 1, hour = 0 })
 local t = 915148800
 for i = 0, 86400 do
   local jd = jd + i / 86400
   local t = t + i
-  local result1 = { julian_day.decode(jd) }
-  local result2 = ("%d-%02d-%02d %02d:%02d:%02d"):format(unpack(result1))
+  local result1 = julian_day.decode(jd)
+  local result2 = ("%d-%02d-%02d %02d:%02d:%02d"):format(result1.year, result1.month, result1.day, result1.hour, result1.min, result1.sec)
   local result3 = os.date("!%Y-%m-%d %H:%M:%S", t)
   assert(result2 == result3)
-  local result4 = julian_day.encode(unpack(result1))
+  local result4 = julian_day.encode(result1)
   assert(jd == result4)
-  local result5 = { julian_day.decode(result4) }
+  local result5 = julian_day.decode(result4)
   assert(equal(result1, result5))
 end

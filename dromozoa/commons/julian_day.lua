@@ -17,9 +17,7 @@
 
 local floor = math.floor
 
-local class = {}
-
-function class.encode(year, month, day, hour, min, sec)
+local function encode(year, month, day, hour, min, sec)
   if hour == nil then
     hour = 12
   end
@@ -47,7 +45,7 @@ function class.encode(year, month, day, hour, min, sec)
   return jd
 end
 
-function class.decode(jd)
+local function decode(jd)
   jd = jd + 0.5
   local F = jd % 1
   local A = jd - F
@@ -78,7 +76,30 @@ function class.decode(jd)
   time = (time - min) / 60
   local hour = time % 24
 
-  return year, month, day, hour, min, sec
+  return {
+    year = year;
+    month = month;
+    day = day;
+    hour = hour;
+    min = min;
+    sec = sec;
+  }
+end
+
+local class = {}
+
+function class.encode(calendar, offset)
+  if offset == nil then
+    offset = 0
+  end
+  return encode(calendar.year, calendar.month, calendar.day, calendar.hour, calendar.min, calendar.sec) - offset / 86400
+end
+
+function class.decode(jd, offset)
+  if offset == nil then
+    offset = 0
+  end
+  return decode(jd + offset / 86400)
 end
 
 return class
