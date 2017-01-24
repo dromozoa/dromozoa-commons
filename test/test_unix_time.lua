@@ -15,12 +15,28 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
+local equal = require "dromozoa.commons.equal"
+local json = require "dromozoa.commons.json"
 local unix_time = require "dromozoa.commons.unix_time"
 
 local function test(time, calendar, timezone)
   local result1 = unix_time.encode(calendar, timezone)
   -- print(result1, time)
   assert(result1 == time)
+
+  if calendar.hour == nil then
+    calendar.hour = 12
+  end
+  if calendar.min == nil then
+    calendar.min = 0
+  end
+  if calendar.sec == nil then
+    calendar.sec = 0
+  end
+  local result2 = unix_time.decode(time, timezone)
+  print(json.encode(result2))
+  print(json.encode(calendar))
+  assert(equal(result2, calendar))
 end
 
 local function test_utc(time, year, month, day, hour, min, sec)

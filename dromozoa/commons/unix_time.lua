@@ -36,7 +36,46 @@ local function encode(year, month, day, hour, min, sec)
   end
 
   local A = floor(year / 100)
-  return (floor(365.25 * year) + floor(30.6001 * month) + day - 719591 - A + floor(A / 4)) * 86400 + hour * 3600 + min * 60 + sec
+  local time = floor(365.25 * year) + floor(30.6001 * month) + day - 719591 - A + floor(A / 4)
+  return time * 86400 + hour * 3600 + min * 60 + sec
+end
+
+local function decode(time)
+  local sec = time % 60
+  time = (time - sec) / 60
+  local min = time % 60
+  time = (time - min) / 60
+  local hour = time % 24
+  time = (time - hour) / 24
+
+  local alpha = floor((time + 573371.75) / 36524.25)
+  local B = time + 2442113 + alpha - floor(alpha / 4)
+  local C = floor((B - 122.1) / 365.25)
+  local D = floor(365.25 * C)
+  local E = floor((B - D) / 30.6001)
+
+  local day = B - D - floor(30.6001 * E)
+  local month
+  if E < 14 then
+    month = E - 1
+  else
+    month = E - 13
+  end
+  local year
+  if month < 3 then
+    year = C - 4715
+  else
+    year = C - 4716
+  end
+
+  return {
+    year = year;
+    month = month;
+    day = day;
+    hour = hour;
+    min = min;
+    sec = sec;
+  }
 end
 
 local class = {}
@@ -49,6 +88,10 @@ function class.encode(calendar, timezone)
 end
 
 function class.decode(time, timezone)
+  if timezone == nil then
+    timezone = 0
+  end
+  return decode(time + timezone)
 end
 
 return class
