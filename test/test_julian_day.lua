@@ -87,4 +87,10 @@ for i = 0, 86400 do
   assert(jd == result4)
   local result5 = julian_day.decode(result4)
   assert(equal(result1, result5))
+  local result6 = julian_day.decode(jd, 32400)
+  local result7 = ("%d-%02d-%02d %02d:%02d:%02d"):format(result6.year, result6.month, result6.day, result6.hour, result6.min, result6.sec)
+  local result8 = os.date("%Y-%m-%d %H:%M:%S", t)
+  assert(result7 == result8)
+  local result9 = julian_day.encode(result6, 32400)
+  assert(jd == result9)
 end
