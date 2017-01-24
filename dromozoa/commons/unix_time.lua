@@ -48,25 +48,26 @@ local function decode(time)
   local hour = time % 24
   time = (time - hour) / 24
 
-  local alpha = floor((time + 573371.75) / 36524.25)
-  local B = time + 2442113 + alpha - floor(alpha / 4)
+  local A = time + 2440588
+  if A >= 2299161 then
+    local alpha = floor((A - 1867216.25) / 36524.25)
+    A = A + 1 + alpha - floor(alpha / 4)
+  end
+  local B = A + 1524
   local C = floor((B - 122.1) / 365.25)
   local D = floor(365.25 * C)
   local E = floor((B - D) / 30.6001)
 
-  local day = B - D - floor(30.6001 * E)
+  local year
   local month
   if E < 14 then
+    year = C - 4716
     month = E - 1
   else
+    year = C - 4715
     month = E - 13
   end
-  local year
-  if month < 3 then
-    year = C - 4715
-  else
-    year = C - 4716
-  end
+  local day = B - D - floor(30.6001 * E)
 
   return {
     year = year;
