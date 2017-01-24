@@ -60,19 +60,16 @@ function class.decode(jd)
   local D = floor(365.25 * C)
   local E = floor((B - D) / 30.6001)
 
-  local day = B - D - floor(30.6001 * E)
+  local year
   local month
   if E < 14 then
+    year = C - 4716
     month = E - 1
   else
+    year = C - 4715
     month = E - 13
   end
-  local year
-  if month < 3 then
-    year = C - 4715
-  else
-    year = C - 4716
-  end
+  local day = B - D - floor(30.6001 * E)
 
   local time = floor(F * 86400 + 0.0001)
   local sec = time % 60
