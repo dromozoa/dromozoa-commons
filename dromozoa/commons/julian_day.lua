@@ -74,12 +74,12 @@ function class.decode(jd)
     year = C - 4716
   end
 
-  local t = floor(F * 86400 + 0.0001)
-  local sec = t % 60
-  local t = (t - sec) / 60
-  local min = t % 60
-  local t = (t - min) / 60
-  local hour = t % 24
+  local time = floor(F * 86400 + 0.0001)
+  local sec = time % 60
+  time = (time - sec) / 60
+  local min = time % 60
+  time = (time - min) / 60
+  local hour = time % 24
 
   return year, month, day, hour, min, sec
 end
