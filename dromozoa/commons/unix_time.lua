@@ -81,18 +81,18 @@ end
 
 local class = {}
 
-function class.encode(calendar, timezone)
-  if timezone == nil then
-    timezone = 0
+function class.encode(calendar, offset)
+  if offset == nil then
+    offset = 0
   end
-  return encode(calendar.year, calendar.month, calendar.day, calendar.hour, calendar.min, calendar.sec) - timezone
+  return encode(calendar.year, calendar.month, calendar.day, calendar.hour, calendar.min, calendar.sec) - offset
 end
 
-function class.decode(time, timezone)
-  if timezone == nil then
-    timezone = 0
+function class.decode(time, offset)
+  if offset == nil then
+    offset = 0
   end
-  return decode(time + timezone)
+  return decode(time + offset)
 end
 
 return class

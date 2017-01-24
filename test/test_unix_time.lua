@@ -34,8 +34,8 @@ local function test(time, calendar, timezone)
     calendar.sec = 0
   end
   local result2 = unix_time.decode(time, timezone)
-  print(json.encode(result2))
-  print(json.encode(calendar))
+  -- print(json.encode(result2))
+  -- print(json.encode(calendar))
   assert(equal(result2, calendar))
 end
 
