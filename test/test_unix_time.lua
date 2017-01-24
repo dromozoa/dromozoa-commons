@@ -72,3 +72,7 @@ test_jst(100000000, 1973, 3, 3, 18, 46, 40)
 test_jst(1000000000, 2001, 9, 9, 10, 46, 40)
 test_jst(1234567890, 2009, 2, 14, 8, 31, 30)
 test_jst(2147483647, 2038, 1, 19, 12, 14, 7)
+
+local t = os.time()
+local offset = unix_time.encode(os.date("*t", t)) - t
+-- print(offset)
