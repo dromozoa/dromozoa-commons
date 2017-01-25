@@ -49,9 +49,7 @@ local function decode(jd)
   jd = jd + 1.5
   local F = jd % 1
   local A = jd - F
-
   local day_of_week = A % 7
-
   if A >= 2299162 then
     local alpha = floor((A - 1867217.25) / 36524.25)
     A = A + 1 + alpha - floor(alpha / 4)
