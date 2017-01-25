@@ -49,6 +49,9 @@ local function decode(jd)
   jd = jd + 0.5
   local F = jd % 1
   local A = jd - F
+
+  local day_of_week = (A + 1) % 7
+
   if A >= 2299161 then
     local alpha = floor((A - 1867216.25) / 36524.25)
     A = A + 1 + alpha - floor(alpha / 4)
@@ -83,6 +86,7 @@ local function decode(jd)
     hour = hour;
     min = min;
     sec = sec;
+    day_of_week = day_of_week;
   }
 end
 
@@ -100,10 +104,6 @@ function class.decode(jd, offset)
     offset = 0
   end
   return decode(jd + offset / 86400)
-end
-
-function class.day_of_week(jd)
-  return floor(jd + 1.5) % 7
 end
 
 return class

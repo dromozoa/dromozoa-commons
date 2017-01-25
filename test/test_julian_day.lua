@@ -42,6 +42,7 @@ local function test(jd, year, month, day, hour, min, sec)
     calendar.sec = 0
   end
   local result = julian_day.decode(jd)
+  result.day_of_week = nil
   assert(equal(result, calendar))
 end
 
@@ -95,7 +96,7 @@ for i = 0, 86400 do
   assert(jd == result9)
 end
 
-assert(julian_day.day_of_week(2434923.49) == 2)
-assert(julian_day.day_of_week(2434923.5) == 3)
-assert(julian_day.day_of_week(2434924.49) == 3)
-assert(julian_day.day_of_week(2434924.5) == 4)
+assert(julian_day.decode(2434923.49).day_of_week == 2)
+assert(julian_day.decode(2434923.50).day_of_week == 3)
+assert(julian_day.decode(2434924.49).day_of_week == 3)
+assert(julian_day.decode(2434924.50).day_of_week == 4)
