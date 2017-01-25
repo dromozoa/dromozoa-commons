@@ -102,4 +102,8 @@ function class.decode(jd, offset)
   return decode(jd + offset / 86400)
 end
 
+function class.day_of_week(jd)
+  return floor(jd + 1.5) % 7
+end
+
 return class

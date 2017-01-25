@@ -94,3 +94,8 @@ for i = 0, 86400 do
   local result9 = julian_day.encode(result6, 32400)
   assert(jd == result9)
 end
+
+assert(julian_day.day_of_week(2434923.49) == 2)
+assert(julian_day.day_of_week(2434923.5) == 3)
+assert(julian_day.day_of_week(2434924.49) == 3)
+assert(julian_day.day_of_week(2434924.5) == 4)
