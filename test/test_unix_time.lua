@@ -76,3 +76,12 @@ test_jst(2147483647, 2038, 1, 19, 12, 14, 7)
 local t = os.time()
 local offset = unix_time.encode(os.date("*t", t)) - t
 -- print(offset)
+
+assert(unix_time.encode({ year = 1999, month = 12, day = 31 }) == unix_time.encode({ year = 2000, month = 1, day = 0 }))
+assert(unix_time.encode({ year = 1999, month = 12, day = 31 }) == unix_time.encode({ year = 2000, month = 0, day = 31 }))
+assert(unix_time.encode({ year = 1999, month = 12, day = 1 }) == unix_time.encode({ year = 2000, month = 0, day = 1 }))
+assert(unix_time.encode({ year = 1999, month = 11, day = 30 }) == unix_time.encode({ year = 2000, month = 0, day = 0 }))
+assert(unix_time.encode({ year = 2000, month = 1, day = 1 }) == unix_time.encode({ year = 1999, month = 12, day = 32 }))
+assert(unix_time.encode({ year = 2000, month = 1, day = 1 }) == unix_time.encode({ year = 1999, month = 13, day = 1 }))
+assert(unix_time.encode({ year = 2000, month = 1, day = 31 }) == unix_time.encode({ year = 1999, month = 13, day = 31 }))
+assert(unix_time.encode({ year = 2000, month = 2, day = 1 }) == unix_time.encode({ year = 1999, month = 13, day = 32 }))
