@@ -48,12 +48,13 @@ local function decode(time)
   local hour = time % 24
   time = (time - hour) / 24
 
-  local A = time + 2440588
-  if A >= 2299161 then
-    local alpha = floor((A - 1867216.25) / 36524.25)
+  local A = time + 2440589
+  local day_of_week = A % 7
+  if A >= 2299162 then
+    local alpha = floor((A - 1867217.25) / 36524.25)
     A = A + 1 + alpha - floor(alpha / 4)
   end
-  local B = A + 1524
+  local B = A + 1523
   local C = floor((B - 122.1) / 365.25)
   local D = floor(365.25 * C)
   local E = floor((B - D) / 30.6001)
@@ -76,6 +77,7 @@ local function decode(time)
     hour = hour;
     min = min;
     sec = sec;
+    day_of_week = day_of_week;
   }
 end
 

@@ -34,6 +34,7 @@ local function test(time, calendar, timezone)
     calendar.sec = 0
   end
   local result2 = unix_time.decode(time, timezone)
+  result2.day_of_week = nil
   -- print(json.encode(result2))
   -- print(json.encode(calendar))
   assert(equal(result2, calendar))
@@ -72,3 +73,16 @@ test_jst(100000000, 1973, 3, 3, 18, 46, 40)
 test_jst(1000000000, 2001, 9, 9, 10, 46, 40)
 test_jst(1234567890, 2009, 2, 14, 8, 31, 30)
 test_jst(2147483647, 2038, 1, 19, 12, 14, 7)
+
+local t = os.time()
+local offset = unix_time.encode(os.date("*t", t)) - t
+-- print(offset)
+
+assert(unix_time.encode({ year = 1999, month = 12, day = 31 }) == unix_time.encode({ year = 2000, month = 1, day = 0 }))
+assert(unix_time.encode({ year = 1999, month = 12, day = 31 }) == unix_time.encode({ year = 2000, month = 0, day = 31 }))
+assert(unix_time.encode({ year = 1999, month = 12, day = 1 }) == unix_time.encode({ year = 2000, month = 0, day = 1 }))
+assert(unix_time.encode({ year = 1999, month = 11, day = 30 }) == unix_time.encode({ year = 2000, month = 0, day = 0 }))
+assert(unix_time.encode({ year = 2000, month = 1, day = 1 }) == unix_time.encode({ year = 1999, month = 12, day = 32 }))
+assert(unix_time.encode({ year = 2000, month = 1, day = 1 }) == unix_time.encode({ year = 1999, month = 13, day = 1 }))
+assert(unix_time.encode({ year = 2000, month = 1, day = 31 }) == unix_time.encode({ year = 1999, month = 13, day = 31 }))
+assert(unix_time.encode({ year = 2000, month = 2, day = 1 }) == unix_time.encode({ year = 1999, month = 13, day = 32 }))
