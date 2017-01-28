@@ -16,8 +16,57 @@
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
 local datetime_parser = require "dromozoa.commons.datetime_parser"
+local sequence_writer = require "dromozoa.commons.sequence_writer"
+
+local function write(out, year, month, day, hour, min, sec, nsec)
+  if hour == nil then
+    hour = 12
+  end
+  if min == nil then
+    min = 0
+  end
+  if sec == nil then
+    sec = 0
+  end
+  if nsec == nil then
+    nsec = 0
+  end
+  out:write(("%04d-%02d-%02dT%02d:%02d"):format(year, month, day, hour, min))
+  if sec ~= 0 or nsec ~= 0 then
+    out:write((":%02d"):format(sec))
+  end
+  if nsec ~= 0 then
+    out:write(((".%09d"):format(nsec):gsub("0+$", "")))
+  end
+  return out
+end
 
 local class = {}
+
+function class.write(out, datetime, offset)
+  write(out, datetime.year, datetime.month, datetime.day, datetime.hour, datetime.min, datetime.sec, datetime.nsec)
+  if offset ~= nil then
+    if offset == 0 then
+      out:write("Z")
+    else
+      if offset > 0 then
+        out:write("+")
+      else
+        out:write("-")
+        offset = -offset
+      end
+      offset = offset / 60
+      local offset_min = offset % 60
+      local offset_hour = (offset - offset_min) / 60
+      out:write(("%02d:%02d"):format(offset_hour, offset_min))
+    end
+  end
+  return out
+end
+
+function class.encode(datetime, offset)
+  return class.write(sequence_writer(), datetime, offset):concat()
+end
 
 function class.parse(this)
   return datetime_parser(this):parse()
