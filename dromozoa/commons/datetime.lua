@@ -18,6 +18,8 @@
 local datetime_parser = require "dromozoa.commons.datetime_parser"
 local sequence_writer = require "dromozoa.commons.sequence_writer"
 
+local floor = math.floor
+
 local function write(out, year, month, day, hour, min, sec, nsec)
   if hour == nil then
     hour = 12
@@ -55,10 +57,10 @@ function class.write(out, datetime, offset)
         out:write("-")
         offset = -offset
       end
-      offset = offset / 60
-      local offset_min = offset % 60
-      local offset_hour = (offset - offset_min) / 60
-      out:write(("%02d:%02d"):format(offset_hour, offset_min))
+      offset = floor(offset / 60)
+      local min = offset % 60
+      local hour = (offset - min) / 60
+      out:write(("%02d:%02d"):format(hour, min))
     end
   end
   return out
