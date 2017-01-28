@@ -27,10 +27,10 @@ else
   pow = math.pow
 end
 
-local function nsec(decimal_part)
-  local n = #decimal_part - 9
-
-end
+local months = {
+  Jan = 1; Feb = 2; Mar = 3; Apr = 4; May = 5; Jun = 6;
+  Jul = 7; Aug = 8; Sep = 9; Oct = 10; Nov = 11; Dec = 12;
+}
 
 local class = {}
 
@@ -78,6 +78,21 @@ function class:parse()
           offset = -offset
         end
       end
+    end
+  elseif this:match("(%d%d)%/(%u%l%l)%/(%d%d%d%d+)%:(%d%d)%:(%d%d)%:(%d%d) ([%+%-])(%d%d)(%d%d)") then
+    datetime.day = tonumber(this[1])
+    local month = months[this[2]]
+    if month == nil then
+      self:raise("invalid month")
+    end
+    datetime.month = month
+    datetime.year = tonumber(this[3])
+    datetime.hour = tonumber(this[4])
+    datetime.min = tonumber(this[5])
+    datetime.sec = tonumber(this[6])
+    offset = tonumber(this[8]) * 3600 + tonumber(this[9]) * 60
+    if this[7] == "-" then
+      offset = -offset
     end
   else
     self:raise()

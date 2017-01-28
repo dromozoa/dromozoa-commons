@@ -16,7 +16,7 @@
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
 local datetime = require "dromozoa.commons.datetime"
-local json = require "dromozoa.commons.json"
+local equal = require "dromozoa.commons.equal"
 local unix_time = require "dromozoa.commons.unix_time"
 
 local result, offset = datetime.decode("0037-12-13 00:00Z")
@@ -46,3 +46,7 @@ assert(datetime.encode(result, offset) == "12345-06-07T12:34:56.123456789-12:34"
 assert(datetime.encode({ year = 2000, month = 1, day = 1 }) == "2000-01-01T12:00")
 assert(datetime.encode({ year = 2000, month = 1, day = 1 }, 0) == "2000-01-01T12:00Z")
 assert(datetime.encode({ year = 2000, month = 1, day = 1 }, 32400) == "2000-01-01T12:00+09:00")
+
+local result, offset = datetime.decode("10/Oct/2000:13:55:36 -0700")
+assert(equal(result, { year = 2000, month = 10, day = 10, hour = 13, min = 55, sec = 36 }))
+assert(offset == -25200)
