@@ -83,11 +83,11 @@ end
 
 local class = {}
 
-function class.encode(calendar, offset)
+function class.encode(datetime, offset)
   if offset == nil then
     offset = 0
   end
-  return encode(calendar.year, calendar.month, calendar.day, calendar.hour, calendar.min, calendar.sec) - offset
+  return encode(datetime.year, datetime.month, datetime.day, datetime.hour, datetime.min, datetime.sec) - offset
 end
 
 function class.decode(time, offset)
