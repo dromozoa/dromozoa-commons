@@ -42,3 +42,7 @@ local result, offset = datetime.decode("12345-06-07 12:34:56.123456789-12:34")
 assert(result.nsec == 123456789)
 assert(unix_time.encode(result, offset) == 327417037736)
 assert(datetime.encode(result, offset) == "12345-06-07T12:34:56.123456789-12:34")
+
+assert(datetime.encode({ year = 2000, month = 1, day = 1 }) == "2000-01-01T12:00")
+assert(datetime.encode({ year = 2000, month = 1, day = 1 }, 0) == "2000-01-01T12:00Z")
+assert(datetime.encode({ year = 2000, month = 1, day = 1 }, 32400) == "2000-01-01T12:00+09:00")
