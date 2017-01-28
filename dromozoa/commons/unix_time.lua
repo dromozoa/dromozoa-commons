@@ -49,7 +49,7 @@ local function decode(time)
   time = (time - hour) / 24
 
   local A = time + 2440589
-  local day_of_week = A % 7
+  local wday = A % 7
   if A >= 2299162 then
     local alpha = floor((A - 1867217.25) / 36524.25)
     A = A + 1 + alpha - floor(alpha / 4)
@@ -77,17 +77,17 @@ local function decode(time)
     hour = hour;
     min = min;
     sec = sec;
-    day_of_week = day_of_week;
+    wday = wday;
   }
 end
 
 local class = {}
 
-function class.encode(calendar, offset)
+function class.encode(datetime, offset)
   if offset == nil then
     offset = 0
   end
-  return encode(calendar.year, calendar.month, calendar.day, calendar.hour, calendar.min, calendar.sec) - offset
+  return encode(datetime.year, datetime.month, datetime.day, datetime.hour, datetime.min, datetime.sec) - offset
 end
 
 function class.decode(time, offset)
