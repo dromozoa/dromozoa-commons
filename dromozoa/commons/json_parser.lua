@@ -46,12 +46,10 @@ function class.new(this)
 end
 
 function class:raise(message)
-  local this = self.this
   if message == nil then
-    error("parse error at position " .. this.position)
-  else
-    error(message .. " at position " .. this.position)
+    message = "parse error"
   end
+  error(message .. " at position " .. self.this.position)
 end
 
 function class:parse_object()
