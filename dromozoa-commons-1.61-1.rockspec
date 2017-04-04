@@ -18,6 +18,7 @@ build = {
     ["dromozoa.commons.base64"] = "dromozoa/commons/base64.lua";
     ["dromozoa.commons.basename"] = "dromozoa/commons/basename.lua";
     ["dromozoa.commons.bitset"] = "dromozoa/commons/bitset.lua";
+    ["dromozoa.commons.clear"] = "dromozoa/commons/clear.lua";
     ["dromozoa.commons.clone"] = "dromozoa/commons/clone.lua";
     ["dromozoa.commons.crypt"] = "dromozoa/commons/crypt.lua";
     ["dromozoa.commons.crypt_apache_md5"] = "dromozoa/commons/crypt_apache_md5.lua";
