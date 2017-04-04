@@ -18,15 +18,6 @@
 local lua_version_num = require "dromozoa.commons.lua_version_num"
 local string_matcher = require "dromozoa.commons.string_matcher"
 
-local pow
-if lua_version_num >= 503 then
-  pow = function (x, y)
-    return x ^ y
-  end
-else
-  pow = math.pow
-end
-
 local months = {
   Jan = 1; Feb = 2; Mar = 3; Apr = 4; May = 5; Jun = 6;
   Jul = 7; Aug = 8; Sep = 9; Oct = 10; Nov = 11; Dec = 12;
@@ -65,7 +56,7 @@ function class:parse()
         datetime.sec = tonumber(this[1])
         if this:match("%.(%d%d?%d?%d?%d?%d?%d?%d?%d?)") then
           local decimal_part = this[1]
-          datetime.nsec = tonumber(decimal_part) * pow(10, 9 - #decimal_part)
+          datetime.nsec = tonumber(decimal_part) * 10 ^ (9 - #decimal_part)
         end
       end
       if this:match("Z") then
