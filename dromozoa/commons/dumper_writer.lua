@@ -153,10 +153,6 @@ function class:write(value, depth)
       out:write("}")
     elseif n == 0 then
       out:write("{}")
-    elseif n == 1 then
-      out:write("{", pretty(self, " "))
-      self:write(value[1])
-      out:write(pretty(self, " "), "}")
     else
       local next_depth = depth + 1
       out:write("{")
