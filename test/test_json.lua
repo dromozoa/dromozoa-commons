@@ -130,3 +130,29 @@ assert(result == [[
     "qux": 42
   }
 }]])
+
+local result = json.encode({ { { { { 17 } } } }, { { { { 23, 37, 42 } } } } }, { pretty = true })
+-- print(result)
+assert(result == [=[
+[
+  [
+    [
+      [
+        [
+          17
+        ]
+      ]
+    ]
+  ],
+  [
+    [
+      [
+        [
+          23,
+          37,
+          42
+        ]
+      ]
+    ]
+  ]
+]]=])

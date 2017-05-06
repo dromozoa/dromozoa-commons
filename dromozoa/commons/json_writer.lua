@@ -177,10 +177,6 @@ function class:write(value, depth)
       else
         out:write("{}")
       end
-    elseif n == 1 then
-      out:write("[", pretty(self, " "))
-      self:write(value[1])
-      out:write(pretty(self, " "), "]")
     else
       local next_depth = depth + 1
       out:write("[")
