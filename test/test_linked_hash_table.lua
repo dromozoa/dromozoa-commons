@@ -143,3 +143,11 @@ local t = linked_hash_table()
 t.get = 17
 t.set = 23
 assert(equal(t, { get = 17, set = 23 }))
+
+local a = linked_hash_table()
+a[1] = true
+a[2] = true
+a[3] = true
+assert(a:remove(1) ~= nil)
+a[1] = true
+test(a, { { 2, true }, { 3, true }, { 1, true } })
