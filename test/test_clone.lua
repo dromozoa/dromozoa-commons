@@ -1,4 +1,4 @@
--- Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2015,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -43,3 +43,5 @@ assert(that.baz[1][1][1][1] == 42)
 this()
 that()
 assert(count == 2)
+
+assert(clone(nil) == nil)

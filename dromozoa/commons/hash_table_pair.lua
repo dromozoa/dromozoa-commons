@@ -102,6 +102,9 @@ function class:remove(handle)
   if handle == p then
     self.f = nil
   else
+    if self.f == handle then
+      self.f = n
+    end
     P[n] = p
     N[p] = n
   end
