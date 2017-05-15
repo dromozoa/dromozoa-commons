@@ -43,3 +43,5 @@ assert(that.baz[1][1][1][1] == 42)
 this()
 that()
 assert(count == 2)
+
+assert(clone(nil) == nil)
