@@ -22,4 +22,4 @@ assert(result:find("%/dromozoa%/commons%/searchpath%.lua$"))
 
 local result, message = searchpath("no.such.file.or.directory", package.path)
 assert(not result)
-assert(message:find("^\n\tno file %'"))
+assert(message:find("^%s*no file %'"))
