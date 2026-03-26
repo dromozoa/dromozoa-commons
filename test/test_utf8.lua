@@ -1,4 +1,4 @@
--- Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2015,2026 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -15,6 +15,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-commons.  If not, see <http://www.gnu.org/licenses/>.
 
+local lua_version_num = require "dromozoa.commons.lua_version_num"
 local utf8 = require "dromozoa.commons.utf8"
 
 assert(utf8.char() == "")
@@ -24,7 +25,9 @@ assert(utf8.char(0x00, 0x20, 0x66, 0x6F, 0x6F, 0x7F) == "\0 foo\127")
 -- print(pcall(utf8.char, 0, 0x110000))
 assert(not pcall(utf8.char, nil))
 assert(not pcall(utf8.char, -1))
-assert(not pcall(utf8.char, 0, 0x110000))
+if lua_version_num <= 504 then
+  assert(not pcall(utf8.char, 0, 0x110000))
+end
 
 assert(utf8.char(0x0041, 0x2262, 0x0391, 0x002E) == string.char(0x41, 0xE2, 0x89, 0xA2, 0xCE, 0x91, 0x2E))
 assert(utf8.char(0xD55C, 0xAD6D, 0xC5B4) == string.char(0xED, 0x95, 0x9C, 0xEA, 0xB5, 0xAD, 0xEC, 0x96, 0xB4))

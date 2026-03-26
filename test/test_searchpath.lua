@@ -1,4 +1,4 @@
--- Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2015,2026 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -22,4 +22,4 @@ assert(result:find("%/dromozoa%/commons%/searchpath%.lua$"))
 
 local result, message = searchpath("no.such.file.or.directory", package.path)
 assert(not result)
-assert(message:find("^\n\tno file %'"))
+assert(message:find("^%s*no file %'"))
