@@ -1,4 +1,4 @@
--- Copyright (C) 2016,2017 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2016,2017,2026 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-commons.
 --
@@ -95,17 +95,19 @@ function class:read(count)
         s = self[m]
         n = #s
         if j <= n then
+          -- Lua 5.5: for-loop variables are read only
+          local x = m
           if j == n then
             j = 0
-            s = table.concat(self, "", min, m)
+            s = table.concat(self, "", min, x)
           else
-            m = m - 1
-            s = table.concat(self, "", min, m) .. s:sub(1, j)
+            x = x - 1
+            s = table.concat(self, "", min, x) .. s:sub(1, j)
           end
-          for m = min, m do
+          for m = min, x do
             self[m] = nil
           end
-          self.min = m + 1
+          self.min = x + 1
           self.i = j + 1
           self.size = size - #s
           return s
